@@ -215,7 +215,7 @@
 
   <header>
     <h1>🏦 CBS Core Knowledge Quiz</h1>
-    <p>30 random questions from the question pool · Master the Core Banking System</p>
+    <p>50 random questions from the question pool · Master the Core Banking System</p>
   </header>
 
   <!-- START SCREEN -->
@@ -223,7 +223,7 @@
     <h2 style="margin-top:0">Ready to test yourself?</h2>
     <p style="color:var(--muted)">Enter your name to start. Your score will be added to the global leaderboard.</p>
     <input id="player-name" class="input" placeholder="Your name (e.g. Adrien)" maxlength="40" />
-    <button id="start-btn" class="btn">Start Quiz (30 questions)</button>
+    <button id="start-btn" class="btn">Start Quiz (50 questions)</button>
     <button id="show-leaderboard-btn" class="btn btn-secondary" style="margin-top:10px">🏆 View Leaderboard</button>
     <div class="small">Including scenario questions that test understanding, not just memory</div>
   </div>
@@ -231,7 +231,7 @@
   <!-- QUIZ SCREEN -->
   <div id="quiz-screen" class="card hidden">
     <div class="meta">
-      <span id="q-counter">Question 1 / 30</span>
+      <span id="q-counter">Question 1 / 50</span>
       <span id="q-score">Score: 0</span>
     </div>
     <div class="progress-bar"><div id="progress-fill" class="progress-fill" style="width:0%"></div></div>
@@ -246,7 +246,7 @@
   <div id="results-screen" class="card hidden">
     <div class="score-display">
       <div id="verdict" class="verdict">🎉 Well done!</div>
-      <div class="score-number"><span id="final-score">0</span> / 30</div>
+      <div class="score-number"><span id="final-score">0</span> / 50</div>
       <div class="score-label"><span id="percent-label">0%</span> correct</div>
     </div>
 
@@ -286,7 +286,7 @@
    Pure vanilla JS. No build step. GitHub Pages ready.
    ========================================================= */
 
-const QUIZ_LENGTH = 30;
+const QUIZ_LENGTH = 50;
 const STATE = {
   playerName: '',
   picked: [],          // 20 picked questions for this round

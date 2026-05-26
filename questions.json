@@ -171,15 +171,15 @@
   {
     "id": 14,
     "topic": "Table Entity",
-    "q": "Account range 1000-1999 in CATEGORY might represent…",
+    "q": "If a bank wants to assign certain account-number ranges to specific product types — e.g. mapping range 7000-7099 to a new Green Savings product — which Table holds this mapping?",
     "options": [
-      "Loan accounts",
-      "Current Accounts",
-      "Savings Accounts",
-      "Suspense accounts"
+      "CUSTOMER",
+      "CATEGORY",
+      "FUNDS.TRANSFER",
+      "DATES"
     ],
     "correct": 1,
-    "tip": "Account numbering ranges in the CATEGORY Table classify accounts by product. The textbook example: 1000-1999 = Current Accounts, 6000-6999 = Savings Accounts. CATEGORY is what lets reports group accounts by product family without each account having to store its product type as a string."
+    "tip": "CATEGORY is the configuration Table that maps account-number ranges to product types — letting reporting, accounting, and product behavior all flow from the account number. The bank simply configures the new range (e.g. 7000-7099) against the Green Savings product. No range-handling code is ever written; CATEGORY drives behavior everywhere via lookup."
   },
   {
     "id": 15,
@@ -236,7 +236,7 @@
   {
     "id": 19,
     "topic": "Table Entity",
-    "q": "A 20-year mortgage would be tracked in which table?",
+    "q": "A 7-year business equipment lease for a manufacturing client should be tracked as a contract in which Table?",
     "options": [
       "DATES",
       "CUSTOMER",
@@ -244,7 +244,7 @@
       "CATEGORY"
     ],
     "correct": 2,
-    "tip": "A 20-year mortgage is tracked as a single Arrangement Record in AA.ARRANGEMENT. The Arrangement ties together interest rates, the repayment schedule, late-payment penalties, collateral references — the full lifecycle of that specific contract. The Product (template) and Customer are referenced; the Arrangement is the specific instance."
+    "tip": "AA.ARRANGEMENT (Arrangement Architecture Arrangement) holds the lifecycle of any specific loan, deposit, or lease contract. The equipment-lease Arrangement ties together the lease's interest pattern, repayment schedule, residual value, and any insurance/fees into one coherent record. This is the CBS equivalent of a Temenos ARRANGEMENT."
   },
   {
     "id": 20,
@@ -288,15 +288,15 @@
   {
     "id": 23,
     "topic": "Table Entity",
-    "q": "In CURRENCY, which property prevents JPY from having decimal places?",
+    "q": "Which CBS Table defines per-currency rules like the maximum decimal places allowed (so e.g. a zero-decimal currency cannot accept fractional amounts)?",
     "options": [
       "NATIONALITY",
       "SECTOR",
-      "Exchange rate decimal definition",
-      "HOLIDAY flag"
+      "CURRENCY (storing decimal-place rules per ISO currency)",
+      "HOLIDAY"
     ],
     "correct": 2,
-    "tip": "CURRENCY defines the decimal places allowed per ISO currency. JPY = 0 (yen has no sub-units), USD = 2 (cents). When a Field is linked to CURRENCY, the system reads this metadata to validate inputs — entering 100.50 JPY would fail; 100.50 USD is fine. This is hot-swap config, not code."
+    "tip": "The CURRENCY Table stores ISO codes and the allowed decimal places per currency. Some currencies (Korean Won, Vietnamese Dong, Chilean Peso, Japanese Yen) have 0 decimals; most major currencies have 2; a few (Kuwaiti Dinar, Bahraini Dinar) have 3. Any amount Field validated against CURRENCY automatically respects the right decimal rule — preventing impossible inputs like a 0.05 Yen transaction."
   },
   {
     "id": 24,
@@ -2212,15 +2212,15 @@
   {
     "id": 171,
     "topic": "DDD",
-    "q": "A repeating Repayment Schedule is best modeled via…",
+    "q": "A 24-month auto-loan Arrangement needs to store all 24 monthly installment records (date, due amount, remaining balance) inside the single Arrangement Record without spawning child tables. What enables this?",
     "options": [
-      "A separate child table",
+      "A separate child Table",
       "Non-1NF associated multi-value fields in DDD",
       "JSON in a TEXT column",
-      "File system folder"
+      "Each installment as its own Arrangement"
     ],
     "correct": 1,
-    "tip": "A Repayment Schedule (date, amount, balance, ... for each installment) is best modeled as Non-1NF associated multi-value fields in the DDD. All installments live inside the parent loan Record — no child table required. Field Associations keep date[i], amount[i], balance[i] index-aligned via < - > markers."
+    "tip": "DDD allows Non-First Normal Form (Non-1NF) structures: a single Record can natively store multi-dimensional arrays and repeating blocks. The 24 installments live inside the parent Arrangement Record as multi-value Fields, kept index-aligned via Field Association markers (<, -, >). No child Table needed; everything stays co-located for easy retrieval and atomic updates."
   },
   {
     "id": 172,
@@ -3044,15 +3044,15 @@
   {
     "id": 235,
     "topic": "Plugins",
-    "q": "A Credit Check during INPUT is typically done by…",
+    "q": "Before authorizing a high-value international wire to a new beneficiary, the system must call an external sanctions-screening API and reject the transfer if the result is negative. Where does this logic belong?",
     "options": [
-      "A pre-hook plugin synchronously calling an external API",
-      "Manual phone call",
-      "HIS lookup",
-      "SIM query"
+      "A pre-hook plugin synchronously calling the API before commit",
+      "A post-hook plugin firing after commit",
+      "A manual phone call",
+      "Daily batch reconciliation"
     ],
     "correct": 0,
-    "tip": "Pre-hook plugins commonly call external APIs (e.g. Credit Check) before commit."
+    "tip": "Pre-hook plugins run BEFORE the operation commits. A pre-hook can synchronously call an external sanctions API and reject the transfer if the response is negative — preventing bad data from ever reaching NAU/LIV. Post-hooks fire after commit, which would be too late to block the transaction."
   },
   {
     "id": 236,
@@ -3902,15 +3902,15 @@
   {
     "id": 301,
     "topic": "Scenario",
-    "q": "Teller Alice starts editing CUSTOMER record C123 and pauses to take a phone call. Teller Bob tries to edit the same record. What does the system do, and why?",
+    "q": "Operations Officer Mei begins amending CONTRACT XB-4471 and is interrupted by a meeting before submitting. While she's away, her colleague Hassan tries to amend the same Contract. What happens, and why?",
     "options": [
-      "Bob is allowed to edit — last write wins",
-      "System returns 'Record Locked' to Bob because Alice's draft is in NAU",
+      "Hassan is allowed to edit — last write wins",
+      "System returns 'Record Locked' to Hassan because Mei's draft occupies NAU",
       "Both edits merge automatically",
-      "The record is wiped to avoid conflict"
+      "The record is wiped"
     ],
     "correct": 1,
-    "tip": "Because Alice's draft sits in the NAU file and NAU is a singleton (one record per ID), Bob cannot create a second draft. The system returns 'Record Locked' to protect against concurrent modification. This is one of the main reasons NAU exists."
+    "tip": "NAU (Unauthorized) is a SINGLETON file — strictly one in-flight draft per record ID. As soon as Mei pressed Input/Hold, her draft occupies NAU for XB-4471. Hassan's attempt finds the slot taken and the system returns 'Record Locked' — protecting Mei's pending work from being overwritten. This is the kernel-level edit-locking that prevents concurrent-modification races."
   },
   {
     "id": 302,
@@ -3941,15 +3941,15 @@
   {
     "id": 304,
     "topic": "Scenario",
-    "q": "A loan officer authorized a $50,000 disbursement to the wrong customer 10 minutes ago. The transaction is now LIVE. Correct way to undo it?",
+    "q": "An FX dealer accidentally routes a £215,000 outgoing payment to the wrong correspondent bank yesterday. The payment is now in LIV (authorized and posted to the GL). What's the correct way to undo it?",
     "options": [
       "DELETE on the LIV record",
-      "REVERSE on the LIV record (creates RNAU pending second-user AUTH)",
-      "HOLD the existing record",
-      "Edit the LIV record directly via SQL"
+      "REVERSE on the LIV record — creates an RNAU pending second-user AUTH",
+      "Edit the LIV record directly via SQL",
+      "Manually re-enter a refund"
     ],
     "correct": 1,
-    "tip": "DELETE only works on NAU drafts. Because the record is already LIVE, you must use REVERSE — which creates an RNAU record in NAU. A second user AUTHs the reversal, moving it to HIS with status REVE. Audit trail intact."
+    "tip": "DELETE only works on NAU drafts (records not yet LIVE). Because this payment is already LIV (and posted), the correct operation is REVERSE — which creates an RNAU (Reversal Not Authorized) entry in NAU. A second user then AUTHs the reversal, which moves the record to HIS as REVE. The audit trail is preserved; the General Ledger is correctly reversed."
   },
   {
     "id": 305,
@@ -3993,28 +3993,28 @@
   {
     "id": 308,
     "topic": "Scenario",
-    "q": "Compliance demands that every loan disbursement above $100K trigger a Credit Check API call before the record reaches the database. Where do you put this logic?",
+    "q": "An auditor demands that every new SME loan above €250K trigger a real-time call to an external credit-bureau API before the record can post to the General Ledger. Where do you implement this?",
     "options": [
-      "Inside the user's web browser",
-      "A pre-hook plugin on the loan projection, registered in VALIDATION.PRGM",
-      "A post-hook after the data is saved",
-      "Manual phone call only"
+      "Inside the user's browser",
+      "A pre-hook plugin on the loan Projection, registered in VALIDATION.PRGM",
+      "A post-hook running after commit",
+      "Manual phone calls"
     ],
     "correct": 1,
-    "tip": "Pre-hooks run BEFORE commit. A pre-hook plugin can make a synchronous Credit Check call and reject the operation if the result is unfavorable — before the record ever reaches NAU or LIV. Post-hooks would be too late."
+    "tip": "Pre-hook plugins fire BEFORE the operation commits. A synchronous credit-bureau call inside a pre-hook can reject the loan if the result is poor — preventing the record from ever reaching NAU/LIV. Post-hooks fire after commit, far too late to block. Browser-side checks are bypassable. The PRE-HOOK is the architecturally correct place."
   },
   {
     "id": 309,
     "topic": "Scenario",
-    "q": "The risk team needs a real-time report of ALL loans above $1M, including the customer's name (which lives on CUSTOMER, not the loan). Right framework?",
+    "q": "The treasury team needs a real-time dashboard showing ALL trade-finance contracts over ¥75M, with each contract's customer name (which lives on CUSTOMER, not on the contract). Which framework should they use?",
     "options": [
-      "A Projection on the loan table",
-      "An Enquiry using Soft Links (Virtual Joins) to fetch customer name",
-      "A new physical join table",
-      "Manual export to Excel"
+      "A Projection over the trade-finance Table",
+      "An Enquiry using Soft Links (Virtual Joins) to fetch customer name from CUSTOMER",
+      "A new physical join table with foreign keys",
+      "Manual Excel exports"
     ],
     "correct": 1,
-    "tip": "Projections are bound to ONE physical table and are for write operations. Enquiries traverse multiple tables via Soft Links (Virtual Joins), which dynamically fetch related fields without physical foreign keys. Reporting = Enquiry."
+    "tip": "Projections are bound to ONE physical target Table and are for write operations. Enquiries traverse MULTIPLE Tables via Soft Links (Virtual Joins) — dynamically fetching related fields like customer name from CUSTOMER at display time. No physical foreign keys, no rigid schema. For multi-table read-only reporting, Enquiry is always the right tool."
   },
   {
     "id": 310,
@@ -4045,15 +4045,15 @@
   {
     "id": 312,
     "topic": "Scenario",
-    "q": "The bank wants a 'FULL.NAME' field that's just FIRST.NAME + ' ' + LAST.NAME. Storing it on disk would waste space and risk going out of sync. Right System Type?",
+    "q": "A bank wants a display-only 'FULL.ADDRESS' field that's just CITY + ', ' + COUNTRY — built from existing stored fields at view time, never persisted (so it's always in sync). What System Type is best?",
     "options": [
-      "D (Data)",
-      "I (I-Descriptor / virtual, computed at runtime)",
-      "J (Join)",
+      "D (Data — stored on disk)",
+      "I (I-Descriptor — computed at runtime, never persisted)",
+      "J (Join — fetched from a related table)",
       "K"
     ],
     "correct": 1,
-    "tip": "I-Descriptor fields are computed in memory at runtime — never persisted. Perfect for derived values like FULL.NAME that are simple combinations of other stored fields. D would store it redundantly; J is for fetching from related tables, not for combining same-record fields."
+    "tip": "I-Descriptor fields (Type I) are computed in memory at runtime — never written to disk. They're perfect for derived values like 'FULL.ADDRESS' that should always reflect current values of the underlying stored fields. Type D would store it redundantly (risk of drift); Type J fetches from a related Table (this is one record). Type I is the right answer for same-record derivations."
   },
   {
     "id": 313,
@@ -4084,15 +4084,15 @@
   {
     "id": 315,
     "topic": "Scenario",
-    "q": "The product team wants to launch 'Diamond Mortgage' — identical to 'Gold Mortgage' except 0.5% lower interest. Fastest correct approach?",
+    "q": "The product team wants to launch a new 'Eco-Saver' deposit — identical to the existing 'Standard-Saver' but with a 0.25% rate bonus for green-certified customers. Fastest correct approach?",
     "options": [
-      "Re-create everything from scratch",
-      "Define a new PRODUCT with PARENT.PRODUCT = Gold Mortgage and override only the interest rate",
-      "Edit Gold Mortgage in place",
-      "Copy and paste the SQL"
+      "Re-create every component from scratch",
+      "Define a new PRODUCT with PARENT.PRODUCT = Standard-Saver and override only the interest condition",
+      "Edit Standard-Saver in place (risks affecting existing customers)",
+      "Manually adjust each contract"
     ],
     "correct": 1,
-    "tip": "PARENT.PRODUCT inheritance is built for this. Define Diamond as a child of Gold and override only the delta (the rate). All other attributes are inherited. Saves time and reduces drift between similar products."
+    "tip": "PARENT.PRODUCT inheritance is built for this scenario. Set Eco-Saver's PARENT.PRODUCT = Standard-Saver and override ONLY the interest condition (the delta). All other attributes — fees, schedules, accounting — are inherited automatically. The bank avoids drift between similar products: Standard-Saver enhancements automatically benefit Eco-Saver too. Effective-dated versioning ensures existing Standard-Saver contracts aren't disrupted."
   },
   {
     "id": 316,
@@ -4214,15 +4214,15 @@
   {
     "id": 325,
     "topic": "Scenario",
-    "q": "A bank wants a 'Risk Level' dropdown with values High/Medium/Low. Should they create a new physical table for these three values?",
+    "q": "A bank needs a 'Channel-Preference' dropdown on the CUSTOMER projection with values like Mobile, Branch, Online, ATM. Should they create a new physical Table for these four options?",
     "options": [
-      "Yes — every reference needs its own table",
-      "No — store entries in VIRTUAL.TABLES with a compound key; DDD auto-generates the UI dropdown",
-      "Hardcode in HTML",
-      "Store as text comments"
+      "Yes — every reference list needs its own physical Table",
+      "No — store the four entries inside VIRTUAL.TABLES (e.g. CHANNEL.PREF|MOBILE) with the DDD auto-generating the dropdown",
+      "Hardcode them in HTML",
+      "Store as free text"
     ],
     "correct": 1,
-    "tip": "Creating thousands of tiny reference tables would bloat the database. VIRTUAL.TABLES centralizes all static reference lists in one physical table, distinguished by compound keys. DDD auto-generates the dropdown and validates input — clean and efficient."
+    "tip": "Creating physical Tables for every tiny static list would bloat the schema. VIRTUAL.TABLES centralizes ALL such reference lists in one physical Table, distinguished by compound keys like CHANNEL.PREF|MOBILE, CHANNEL.PREF|BRANCH, etc. The DDD's link to virtual tables auto-generates the dropdown UI and validates inputs against the list — zero schema bloat, zero code."
   },
   {
     "id": 326,
@@ -4331,15 +4331,15 @@
   {
     "id": 334,
     "topic": "Scenario",
-    "q": "Allow a transaction in JPY (no decimals) but the same transaction in USD (two decimals). Where is this rule configured?",
+    "q": "A wire transfer in Korean Won (zero decimals) must be rejected when 0.5 KRW is entered, while the same field accepts 49.95 in USD. Where is this decimal rule configured?",
     "options": [
-      "In the projection",
-      "In the CURRENCY table — defines ISO codes and exchange-rate decimals",
-      "In the plugin code",
-      "In the HTML"
+      "In the Projection",
+      "In the CURRENCY Table — defines ISO codes and decimal places per currency",
+      "In a Plugin",
+      "Hardcoded in HTML"
     ],
     "correct": 1,
-    "tip": "The CURRENCY table defines ISO codes and allowed decimal places per currency. This single source of truth ensures any amount field validated against CURRENCY respects the right decimal rule."
+    "tip": "CURRENCY defines per-currency decimal rules: KRW = 0 decimals, USD = 2 decimals, BHD/KWD = 3 decimals. Any amount Field validated against CURRENCY automatically respects the right rule — no need to hardcode 'reject decimals for KRW' in code. Change the rule in CURRENCY (highly unusual — these come from ISO 4217 standards), and the new behavior applies system-wide instantly."
   },
   {
     "id": 335,
@@ -4396,15 +4396,15 @@
   {
     "id": 339,
     "topic": "Scenario",
-    "q": "A mortgage product has a Repayment Schedule of 240 monthly entries inside each contract. Should each entry be a separate child-table row?",
+    "q": "A construction-loan Arrangement has a Drawdown Schedule of 36 individual drawdown events (date, amount, status) inside each contract. Should each drawdown be a separate child-Table row?",
     "options": [
-      "Yes — one row per installment",
-      "No — DDD's Non-1NF support and Field Associations natively store repeating blocks inside a single record",
+      "Yes — one row per drawdown",
+      "No — DDD's Non-1NF and Field Associations natively store the repeating drawdown block inside the single Arrangement Record",
       "Store as JSON text",
       "Don't store it"
     ],
     "correct": 1,
-    "tip": "DDD allows Non-First Normal Form: a single record can natively hold multi-dimensional arrays and repeating blocks using Field Association markers (<, -, >). No child tables; index alignment is maintained automatically."
+    "tip": "DDD Non-1NF lets one Record hold repeating blocks natively. The 36 drawdowns live inside the parent Arrangement Record as multi-value Fields kept index-aligned via Field Association markers (<, -, >). No child Table, no joins, atomic updates. Adding a new drawdown at index 5 automatically shifts all associated fields (date[i], amount[i], status[i]) consistently."
   },
   {
     "id": 340,
@@ -4448,15 +4448,15 @@
   {
     "id": 343,
     "topic": "Scenario",
-    "q": "A marketing Black Friday promo product must auto-deactivate on Dec 1. Best feature?",
+    "q": "A bank's marketing team launches a Summer-Promotion deposit product that must auto-deactivate on August 31. Best feature to use?",
     "options": [
-      "Manual delete on Dec 1",
-      "EFFECTIVE.DATE versioning — schedule a new product version effective Dec 1",
-      "Send an email reminder",
-      "Manual code change"
+      "Manually delete the product on August 31",
+      "EFFECTIVE.DATE versioning — schedule a new (deactivation) version effective Sep 1; system switches automatically",
+      "Send a calendar reminder",
+      "Manual code change at year-end"
     ],
     "correct": 1,
-    "tip": "Products are versioned by PRODUCT.ID + EFFECTIVE.DATE. Stage a future-dated 'deactivation' version effective Dec 1. The system switches automatically — no weekend ops work."
+    "tip": "Products are versioned by composite key PRODUCT.ID + EFFECTIVE.DATE. Stage the Summer-Promotion version with effective date today, and a deactivation/replacement version effective Sep 1. The system switches automatically on Sep 1 — no weekend ops, no calendar reminders, no risk of forgetting. This is the same pattern used for scheduled fee changes, rate changes, and regulatory transitions."
   },
   {
     "id": 344,
@@ -4643,7 +4643,7 @@
   {
     "id": 358,
     "topic": "Scenario",
-    "q": "The PRODUCT.CLASS for a 'Personal Loan' is most likely…",
+    "q": "An auto-loan product would most likely sit under which PRODUCT.CLASS in the product hierarchy?",
     "options": [
       "ACCOUNT",
       "LENDING",
@@ -4651,7 +4651,7 @@
       "CURRENCY"
     ],
     "correct": 1,
-    "tip": "PRODUCT.CLASS is the highest tier and defines the permitted base components. LENDING is the class for loans (Personal Loan, Mortgage). ACCOUNT class is for current/savings accounts. PRODUCT.TYPE underneath might be 'PERSONAL.LOAN'."
+    "tip": "PRODUCT.CLASS is the highest tier of the product hierarchy. LENDING is the class for loans (auto-loans, mortgages, personal loans, business loans). ACCOUNT class covers current/savings/checking products. DEPOSIT class covers fixed-term and notice deposits. Each class defines the set of permitted base Components (e.g. LENDING products MUST have an Interest Component and a Schedule Component; ACCOUNT products may not need a Schedule)."
   },
   {
     "id": 359,
@@ -5111,15 +5111,15 @@
   {
     "id": 394,
     "topic": "Record/Field",
-    "q": "A Record 'CUSTOMER 123456' represents what conceptually?",
+    "q": "A Record identifier like 'CUSTOMER A78342' represents which conceptual layer of the data model?",
     "options": [
-      "One specific client",
-      "All clients in the bank",
+      "One specific client of the bank",
+      "All clients of the bank in aggregate",
       "A reporting view",
       "A backup snapshot"
     ],
     "correct": 0,
-    "tip": "Each Record is ONE specific business object. CUSTOMER 123456 is one specific client of the bank — distinct from CUSTOMER 123457 and every other customer. The CUSTOMER Table holds many such Records. This is the same as 'one row per entity' in a relational database: the table defines structure; rows (Records) are the actual instances."
+    "tip": "Each Record represents ONE specific business object. CUSTOMER A78342 is one specific person/corporate the bank holds master data for. The CUSTOMER Table itself is the SCHEMA (the container); each Record is a row holding values for all the Fields defined by the Table. Many Records per Table; one specific instance per Record."
   },
   {
     "id": 395,
@@ -5930,15 +5930,15 @@
   {
     "id": 457,
     "topic": "Product/Contract",
-    "q": "A Personal Loan with a special promotional rate for a VIP customer would be modeled as…",
+    "q": "A high-net-worth client negotiates a 0.4% rate discount on the bank's standard small-business loan product. The cleanest way to model this is…",
     "options": [
-      "A new Product for that one customer",
-      "A standard Contract from the Personal Loan Product, with rate overridden at the Contract level",
-      "A manual ledger entry",
-      "A SIM record"
+      "Create a brand-new product just for this one client",
+      "Use the standard product but override the rate at the CONTRACT level via Negotiation rules",
+      "Make a manual ledger adjustment each month",
+      "Store the discount in SIM only"
     ],
     "correct": 1,
-    "tip": "Standard pattern: use the existing Personal Loan Product but override the negotiated rate in that VIP's Contract. Creating a new Product per customer would explode product count, complicate maintenance, and defeat the purpose of the Product/Contract distinction. Per-customer negotiation belongs at the Contract level."
+    "tip": "Per-customer negotiation belongs at the CONTRACT level — not the Product level. The standard product is the template; the customer's specific Contract overrides only the negotiated parameters (rate, in this case). Negotiation Rules (DEFAULT.NEGOTIABLE / NR.TYPE / NR.OPTIONS) define what can be negotiated and within what bounds. Cleaner than creating one-off products per VIP."
   },
   {
     "id": 458,
@@ -7538,5 +7538,1565 @@
     ],
     "correct": 1,
     "tip": "Over time, live tables accumulate millions of records and slow down. The ARCHIVE engine, driven by ARC.GENERIC.REQUEST, migrates old data to $ARC suffixed tables (e.g. STMT.ENTRY$ARC). The migration uses PURGE.DATE (absolute) or RETENTION.PERIOD (rolling window) rules. Archive Tables are read-only and live on cheaper storage — preserving compliance access while keeping live tables fast."
+  },
+  {
+    "id": 581,
+    "topic": "AA Accounting",
+    "q": "AC.BALANCE.TYPE differentiates multiple balance states on a single contract. Which is NOT one of the standard balance prefixes?",
+    "options": [
+      "CUR (Current)",
+      "ACC (Accrued)",
+      "DUE (Arrears)",
+      "MAX (Maximum allowed)"
+    ],
+    "correct": 3,
+    "tip": "AC.BALANCE.TYPE uses standardized prefixes to track multiple states of a contract independently. CUR = the current principal, ACC = accrued (e.g. interest accrued but not yet capitalized), DUE = amounts past due / in arrears, AGE = aging buckets. MAX is not a standard balance prefix — it's just an upper limit, not a tracked balance. The dynamic appearance of these balances means a contract only carries balances it actually needs."
+  },
+  {
+    "id": 582,
+    "topic": "AA Accounting",
+    "q": "Which Table holds the live financial balances of every contract (decoupled from the static ACCOUNT record)?",
+    "options": [
+      "ACCOUNT",
+      "EB.CONTRACT.BALANCES (ECB)",
+      "STMT.ENTRY",
+      "DATES"
+    ],
+    "correct": 1,
+    "tip": "EB.CONTRACT.BALANCES (ECB) is the high-performance engine holding live financial balances — Working, Cleared, Actual, plus all the AC.BALANCE.TYPE breakdowns. The ACCOUNT record holds only static descriptive data (account name, mnemonic, primary owner); financial state lives in ECB. This decoupling allows concurrent transaction processing without DB locking on the descriptive ACCOUNT record."
+  },
+  {
+    "id": 583,
+    "topic": "AA Accounting",
+    "q": "STMT.ENTRY, CATEG.ENTRY, and RE.CONSOL.SPEC.ENTRY are the three core posting files. What's the role of RE.CONSOL.SPEC.ENTRY?",
+    "options": [
+      "P&L entries only",
+      "Tracks CONTRACT-level updates and contingent (off-balance-sheet) items",
+      "Backup entries",
+      "Random data"
+    ],
+    "correct": 1,
+    "tip": "RE.CONSOL.SPEC.ENTRY is the third leg of the posting trinity. STMT.ENTRY = account-level movements (Asset/Liability), CATEG.ENTRY = P&L category movements, RE.CONSOL.SPEC.ENTRY = contract-level consolidation and contingent (off-balance-sheet) tracking like unutilized credit lines or memorandum assets. Together they cover synthetic (aggregate) and analytical (detailed) accounting views."
+  },
+  {
+    "id": 584,
+    "topic": "AA Accounting",
+    "q": "What's the role of AC.POSTING.DETAIL in the Soft Accounting chain?",
+    "options": [
+      "UI styling",
+      "Isolates formatting/narrative logic — mapping descriptions from Activity, Property, or Transaction independently of financial routing",
+      "Random data",
+      "Encryption"
+    ],
+    "correct": 1,
+    "tip": "The Soft Accounting chain is AC.EVENT → AC.ALLOCATION.RULE → AC.POSTING.DETAIL → entries. AC.POSTING.DETAIL specifically handles the NARRATIVE side (account-statement descriptions, references) — separately from financial routing. So you can change how an entry is described in customer statements without touching where it lands in the GL."
+  },
+  {
+    "id": 585,
+    "topic": "AA Accounting",
+    "q": "The Working Balance on an account is defined as…",
+    "options": [
+      "Just authorized deposits",
+      "Authorized entries + unauthorized debits (worst-case available funds)",
+      "Yearly balance",
+      "Random average"
+    ],
+    "correct": 1,
+    "tip": "ECB tracks three distinct balance states: ACTUAL (the full ledger position), CLEARED (only authorized/cleared funds), WORKING (Cleared + unauthorized debits — the pessimistic 'what's truly available' view, used to prevent overdraws against pending debits). Tellers checking 'can the customer withdraw X?' use Working Balance."
+  },
+  {
+    "id": 586,
+    "topic": "AA Accounting",
+    "q": "Why does the system maintain ACCT.ACTIVITY (also called ACCT.BALANCE.ACTIVITY)?",
+    "options": [
+      "Marketing data",
+      "A dated history of balances — essential for back-dated interest recalculations and audit",
+      "Random",
+      "Customer addresses"
+    ],
+    "correct": 1,
+    "tip": "ACCT.ACTIVITY snapshots the balance at every value date. If a back-dated transaction is posted (e.g. correcting an error from two weeks ago), the system uses ACCT.ACTIVITY to recompute interest accruals accurately from the corrected balance forward. Without ACCT.ACTIVITY, back-dating would be impossible without losing interest precision."
+  },
+  {
+    "id": 587,
+    "topic": "AA Accounting",
+    "q": "Activity Mapping bridges external transactions to internal AA Activities. Which Table holds the mapping?",
+    "options": [
+      "AA.PRD.DES.ACTIVITY.MAPPING",
+      "DATES",
+      "USER",
+      "Random table"
+    ],
+    "correct": 0,
+    "tip": "AA.PRD.DES.ACTIVITY.MAPPING is the product-level config that ties external transaction codes (FT codes, Teller codes) to internal AA Activities. For instance, transaction code 850 (a particular disbursement code) might map to LENDING-DISBURSE-COMMITMENT activity. TRACKING.ONLY mode means mapping rules live at the product level and can't be overridden per individual contract."
+  },
+  {
+    "id": 588,
+    "topic": "AA Accounting",
+    "q": "An Eligibility Engine prevents a 16-year-old from holding an adult-only credit card. Which mechanism enforces this dynamically?",
+    "options": [
+      "Manual screening",
+      "AA.PRD.DES.ELIGIBILITY rules evaluated against customer attributes (Age, Residence, Sector, Income) via EB.RULE.GATEWAY",
+      "Hardcoded if-else",
+      "Random rejection"
+    ],
+    "correct": 1,
+    "tip": "The Eligibility Engine uses rule sets (AA.PRD.DES.ELIGIBILITY) evaluated via EB.RULE.GATEWAY against EB.CONTEXT (customer + arrangement data). At product-selection time the catalog is filtered to show only products the customer qualifies for. Auto-transitions are supported too — e.g. a Minor account automatically Change-Products to a Standard account on the customer's 18th birthday."
+  },
+  {
+    "id": 589,
+    "topic": "AA Accounting",
+    "q": "A bank offers loans with Annuity, Linear, and Bullet repayment styles. These are all configured via…",
+    "options": [
+      "Hardcoded code",
+      "AA.PRD.DES.PAYMENT.SCHEDULE — defines repayment rules including calculation type (Annuity / Linear / Actual)",
+      "Random selection",
+      "Customer choice only"
+    ],
+    "correct": 1,
+    "tip": "The Schedule Engine configures repayment via AA.PRD.DES.PAYMENT.SCHEDULE. Annuity (constant total payment, varying principal/interest split), Linear (constant principal, varying interest), Actual (calculated each period — for bullet loans). The engine handles Date Conventions (Forward/Backward) when due dates fall on holidays, plus dynamic recalculation when interest rates change."
+  },
+  {
+    "id": 590,
+    "topic": "AA Accounting",
+    "q": "AA.SIMULATION.CAPTURE allows users to model 'what-if' scenarios. Where is simulation data stored to keep it isolated from live?",
+    "options": [
+      "LIV (Live) files",
+      "$SIM suffixed files like AA.SIM.INTEREST, AA.SIM.TERM.AMOUNT",
+      "User's email",
+      "Random storage"
+    ],
+    "correct": 1,
+    "tip": "Simulation Engine writes to parallel $SIM files (e.g. AA.SIM.INTEREST, AA.SIM.TERM.AMOUNT) — strictly isolated from live contract files. The three-stage workflow is Data Capture → Runner definition → Execution. If the customer likes the projected terms, the simulation can be promoted to a real LIV Arrangement in one click."
+  },
+  {
+    "id": 591,
+    "topic": "AA Accounting",
+    "q": "When a teller views an arrangement, ACTIVITY.PRESENTATION dynamically selects which Version (Projection) to show. What flag hides non-editable fields to save screen space?",
+    "options": [
+      "HIDE_ALL",
+      "SUPPRESS.SEE.MODE",
+      "MIN_VIEW",
+      "ECO_DISPLAY"
+    ],
+    "correct": 1,
+    "tip": "SUPPRESS.SEE.MODE is a Projection flag that mathematically suppresses non-editable / non-participating fields from the payload — keeping the UI focused on only what the user can do. ACTIVITY.PRESENTATION orchestrates which Version to invoke based on the current Activity (e.g. CHANGE-INTEREST opens a different view than VIEW-BALANCES)."
+  },
+  {
+    "id": 592,
+    "topic": "AA Accounting",
+    "q": "The Arrangement state machine progresses through several statuses. Which is NOT one of the standard arrangement states?",
+    "options": [
+      "UNAUTH",
+      "AUTH",
+      "CURRENT",
+      "DELETED"
+    ],
+    "correct": 3,
+    "tip": "Standard Arrangement statuses include UNAUTH (pending authorization), AUTH (authorized), CURRENT (active and live), EXPIRED, MATURED, CLOSED. DELETED isn't a status — deletions are handled by lifecycle files (DEL space, REVE status in HIS). The state machine governs valid transitions: you can't go from CLOSED back to CURRENT, for instance."
+  },
+  {
+    "id": 593,
+    "topic": "AA Accounting",
+    "q": "When a fixed-term deposit reaches maturity, the system can renew it. Which strategy uses the CURRENT product's terms (instead of the original)?",
+    "options": [
+      "ROLLOVER",
+      "RESET",
+      "CHANGE.PRODUCT",
+      "STOP"
+    ],
+    "correct": 1,
+    "tip": "Renewal strategies: ROLLOVER (extends with EXISTING terms — same rate, same period), RESET (uses CURRENT product terms — gets today's rate and conditions), CHANGE.PRODUCT (switches to a different product entirely). RESET is useful when interest rates have moved significantly and you want the renewal to reflect today's market — without manually editing each contract."
+  },
+  {
+    "id": 594,
+    "topic": "AA Accounting",
+    "q": "A bank wants up to 9 different account statement cycles per customer (e.g. monthly for customer, daily for internal reconciliation, weekly for audit). What Table supports this?",
+    "options": [
+      "ACCOUNT.STATEMENT supporting up to 9 statement cycles",
+      "Random",
+      "Hardcoded single cycle",
+      "Manual emails"
+    ],
+    "correct": 0,
+    "tip": "ACCOUNT.STATEMENT supports up to NINE independent statement cycles per account — frequencies from daily to yearly. Each cycle has its own STMT.GEN.CONDITION rule controlling what's included. So a corporate treasury customer might get daily statements for cash management, monthly for accounting, and quarterly for tax reporting — all simultaneously, all automated."
+  },
+  {
+    "id": 595,
+    "topic": "AA Accounting",
+    "q": "AC.PRINT.MASK is used to…",
+    "options": [
+      "Print masked text",
+      "Suppress internal/wash entries (e.g. CUR-to-DUE movements) from customer-facing statements while keeping them in the GL",
+      "Random masking",
+      "Customer photos"
+    ],
+    "correct": 1,
+    "tip": "AC.PRINT.MASK (with the MASK flag in AC.ALLOCATION.RULE) hides confusing internal accounting movements from customer statements. For instance, an internal transfer from Current Principal balance to Arrears balance is meaningful accounting but bewildering to customers. Mask it on the statement; keep it in the GL. Cleaner customer experience without compromising audit."
+  },
+  {
+    "id": 596,
+    "topic": "AA Accounting",
+    "q": "ACCOUNT.CLOSURE simulates final settlement before committing. Which Table holds the pre-closure simulation?",
+    "options": [
+      "AC.PRE.CLOSURE.DETAILS",
+      "SIM file randomly",
+      "STMT.ENTRY",
+      "DATES"
+    ],
+    "correct": 0,
+    "tip": "AC.PRE.CLOSURE.DETAILS holds the dry-run simulation — final interest recalculation, charge accruals, balance zeroing logic, any blocking overrides. The branch officer can review before initiating REQUEST.CLOSURE. Reserved Posting Restriction codes 90-99 prevent unauthorized debits/credits once closure starts. Closed records move to $HIS and are registered in ACCOUNT.CLOSED."
+  },
+  {
+    "id": 597,
+    "topic": "AA Accounting",
+    "q": "POSTING.RESTRICT enables blocking of an account by reason — e.g. 'Account Frozen' or 'Deceased'. What still happens despite the restriction?",
+    "options": [
+      "Nothing — account is fully frozen",
+      "Interest and charges can still accrue or park in suspense — accrual integrity is preserved",
+      "All transactions process normally",
+      "Account auto-closes"
+    ],
+    "correct": 1,
+    "tip": "POSTING.RESTRICT blocks customer-facing Debits, Credits, or both — but the system still ACCRUES interest and charges (parking them in suspense if needed). Why? Otherwise, freezing an account would silently stop interest accrual, leading to incorrect balances when the freeze is lifted. The restriction is for outward movements, not internal accounting integrity."
+  },
+  {
+    "id": 598,
+    "topic": "AA Accounting",
+    "q": "AC.LOCKED.EVENTS lets the bank lock specific amounts for defined periods. Use case?",
+    "options": [
+      "Random restrictions",
+      "Reserving funds for guaranteed obligations (e.g. a $25,000 letter-of-credit reserve held for 60 days)",
+      "Locking out users",
+      "Encryption keys"
+    ],
+    "correct": 1,
+    "tip": "AC.LOCKED.EVENTS maintains a chronological 'ladder' of locked amounts inside an account. Each lock has an amount, a period (or indefinite), and a reason. The Working Balance subtracts the locks — so the customer can't withdraw funds that are reserved for a pending letter-of-credit, escrow obligation, or court-ordered hold. When the lock expires, funds become available automatically."
+  },
+  {
+    "id": 599,
+    "topic": "AA Accounting",
+    "q": "IBAN (International Bank Account Number) is auto-generated for new accounts. Which validation algorithm does the system use?",
+    "options": [
+      "MD5",
+      "ISO/IEC 7064 MOD97-10 check-digit algorithm",
+      "SHA-256",
+      "Manual calculation"
+    ],
+    "correct": 1,
+    "tip": "IBANs use the ISO/IEC 7064 MOD97-10 standard for check-digit calculation. The system reads IN.IBAN.STRUCTURE for the country's BBAN format (Bank ID + Branch ID + Account Number positions), computes the check digits with MOD97-10, and stores the IBAN in ALT.ACCT.ID under type T24.IBAN. Auto-generated IBANs are IMMUTABLE — users can't edit them, preserving payment-network integrity."
+  },
+  {
+    "id": 600,
+    "topic": "AA Accounting",
+    "q": "Which ACCOUNT.CLASS designation is for accounts holding funds the bank has placed with another bank abroad?",
+    "options": [
+      "NOSTRO",
+      "VOSTRO",
+      "SUSPENSE",
+      "BANK"
+    ],
+    "correct": 0,
+    "tip": "ACCOUNT.CLASS distinguishes internal account types. NOSTRO = 'our' account held by another bank (the bank's foreign currency cash sitting at correspondent banks). VOSTRO = 'your' account — foreign bank's funds held with US. SUSPENSE = temporary parking for unallocated entries. BANK = identifies counterparty as a bank for risk grouping. Categories 10000-19999 are typically reserved for these internal account types."
+  },
+  {
+    "id": 601,
+    "topic": "AA Accounting",
+    "q": "The Mismatch tool RE.STAT.MISMATCH does what?",
+    "options": [
+      "Random checks",
+      "Identifies CRF (Central Reporting File) keys where the sum of underlying contract balances doesn't equal the total in the key — high-level integrity check",
+      "Encrypts data",
+      "Sends email"
+    ],
+    "correct": 1,
+    "tip": "RE.STAT.MISMATCH continuously monitors whether the Virtual GL agrees with the underlying sub-ledger. If the sum of individual contract balances under a CRF key doesn't match what the key reports, that's a mismatch — investigated via the more granular RE.STAT.BAL.REC tool. Together they trap any out-of-balance condition before it compounds across reporting cycles."
+  },
+  {
+    "id": 602,
+    "topic": "AA Accounting",
+    "q": "Line 9999 in CRF reporting is reserved for…",
+    "options": [
+      "The last item",
+      "Catch-All — captures balances NOT specifically mapped to other report lines, ensuring no balance is omitted",
+      "Errors only",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "Reports define line definitions mapping CRF keys to display lines. Line 9999 is the 'Catch-All' — any balance whose key doesn't match a defined line still appears here. This guarantees the report total ties to the underlying GL, even when a new product creates keys the report writer hadn't anticipated. Critical for balance sheet integrity."
+  },
+  {
+    "id": 603,
+    "topic": "AA Accounting",
+    "q": "CRF (Central Reporting File) is composed of two main tables. They are…",
+    "options": [
+      "LIV and NAU",
+      "CAL (Asset/Liability) and CPL (Profit/Loss)",
+      "STMT and CATEG",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "CRF has two sides: CONSOLIDATE.ASST.LIAB (CAL) holds Asset/Liability key balances; CONSOLIDATE.PRFT.LOSS (CPL) holds P&L key balances. Together they form the Virtual GL — the consolidated, key-based ledger that supports balance sheet and P&L reporting. STMT.ENTRY/CATEG.ENTRY feed into them via Consolidation."
+  },
+  {
+    "id": 604,
+    "topic": "AA Accounting",
+    "q": "When customer static data changes (e.g. a customer moves from Sector 2001 to Sector 2002), what happens during COB?",
+    "options": [
+      "Nothing",
+      "Automatic re-classification — affected balances are regrouped under the new keys during COB; no manual journals needed",
+      "Customer is locked out",
+      "All accounts close"
+    ],
+    "correct": 1,
+    "tip": "The Consolidation Engine handles dynamic re-classification. If a customer's Sector changes, contracts that key off Sector get re-keyed during COB. Balances are correctly grouped under the new keys without any manual reclassification journals. This is why the Virtual GL stays accurate even as underlying static data evolves."
+  },
+  {
+    "id": 605,
+    "topic": "AA Accounting",
+    "q": "Revaluation methods include Spot, Rebate, Straight Line, Interest, and Interest Hedged. Which is the simplest mark-to-market method?",
+    "options": [
+      "Spot — uses current exchange rate against the original (book) rate",
+      "Straight Line",
+      "Interest Hedged",
+      "Random"
+    ],
+    "correct": 0,
+    "tip": "REVALUATION.PARAMETER drives multi-method revaluation of FX positions. SPOT method = simply mark to current market rate. STRAIGHT LINE = amortize the FX gain/loss over time. INTEREST / INTEREST HEDGED = applied to interest-rate-sensitive instruments. REBATE = adjust for fees/discounts. Each is appropriate for different instrument types and accounting standards."
+  },
+  {
+    "id": 606,
+    "topic": "AA Accounting",
+    "q": "ADJ posting vs I/O posting in revaluation — what's the difference?",
+    "options": [
+      "No difference",
+      "ADJ posts only the DIFFERENTIAL amount; I/O reverses yesterday's revaluation and posts today's TOTAL — same net effect, different ledger noise",
+      "ADJ is illegal",
+      "I/O is faster"
+    ],
+    "correct": 1,
+    "tip": "ADJ (Adjustment) = post only the change vs yesterday (cleaner GL). I/O (Input/Output) = reverse yesterday's full revaluation, then post today's full revaluation (more journal volume but each day stands alone). Choice depends on audit / regulatory preference. Same end balance; very different audit-trail experience."
+  },
+  {
+    "id": 607,
+    "topic": "AA Accounting",
+    "q": "Charge Amortization (e.g. spreading a £900 upfront origination fee over 36 months at £25/month) is configured via which field setting?",
+    "options": [
+      "UPFRONT",
+      "ACCRUE.AMORT = AMORT — triggers spreading logic instead of upfront recognition",
+      "BATCH",
+      "MANUAL"
+    ],
+    "correct": 1,
+    "tip": "Setting ACCRUE.AMORT to AMORT in the charge property tells the engine to spread (amortize) the fee over the contract term — instead of recognizing all £900 on day one. AA.ACCRUAL.FREQUENCY controls 'dripping' cadence. Compliant with IFRS matching principle: income recognized in periods earned, not when cash arrives. Smoother P&L."
+  },
+  {
+    "id": 608,
+    "topic": "AA Accounting",
+    "q": "Drill-down from synthetic (consolidated GL line) to analytical (individual contract record) is supported via…",
+    "options": [
+      "Random navigation",
+      "RE.STAT.BAL.REC reconciliation tool, navigating from a CAL key down through ECB to specific contract records",
+      "Manual search",
+      "Email queries"
+    ],
+    "correct": 1,
+    "tip": "The drill-down 'golden thread' goes Report Line → CAL/CPL key → ECB record → Contract record. RE.STAT.BAL.REC handles the line-by-line reconciliation. Auditors can start at a balance sheet line and follow it all the way down to the specific loans/deposits that drive it — without manual spreadsheet matching."
+  },
+  {
+    "id": 609,
+    "topic": "AA Accounting",
+    "q": "The TRADE-DATED vs VALUE-DATED accounting mode is controlled by which Table?",
+    "options": [
+      "DATES",
+      "ACCOUNT.PARAMETER",
+      "STMT.ENTRY",
+      "USER"
+    ],
+    "correct": 1,
+    "tip": "ACCOUNT.PARAMETER is the global accounting-system control. It switches the engine between Trade-Dated mode (entries booked on transaction date — entries hit GL immediately) and Value-Dated mode (entries treated as CONTINGENT until value date, then converted to actual). The choice affects regulatory reporting and back-dated transaction handling."
+  },
+  {
+    "id": 610,
+    "topic": "AA Accounting",
+    "q": "AA.ARRANGEMENT.ACTIVITY is the central engine for all updates to an Arrangement. Why must changes go through Activities?",
+    "options": [
+      "For UI display",
+      "Ensures process integrity, automatic downstream impacts (accounting, limits, notices), and immutable audit trail — direct DB edits would break all of this",
+      "To slow processing",
+      "Random rule"
+    ],
+    "correct": 1,
+    "tip": "If users could free-edit an Arrangement's components, business rules would be silently violated, downstream accounting wouldn't fire, and audit trails would be ambiguous. Forcing every change through an Activity (LENDING-DISBURSE, CHANGE-INTEREST, REPAY, etc.) ensures consistency. Activities have validation, side-effects, and audit baked in. Direct DB edits are forbidden."
+  },
+  {
+    "id": 611,
+    "topic": "Payments",
+    "q": "PAYMENT.ORDER acts as which kind of component in the architecture?",
+    "options": [
+      "A final ledger",
+      "Common integration vehicle that DECOUPLES payment INITIATION from EXECUTION — routes to internal FT or external payment hubs",
+      "A customer Table",
+      "An archive"
+    ],
+    "correct": 1,
+    "tip": "PAYMENT.ORDER captures the request (ordering party, beneficiary, IBAN/BIC, amount, value date) without immediately executing it. It then routes the order — internal Funds Transfer for own-bank movements, or external Payment Hub/ESB for cross-bank. Source applications stay simple; PAYMENT.ORDER handles formatting, validation, and routing complexity."
+  },
+  {
+    "id": 612,
+    "topic": "Payments",
+    "q": "An AML hook intercepts a payment and the engine pauses to await an external screening response. What status indicates this wait state?",
+    "options": [
+      "Status 200 (OK)",
+      "Status 649 (asynchronous wait for external response)",
+      "Status 500 (Error)",
+      "Status 404 (Not Found)"
+    ],
+    "correct": 1,
+    "tip": "Status 649 is the dedicated wait-state for asynchronous hooks. The payment engine pauses while an external AML/sanctions engine (OFAC, SDN watchlists) screens the transaction. When the external response arrives (Pass/Fail), the engine resumes — either completing the payment or rejecting it. This prevents bottlenecks: the engine isn't blocked synchronously."
+  },
+  {
+    "id": 613,
+    "topic": "Payments",
+    "q": "PROTECTION.LIMIT enforces what kind of cap?",
+    "options": [
+      "File size",
+      "Cumulative daily fraud-prevention limits at Customer and External User levels (cap on potentially-fraudulent outflows)",
+      "Database row count",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "PROTECTION.LIMIT is a fraud guardrail — total daily amounts that can be moved through external channels. If a fraudster gets credentials, this caps their damage. Set at both Customer level (the account holder) and External User level (an internet banking session). Combined with BEN.RISK.RATE (per-beneficiary risk profile) it creates a layered defense against fraudulent disbursements."
+  },
+  {
+    "id": 614,
+    "topic": "Payments",
+    "q": "BEN.RISK.RATE allows the system to…",
+    "options": [
+      "Calculate beneficiary's credit score",
+      "Apply transaction logic per beneficiary risk profile — e.g. tighter limits or enhanced due diligence for high-risk targets",
+      "Reveal customer secrets",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "BEN.RISK.RATE (Beneficiary Risk Rate) lets the bank score each beneficiary and apply differentiated controls. A long-trusted vendor might have no extra friction; a never-seen-before payee might trigger enhanced due diligence, lower PROTECTION.LIMIT, or call-back verification. It's a risk-based approach rather than one-size-fits-all controls."
+  },
+  {
+    "id": 615,
+    "topic": "Payments",
+    "q": "Funds Transfer (FT) handles internal/P&L transfers natively in CBS. What gets generated automatically upon AUTH?",
+    "options": [
+      "Customer email",
+      "STMT.ENTRY for account movements and CATEG.ENTRY for P&L impacts — automated accounting",
+      "Random data",
+      "Nothing"
+    ],
+    "correct": 1,
+    "tip": "FT (Funds Transfer) is the engine for internal/own-bank transfers. When the transfer is authorized, the system automatically raises STMT.ENTRY (debit source, credit destination) and CATEG.ENTRY for any fee/commission income hitting P&L. No manual journal entries — transaction-driven accounting in action."
+  },
+  {
+    "id": 616,
+    "topic": "Payments",
+    "q": "CHEQUE.STATUS tracks the lifecycle of a chequebook. Which value indicates the chequebook is awaiting printing?",
+    "options": [
+      "RECEIVED",
+      "SENT FOR PRINTING",
+      "ISSUED",
+      "DESTROYED"
+    ],
+    "correct": 1,
+    "tip": "CHEQUE.STATUS values include 'Request Received' (customer asked for a book), 'Sent for Printing' (in production), 'Issued' (handed over to customer), etc. The progression is tracked so the bank can answer 'where's my chequebook?' instantly. STOCK.ENTRY and STOCK.REGISTER track the raw blank inventory."
+  },
+  {
+    "id": 617,
+    "topic": "Payments",
+    "q": "PAYMENT.STOP captures stop-payment instructions. Up to how many reasons can be configured?",
+    "options": [
+      "10",
+      "99",
+      "Unlimited",
+      "1"
+    ],
+    "correct": 1,
+    "tip": "PAYMENT.STOP supports up to 99 stop-payment reasons (e.g. Lost, Stolen, Disputed, Duplicate, Funds-insufficient). Reasons can target specific cheque numbers, ranges, or amounts. Real-time validation during clearing rejects any cheque matching a stop instruction — fraud and loss mitigation in the cheque lifecycle."
+  },
+  {
+    "id": 618,
+    "topic": "Cards",
+    "q": "CARD.ISSUE / CARD.TYPE separate the…",
+    "options": [
+      "Card colors",
+      "PRODUCT definition (CARD.TYPE — defines rules) from the INSTANCE (CARD.ISSUE — a specific card for a specific customer)",
+      "Random separation",
+      "Internal data"
+    ],
+    "correct": 1,
+    "tip": "CARD.TYPE = the product (e.g. 'VISA Platinum' with rules: expiry frequency, renewal rules, billing offset). CARD.ISSUE = a specific card issued to a specific customer, linked to one or more accounts. The same Product/Contract pattern as elsewhere: one CARD.TYPE serves many CARD.ISSUE instances. CARD.STATUS tracks state (Issue / Re-issue / Scrap / Cancelled)."
+  },
+  {
+    "id": 619,
+    "topic": "Cards",
+    "q": "A single card can be linked to MULTIPLE customer accounts. Which account is designated as the 'primary'?",
+    "options": [
+      "Random",
+      "A designated primary account for fee debits and drawings",
+      "All accounts equally",
+      "The newest account"
+    ],
+    "correct": 1,
+    "tip": "Multi-account linkage lets one card act as both Current and Savings, etc. One account is the PRIMARY — that's where fees debit and where 'default draw' happens. The customer can switch between linked accounts at the ATM/POS as needed. Decoupling cards from accounts gives flexibility without account proliferation."
+  },
+  {
+    "id": 620,
+    "topic": "Direct Debit",
+    "q": "DD.DDI is the central record for Direct Debit Instructions. Outward vs Inward mandates — what's the difference?",
+    "options": [
+      "No difference",
+      "OUTWARD = bank's CUSTOMER authorizes a third party to debit (e.g. utility bill); INWARD = ANOTHER BANK is authorized to collect from our customer",
+      "Outward is faster",
+      "Inward is illegal"
+    ],
+    "correct": 1,
+    "tip": "Direct Debits operate in both directions. OUTWARD: your customer signs a mandate authorizing a utility company to collect monthly. INWARD: another bank is authorized to collect from your customer's account. DD.DDI tracks both, including clearing references, status (NEW/ADVISED/ACTIVE), and bank sort codes. Failed DDs route into a retry framework."
+  },
+  {
+    "id": 621,
+    "topic": "Standing Order",
+    "q": "A Standing Order (STO) is used for…",
+    "options": [
+      "One-time payments",
+      "Recurring fixed or variable transfers (rent, subscriptions, sweeps)",
+      "Random",
+      "Manual entries"
+    ],
+    "correct": 1,
+    "tip": "STANDING.ORDER orchestrates periodic transfers — fixed (rent, mortgage payment) or variable (utility bills). Supports 'Credit' STOs that periodically claim fixed amounts from external systems. Failed STOs (insufficient funds) go into a retry framework for resubmission later. 'Set and forget' convenience for customers, automated liquidity management."
+  },
+  {
+    "id": 622,
+    "topic": "Limits",
+    "q": "The limit hierarchy supports up to how many levels?",
+    "options": [
+      "3",
+      "12",
+      "5",
+      "Unlimited"
+    ],
+    "correct": 1,
+    "tip": "LIMIT.REFERENCE and LIMIT support up to 12 hierarchical levels — Global → Product → Sub-product → ... Each child limit is inherently constrained by its parent. So you could have 'Total Country Exposure' as Level 1, then Level 2 by Industry, Level 3 by Customer, Level 4 by Product Class. Real-time aggregation enforces all levels simultaneously."
+  },
+  {
+    "id": 623,
+    "topic": "Limits",
+    "q": "Revolving vs Non-Revolving limits differ in…",
+    "options": [
+      "Color",
+      "Revolving restores availability upon repayment (like a credit card); Non-Revolving is a one-time cap (utilization permanently reduces available)",
+      "Currency",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "REVOLVING limit (e.g. credit card limit, line of credit): when you use £500 and then pay £300 back, £300 of capacity is restored. NON-REVOLVING (e.g. term loan): the £500 you used reduces your remaining capacity permanently. Choice depends on product type. Defined via LIMIT.PARAMETER configuration."
+  },
+  {
+    "id": 624,
+    "topic": "Limits",
+    "q": "FX.OR.TIME.BAND set to 'TB' enables…",
+    "options": [
+      "Random sizing",
+      "Tenor-based tiering — a single limit record with different caps for different transaction maturities",
+      "Cancellation",
+      "Time travel"
+    ],
+    "correct": 1,
+    "tip": "Time Banding (FX.OR.TIME.BAND = 'TB') lets one limit have descending exposure caps based on transaction tenor: e.g. up to $1M for short-dated, $500K for medium-dated, $100K for long-dated. Encodes the principle that longer maturity = higher risk = stricter cap, all in one consolidated limit record."
+  },
+  {
+    "id": 625,
+    "topic": "Limits",
+    "q": "Liability Groups vs Limit Sharing Groups — both share credit lines, but…",
+    "options": [
+      "Identical",
+      "Liability Group = linked members share a Group Master credit; Limit Sharing Group = multiple parties draw against one shared facility",
+      "Liability is for cars",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "Both manage shared credit across multiple entities (common for corporate groups). Liability Group ties subsidiaries to a Group Master's credit. Limit Sharing Group lets several distinct customers all draw against one shared facility. Together they handle the complex web of corporate borrowing relationships in modern banking."
+  },
+  {
+    "id": 626,
+    "topic": "Limits",
+    "q": "When a transaction exceeds the customer's available limit, the system generates…",
+    "options": [
+      "Silence",
+      "'Unauthorized Overdraft' override message — requires authorized approver to allow it",
+      "Customer call",
+      "Random response"
+    ],
+    "correct": 1,
+    "tip": "Real-Time Control intercepts every transaction. If the requested amount exceeds the Working Balance + available limit, an 'Unauthorized Overdraft' override is raised. The transaction sits unauthorized until a properly classed officer (OVERRIDE.CLASS) approves. Limit utilization is updated online so the 360-degree view of credit availability is always real-time."
+  },
+  {
+    "id": 627,
+    "topic": "Documents",
+    "q": "STOP.TXN logic in document management blocks…",
+    "options": [
+      "Random transactions",
+      "Transaction authorization if required documents are missing or expired",
+      "All transactions",
+      "Customer logins"
+    ],
+    "correct": 1,
+    "tip": "Document Management uses STOP.TXN to enforce KYC compliance. If a customer's mandatory documents (ID, proof of address, FATCA self-cert, etc.) are marked Missing or Expired in CUST.DOCUMENT / TRANS.DOCUMENT, the system blocks transaction authorization until they're refreshed. Document expiry monitoring happens during COB so issues are flagged proactively."
+  },
+  {
+    "id": 628,
+    "topic": "Documents",
+    "q": "DOCUMENT.CLASS vs DOCUMENT.TYPE — what's the relationship?",
+    "options": [
+      "Identical",
+      "DOCUMENT.CLASS groups document types into logical buckets (e.g. 'Account Opening Forms'); DOCUMENT.TYPE defines specific instruments within a class",
+      "Class is encrypted",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "DOCUMENT.CLASS is the high-level grouping ('Account Opening Forms', 'KYC Refresh', 'Loan Documentation'). DOCUMENT.TYPE is the specific document within the class ('Passport scan', 'Utility bill', 'Salary slip'). DOC.GEN.CONDITION rules say which documents are mandatory per customer profile or product."
+  },
+  {
+    "id": 629,
+    "topic": "Image Capture",
+    "q": "IM.DOCUMENT.IMAGE stores digital assets like signatures and ID scans. What enables retrieval at high speed?",
+    "options": [
+      "Random naming",
+      "IM.IMAGE.TYPE — defines logical storage paths and metadata grouping (KYC, Signatures, etc.)",
+      "Brute force search",
+      "Manual filing"
+    ],
+    "correct": 1,
+    "tip": "IM.DOCUMENT.IMAGE is the digital evidence repository. IM.IMAGE.TYPE categorizes assets (KYC, Signatures, Passport) and defines logical storage paths. IMAGE.APPLICATION maps each digital file to specific records (Customer, Account). When a teller pulls up CUSTOMER 12345, the relevant signature image displays instantly — no paper file retrieval needed."
+  },
+  {
+    "id": 630,
+    "topic": "Provisioning",
+    "q": "PV.LOAN.CLASSIFICATION supports automated risk categorization. Which state indicates highest risk?",
+    "options": [
+      "Standard",
+      "Loss (highest rank — full provisioning required)",
+      "Watchlist",
+      "Substandard"
+    ],
+    "correct": 1,
+    "tip": "Asset Classification states (in rank order, lowest risk to highest): Standard → Watchlist → Substandard → Doubtful → Loss. Higher ranks = higher provisioning percentage required. Loss = full write-off. EB.RULE.GATEWAY automatically transitions assets based on Days Past Due (DPD), customer Sector, and other risk criteria. Multi-level option uses 'worst' classification across all customer contracts."
+  },
+  {
+    "id": 631,
+    "topic": "Provisioning",
+    "q": "IFRS 9 provisioning uses PD (Probability of Default), LGD (Loss Given Default), and LIP (Loss Identification Period). These are inputs to…",
+    "options": [
+      "Random calculation",
+      "Statistical Expected Credit Loss models, opposed to simpler Standard Percentage-based provisioning",
+      "Marketing",
+      "User passwords"
+    ],
+    "correct": 1,
+    "tip": "IFRS 9 requires Expected Credit Loss (ECL) calculations using PD × LGD × LIP times exposure. Compare with the legacy Standard Percentage method (e.g. 'Loss class = 100%, Doubtful = 50%'). The system supports BOTH methods via PV.CALCULATION. ECL is more accurate but data-intensive; Standard% is simpler. Banks often use both for parallel multi-GAAP reporting."
+  },
+  {
+    "id": 632,
+    "topic": "Teller",
+    "q": "TELLER.ID 9999 conventionally identifies what?",
+    "options": [
+      "A specific teller",
+      "The Vault — central cash store (persistent, no daily open/close)",
+      "Manager",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "By convention, Till IDs are numbered low; the Vault is given a special ID like 9999. The Vault doesn't go through daily OPEN/CLOSED cycles like Tills — it persists. Tellers transfer cash between the Vault and Tills as operational needs change. STOCK.ENTRY brings new blank instruments into the Vault."
+  },
+  {
+    "id": 633,
+    "topic": "Teller",
+    "q": "TELLER.DENOMINATION tracks…",
+    "options": [
+      "Random data",
+      "Per-currency unit definitions (specific notes, coins, multiples/fractions of a unit)",
+      "Customer addresses",
+      "User passwords"
+    ],
+    "correct": 1,
+    "tip": "For physical cash, the system tracks EXACT denominations. TELLER.DENOMINATION defines which notes/coins exist for each currency (e.g. for EUR: 500/200/100/50/20/10/5 notes; 2/1/0.50/0.20/0.10/0.05/0.02/0.01 coins). DENOM.TYPE classifies assets — Cash, Travelers Cheques, Gift Cheques. TT.STOCK.CONTROL holds real-time counts per Till/Vault."
+  },
+  {
+    "id": 634,
+    "topic": "Teller",
+    "q": "During Till closure, the physical balancing engine reconciles…",
+    "options": [
+      "Random data",
+      "Counted physical cash against the digital ledger — discrepancies adjusted via Overage/Shortage accounts with override approval",
+      "Customer satisfaction",
+      "Server uptime"
+    ],
+    "correct": 1,
+    "tip": "Till closure forces the teller to enter physical cash counts. The system compares with the digital expected balance. Any discrepancy must be explained: if short, debit Shortage account; if over, credit Overage account. The override requires approval, ensuring no cash discrepancy hides without explanation. Hardened cash accountability."
+  },
+  {
+    "id": 635,
+    "topic": "Teller",
+    "q": "Why do teller transactions support entering NEGATIVE denomination counts?",
+    "options": [
+      "Random feature",
+      "To record CHANGE returned to customers (e.g. customer pays £100 for a £73 transaction; teller enters £27 change as negative denominations leaving the Till)",
+      "To create fake records",
+      "Encryption"
+    ],
+    "correct": 1,
+    "tip": "Real-world transactions involve change. If a customer hands £100 to settle a £73 bill, the teller records +£100 incoming + (-£27) outgoing (the change given back). Negative denominations reflect cash LEAVING the till. The system validates the net amount matches the transaction total. Models real-world cash handling precisely."
+  },
+  {
+    "id": 636,
+    "topic": "Interest",
+    "q": "BASIC.INTEREST holds…",
+    "options": [
+      "Random rates",
+      "Floating benchmarks (the bank's central interest reference rates)",
+      "Customer accounts",
+      "User salaries"
+    ],
+    "correct": 1,
+    "tip": "BASIC.INTEREST is the central reference table for floating interest rates — the bank's house benchmark. Contract interest rates can reference BASIC.INTEREST + a margin (e.g. 'BASIC + 1.5%'). When BASIC.INTEREST changes (e.g. due to central bank rate moves), all linked contracts automatically pick up the new rate — no manual recalculation across thousands of loans."
+  },
+  {
+    "id": 637,
+    "topic": "Interest",
+    "q": "PERIODIC.INTEREST captures…",
+    "options": [
+      "Random data",
+      "Periodic index rates (e.g. LIBOR, EURIBOR, SOFR) used as floating references for loans",
+      "Calendars",
+      "User data"
+    ],
+    "correct": 1,
+    "tip": "PERIODIC.INTEREST holds market index rates — LIBOR, SOFR, EURIBOR, etc. — that products reference for floating-rate calculations. The system fetches the index value as of the rate-fix date. Combined with BASIC.INTEREST (internal bank rates) it covers both market-driven and bank-driven floating rate products."
+  },
+  {
+    "id": 638,
+    "topic": "Interest",
+    "q": "LEVEL vs BAND tiered interest — what's the difference?",
+    "options": [
+      "Identical",
+      "LEVEL = single rate applies to the WHOLE balance based on which threshold is hit; BAND = blended rate where each balance SLICE gets a different rate",
+      "LEVEL is for credits",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "LEVEL tier: balance £100K → entire balance earns 2%; balance £200K → entire balance earns 3%. BAND tier: first £100K at 1%, next £100K at 2%, next £100K at 3% — blended effective rate. Banks use LEVEL for simpler 'reward bands'; BAND for tiered products like progressive savings or progressive overdraft. Configured per product."
+  },
+  {
+    "id": 639,
+    "topic": "Interest",
+    "q": "Day Basis rules (360/360, 366/360, etc.) control…",
+    "options": [
+      "Random",
+      "How the day count is computed for interest (numerator days / denominator days per year) — different conventions per market/product",
+      "Holiday dates",
+      "Server uptime"
+    ],
+    "correct": 1,
+    "tip": "Day Basis conventions: 360/360 (each month = 30 days, year = 360); 366/360 (actual days/360); 365/365 (actual/actual); ACT/360 etc. Different markets and products use different conventions. Money market often uses ACT/360; corporate loans might use 30/360. The Day Basis directly affects accrued interest amounts — critical for precise yield calculations."
+  },
+  {
+    "id": 640,
+    "topic": "Interest",
+    "q": "Negative interest rates on credit balances are supported by…",
+    "options": [
+      "Hardcoded floors",
+      "Dynamic Spread Management — banks can configure negative rates in BASIC.INTEREST / PERIODIC.INTEREST",
+      "Manual entry",
+      "Not supported"
+    ],
+    "correct": 1,
+    "tip": "In modern banking (esp. post-2014 in EU), interest rates can go negative — banks pay to hold large deposits at central banks, and may pass this on to large depositors. The system handles negative rates natively in BASIC.INTEREST. Contract rate = BASIC + margin; if BASIC is -0.5% and margin is 0.2%, the effective rate is -0.3% (the depositor pays the bank)."
+  },
+  {
+    "id": 641,
+    "topic": "Charges",
+    "q": "GENERAL.CHARGE acts as…",
+    "options": [
+      "A login",
+      "Central hub grouping disparate fee types (interest-related addons, ledger fees, transaction-based charges) into one tariff structure",
+      "Random data",
+      "User data"
+    ],
+    "correct": 1,
+    "tip": "GENERAL.CHARGE consolidates the bank's fee structure. Instead of fees being scattered across many tables, they're grouped into one tariff that links to products via CONDITION.PRIORITY. Different customer segments (Staff, VIP, Standard) get different tariffs automatically. Centralization prevents 'rogue fees' and supports clean fee reporting/reconciliation."
+  },
+  {
+    "id": 642,
+    "topic": "Charges",
+    "q": "FT.COMMISSION.TYPE supports calculation in which forms?",
+    "options": [
+      "Only flat",
+      "Flat amounts, percentages, or tiered (Level/Band) structures with min/max caps",
+      "Only percentages",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "FT.COMMISSION.TYPE handles fee calculation flexibility: FLAT (£10 fixed), PERCENTAGE (0.2% of amount), TIERED (different rates per balance/amount band). With built-in MINIMUM and MAXIMUM caps — e.g. 'percentage 0.5% with £5 minimum and £50 maximum'. Configurable enough to model virtually any real-world fee structure."
+  },
+  {
+    "id": 643,
+    "topic": "Charges",
+    "q": "CONDITION.PRIORITY enables…",
+    "options": [
+      "Random ordering",
+      "Auto-application of specific tariffs to accounts based on customer attributes (Sector, Industry, Residence) — preferential pricing by segment",
+      "Customer ranks",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "CONDITION.PRIORITY is the rules engine for applying preferential tariffs. Different customer attributes trigger different tariffs: VIPs get the VIP fee structure; Staff get the Staff one; standard customers get the standard one. No manual assignment — driven by attributes that are already maintained on the customer record."
+  },
+  {
+    "id": 644,
+    "topic": "COB",
+    "q": "The 5-Phase COB engine runs phases in which order?",
+    "options": [
+      "Random order",
+      "Application (A) → System Wide (S) → Reporting (R) → Start of Day (D) → Online (O)",
+      "Online first",
+      "Reverse order"
+    ],
+    "correct": 1,
+    "tip": "5-Phase COB: A (Application — module-specific work like loan accruals), S (System Wide — global tasks like FX revaluation), R (Reporting — generate trial balance, statements), D (Start of Day — roll forward DATES table, prepare for next day), O (Online — restore online services). The strict order ensures dependent jobs always have the data they need from earlier phases."
+  },
+  {
+    "id": 645,
+    "topic": "COB",
+    "q": "The T24 Service Manager (tSM) and Service Agents (tSA) work together to…",
+    "options": [
+      "Random",
+      "Multi-threaded batch execution — tSM launches and monitors multiple tSA agents that share the workload",
+      "Customer service",
+      "Backup"
+    ],
+    "correct": 1,
+    "tip": "tSM (T24 Service Manager) orchestrates batch processing. tSAs (Service Agents) are the worker threads that actually run jobs. tSM distributes the workload across multiple tSAs so a single-threaded job becomes multi-threaded. AGENT.STATUS and COB.PROGRESS enquiries provide real-time visibility into how many agents are running, what percentage complete, etc."
+  },
+  {
+    "id": 646,
+    "topic": "COB",
+    "q": "Why does the COB engine support '24/7' online while batch is still running?",
+    "options": [
+      "Marketing",
+      "Online transactions are accepted for the 'Next Day' while batch closes the current one — no full system downtime",
+      "Random",
+      "Impossible"
+    ],
+    "correct": 1,
+    "tip": "Modern banks can't shut down for hours of batch. The COB engine decouples online activity from batch closing: tellers can keep taking transactions (booked to the 'Next Day') while batch closes the current day in parallel. EB.EOD.ERROR catches batch failures; critical errors block the date rollover. The customer never notices COB happening."
+  },
+  {
+    "id": 647,
+    "topic": "COB",
+    "q": "ACCT.ACCRUAL and GROUP.CAPITALISATION are batch processes that…",
+    "options": [
+      "Random",
+      "Calculate daily interest accruals and execute scheduled interest capitalizations (debiting/crediting accounts on the configured frequency)",
+      "Customer onboarding",
+      "User logout"
+    ],
+    "correct": 1,
+    "tip": "During COB, ACCT.ACCRUAL computes the daily interest on every relevant account/contract (adding to ACC balance). GROUP.CAPITALISATION executes scheduled capitalization (moving ACC balance into actual posted entries — debiting customer's account for loan interest, crediting for deposit interest). Frequency is configurable: monthly, quarterly, etc."
+  },
+  {
+    "id": 648,
+    "topic": "Testing",
+    "q": "The automated testing framework supports Model Bank. What is Model Bank?",
+    "options": [
+      "A small bank",
+      "Pre-built standardized test data injected into versions to avoid repetitive manual setup during testing cycles",
+      "A real bank model",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "Model Bank is a vendor-shipped set of standardized test data + configurations. QA teams can run regression tests against it to validate that new releases don't break baseline functionality. Combined with the trace tooling (number of I/Os, subroutine calls, elapsed time), it lets QA validate both functional correctness AND performance impacts before production deployment."
+  },
+  {
+    "id": 649,
+    "topic": "COB",
+    "q": "EB.EOD.ERROR captures…",
+    "options": [
+      "Random errors",
+      "All COB job failures — central audit trail for troubleshooting; critical errors prevent rollover",
+      "Customer errors",
+      "Network errors only"
+    ],
+    "correct": 1,
+    "tip": "Every COB job's failures are logged in EB.EOD.ERROR. Routine warnings might allow COB to proceed; CRITICAL errors block the date rollover until resolved (preventing a corrupted close). The operations team reviews EB.EOD.ERROR each morning to identify and fix any issues. Without this central error trail, troubleshooting overnight failures would be impossible."
+  },
+  {
+    "id": 650,
+    "topic": "AA Accounting",
+    "q": "AASUSPENSE is described as an 'internal intermediate balance'. What advantage over a physical Suspense account?",
+    "options": [
+      "None",
+      "Improves performance by handling temporary postings internally — avoids creating a high-volume physical suspense account",
+      "More expensive",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "Some intra-day or intra-transaction postings need a temporary 'parking' account before final disposition. Physical suspense accounts would handle MILLIONS of these intra-day postings — bloating storage and slowing queries. AASUSPENSE handles them as INTERNAL intermediate balances within the engine, never persisting as discrete physical entries. Better performance, cleaner ledger."
+  },
+  {
+    "id": 651,
+    "topic": "Mismatch",
+    "q": "RE.STAT.REP.LINE defines…",
+    "options": [
+      "Random",
+      "Mapping between CRF/CRB report lines and the underlying CAL/CPL keys they aggregate",
+      "User lines",
+      "Random data"
+    ],
+    "correct": 1,
+    "tip": "Financial statements are built from report lines (e.g. 'Total Cash and Cash Equivalents' on the balance sheet). RE.STAT.REP.LINE defines which CAL keys roll up into each report line. Combined with RE.STAT.REQUEST (the report itself) and RE.STAT.COLUMN.TYPE (column configuration), it lets admins design custom regulatory reports without writing code."
+  },
+  {
+    "id": 652,
+    "topic": "Mismatch",
+    "q": "An 'undefined item' — a balance whose key matches no defined report line — goes to which line?",
+    "options": [
+      "Random",
+      "Line 9999 (Catch-All) — ensures total report still balances against underlying GL",
+      "Auto-deleted",
+      "Customer email"
+    ],
+    "correct": 1,
+    "tip": "Without a catch-all, missing line mappings would produce a report total that doesn't equal the GL — accounting equivalent of money disappearing. Line 9999 absorbs anything that wasn't explicitly mapped, so reports always tie. Reviewing Line 9999's contents tells you what new products introduced keys that need explicit mapping in next report iteration."
+  },
+  {
+    "id": 653,
+    "topic": "Eligibility",
+    "q": "Eligibility failure can be configured to trigger an automated…",
+    "options": [
+      "System shutdown",
+      "Change Product activity — moving the arrangement to a default product variant (e.g. Minor → Standard at age 18)",
+      "Random",
+      "Customer dismissal"
+    ],
+    "correct": 1,
+    "tip": "When eligibility fails, instead of just rejecting the customer, the system can automatically initiate a Change Product activity. Classic example: a customer's Minor Account auto-transitions to a Standard Adult Account on their 18th birthday — same account number, new product behind it, no back-office workflow. Customer experience: seamless aging-up."
+  },
+  {
+    "id": 654,
+    "topic": "Activity",
+    "q": "The Custom Logic Hooks property class is called…",
+    "options": [
+      "RANDOM.API",
+      "ACTIVITY.API — links user-defined Pre-routines, Post-routines, and Validation routines to specific arrangement events",
+      "AC.HOOK",
+      "ROUTINE"
+    ],
+    "correct": 1,
+    "tip": "ACTIVITY.API is the property class for extending AA arrangements with custom logic. Pre-routines run before activity commits (validation, external API calls); Post-routines run after (notifications, cascades); Validation routines enforce custom rules. This is the AA-equivalent of Projection-level Plugin hooks — but tied to Activities rather than Projection events."
+  },
+  {
+    "id": 655,
+    "topic": "AA Accounting",
+    "q": "What does TRACKING.ONLY mean in Activity Mapping configuration?",
+    "options": [
+      "Tracks users",
+      "Mapping rules live at the PRODUCT level and cannot be overridden at the individual ARRANGEMENT instance level — consistency enforced",
+      "Random rule",
+      "Customer tracking"
+    ],
+    "correct": 1,
+    "tip": "TRACKING.ONLY ensures mapping rules (e.g. 'transaction code 850 = LENDING-DISBURSE') are defined ONCE on the product and apply to all arrangements derived from it. You can't override per-customer (which would lead to inconsistent accounting per contract). The product is the authoritative source — change it there and all arrangements track the new rule."
+  },
+  {
+    "id": 656,
+    "topic": "Schedule",
+    "q": "AA.PRD.DES.PAYMENT.SCHEDULE supports calculation types Annuity, Linear, and Actual. Which is used for bullet loans?",
+    "options": [
+      "Annuity",
+      "Linear",
+      "Actual — calculated each period (suits bullet structures where principal pays only at maturity)",
+      "Random"
+    ],
+    "correct": 2,
+    "tip": "Annuity = constant total payment (variable principal/interest split). Linear = constant principal payment (declining total). Actual = calculated each period based on actual balance and rate. Bullet loans (principal only at maturity) use Actual because there's no constant payment formula — interest accrues each period, principal repays at the end. Configured per product."
+  },
+  {
+    "id": 657,
+    "topic": "Statements",
+    "q": "ACCOUNT.STATEMENT defaults its frequency on creation based on…",
+    "options": [
+      "Random",
+      "STMT.GEN.CONDITION rules engine — driven by customer attributes (Sector, Industry, Product)",
+      "Vendor whim",
+      "User typed"
+    ],
+    "correct": 1,
+    "tip": "When an account is created, ACCOUNT.STATEMENT is automatically instantiated. STMT.GEN.CONDITION rules look at the customer's profile and decide the default frequency: e.g. Retail = monthly, Corporate = daily, Tax-sensitive = annual + monthly. Customers can request different cycles, but defaults reduce setup work — most accounts get the right cycles automatically."
+  },
+  {
+    "id": 658,
+    "topic": "Reporting",
+    "q": "CRB (Central Reporting Balance) reports differ from CRF reports in…",
+    "options": [
+      "Identical",
+      "CRB drills down to underlying ACCOUNTS and CONTRACTS — granular analytical view; CRF is the higher-level CAL/CPL key view",
+      "CRB is monthly",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "CRF (Central Reporting File) reports = key-level (CAL/CPL) — the synthetic view (totals by Consolidation Key dimensions). CRB (Central Reporting Balance) reports = the analytical breakdown showing which specific accounts/contracts comprise each key total. CRF for management summaries; CRB for auditor drill-down."
+  },
+  {
+    "id": 659,
+    "topic": "Reporting",
+    "q": "Currency split options in CRF/CRB reports include Local, Foreign, and All. What's the use case for 'Foreign' only?",
+    "options": [
+      "Random",
+      "Identifying the bank's TOTAL exposure to non-local currencies — useful for FX risk and revaluation analysis",
+      "Customer reports",
+      "Random data"
+    ],
+    "correct": 1,
+    "tip": "Reports can be filtered by currency type. 'Foreign' shows only non-local-currency positions — perfect for FX risk dashboards, revaluation impact analysis, and regulatory reporting on FX exposures. 'Local' shows only home-currency positions; 'All' aggregates everything. Section-wise currency splits enable detailed analysis without separate reports."
+  },
+  {
+    "id": 660,
+    "topic": "Revaluation",
+    "q": "Bucket-level revaluation operates at which granularity?",
+    "options": [
+      "Random",
+      "Each Asset Type within a Consolidation Key — adjusts buckets to current LCY equivalent",
+      "Per customer",
+      "Per branch"
+    ],
+    "correct": 1,
+    "tip": "Revaluation isn't applied per-transaction (too granular) or per-currency (too coarse). It operates at the BUCKET level within the CRF: each Asset Type under each Consolidation Key gets revalued to current LCY equivalent. Position Balancing then ensures the non-contingent reporting base ties to the system-wide Position file for each currency — internal consistency check."
+  },
+  {
+    "id": 661,
+    "topic": "Revaluation",
+    "q": "Unrealized P&L from revaluation can be posted to which categories?",
+    "options": [
+      "P&L only",
+      "Profit/Loss OR Equity (e.g. IAS 39 hedge accounting may book to OCI/Equity rather than P&L)",
+      "Random",
+      "Customer accounts"
+    ],
+    "correct": 1,
+    "tip": "International standards (IAS 39, IFRS 9) sometimes require unrealized P&L to be booked to EQUITY (other comprehensive income / OCI) rather than running through the P&L statement. For instance, hedged positions or available-for-sale securities may route there. The system supports both, configured via REVALUATION.PARAMETER. Critical for compliant multi-GAAP reporting."
+  },
+  {
+    "id": 662,
+    "topic": "Charge Amortization",
+    "q": "Received-Not-Earned balances are managed in which category range?",
+    "options": [
+      "Random",
+      "Internal categories 10000-19999 — bank's internal accounts (not customer-visible)",
+      "0-99",
+      "20000-29999"
+    ],
+    "correct": 1,
+    "tip": "When a fee is received upfront but earned over time, the unrecognized portion sits in an internal category in the 10000-19999 range. As periods pass, AA.ACCRUAL.FREQUENCY drips the earned portion into P&L. Customers don't see these internal categories; they're for the bank's own ledger management. EB.ACCRUAL.PARAM controls the drip cadence."
+  },
+  {
+    "id": 663,
+    "topic": "Mismatch",
+    "q": "Why is daily mismatch monitoring crucial?",
+    "options": [
+      "Cosmetic",
+      "Errors discovered immediately are tractable; errors compounding over weeks become unwinable — RE.STAT.MISMATCH traps them daily",
+      "For UI",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "If the Virtual GL drifts from underlying contracts by £0.01 on Monday, it's trivial to find Monday's failing transaction. If undetected for a month, you'd have to investigate millions of transactions to find the culprit. Daily mismatch monitoring keeps the investigation tractable. RE.STAT.MISMATCH for high-level detection; RE.STAT.BAL.REC for granular drill-down."
+  },
+  {
+    "id": 664,
+    "topic": "Cards",
+    "q": "CARD.STATUS values include 'Scrap' — what does it mean?",
+    "options": [
+      "Bad rating",
+      "The physical card is destroyed (e.g. ATM ate it, mailed back damaged) — removed from active inventory",
+      "Cancelled by customer",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "Card lifecycle includes physical events. SCRAP = physical card destroyed (ATM swallowed it, returned damaged, post office lost it). CANCELLED = card administratively closed (customer left bank, account closed). ISSUE = active in customer's hands. RE-ISSUE = replacement sent. Tracking these states lets the bank manage physical inventory + know which plastic is in the wild."
+  },
+  {
+    "id": 665,
+    "topic": "Direct Debit",
+    "q": "DD.PARAMETER controls…",
+    "options": [
+      "Random",
+      "System-wide DD configuration — defaults for new mandates, retry rules, country-specific clearing settings",
+      "Customer salaries",
+      "User passwords"
+    ],
+    "correct": 1,
+    "tip": "DD.PARAMETER is the central config for Direct Debit behavior. It defines defaults for new mandates (how many retries on failure, retry interval), clearing-house specific rules (SEPA vs UK BACS vs local schemes), and default messaging templates. Per-mandate specifics live in DD.DDI; PARAMETER governs the system-wide defaults."
+  },
+  {
+    "id": 666,
+    "topic": "Standing Order",
+    "q": "If a STO fails because of insufficient funds, what happens?",
+    "options": [
+      "Cancelled forever",
+      "Captured in a retry recycler for configurable online or daily resubmission",
+      "Customer is fined",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "Failed STOs (most common reason: insufficient funds) aren't lost — they go into a retry framework. The bank can configure how aggressively to retry (e.g. hourly for 4 hours, then daily for 3 days). This is critical for customer experience: a temporary £20 shortfall shouldn't permanently break your rent payment STO. Retry until success or escalation."
+  },
+  {
+    "id": 667,
+    "topic": "Limits",
+    "q": "LIMIT.DAILY.OS records…",
+    "options": [
+      "Random",
+      "Daily outstanding limit snapshots — supports historical limit-utilization reporting and trend analysis",
+      "User logins",
+      "OS versions"
+    ],
+    "correct": 1,
+    "tip": "LIMIT.DAILY.OS captures end-of-day outstanding utilization per limit. Useful for: trend analysis ('Is exposure growing?'), regulatory reporting (peak utilization), credit committee reviews ('what utilization did this customer hit last quarter?'). Without daily snapshots, only current utilization would be queryable; historical patterns would be invisible."
+  },
+  {
+    "id": 668,
+    "topic": "Documents",
+    "q": "DOCUMENT.REQUIRED records…",
+    "options": [
+      "Random",
+      "Which documents are mandatory per customer/contract type — derived from DOC.GEN.CONDITION rules",
+      "User passwords",
+      "Customer photos"
+    ],
+    "correct": 1,
+    "tip": "DOC.GEN.CONDITION rules say 'corporate customers in Sector 4500 (Pharma) require Trade License + Drug Manufacturing Permit + Authorised Signatories letter'. DOCUMENT.REQUIRED records realize these rules per specific customer/contract. STOP.TXN enforces them — blocks transactions if any required doc is missing or expired."
+  },
+  {
+    "id": 669,
+    "topic": "Provisioning",
+    "q": "Daily batch automatically re-evaluates provisioning if…",
+    "options": [
+      "Random",
+      "Balances fluctuate OR asset classifications change — recalculates required provisions and posts adjustments",
+      "Never",
+      "Customer requests"
+    ],
+    "correct": 1,
+    "tip": "Provisions aren't static. If an account moves from Standard to Watchlist classification, more provisioning is needed. If balances grow, absolute provision amount changes. Daily batch reads PV.PROFILE and recalculates per PV.CALCULATION rules — posting any required adjustment entries (debit P&L expense, credit provision liability). Keeps provisioning current automatically."
+  },
+  {
+    "id": 670,
+    "topic": "Teller",
+    "q": "Marketing Exchange Profit/Loss is captured by the system when…",
+    "options": [
+      "Always",
+      "The OFFERED exchange rate differs from the TREASURY (mid) rate — bank profits/loses on the spread",
+      "Never",
+      "Random times"
+    ],
+    "correct": 1,
+    "tip": "Banks make money on FX spreads at the teller. The teller might offer 1 USD = 0.83 EUR while the underlying treasury rate is 0.85. The system automatically books the spread (0.02 × amount) as Marketing Exchange Profit. Conversely, if marketing rate is more generous than treasury, the bank books a loss. This automation captures the FX spread revenue stream without manual tracking."
+  },
+  {
+    "id": 671,
+    "topic": "Interest",
+    "q": "Daily, Average, or Min/Max value-dated balances are options for…",
+    "options": [
+      "Random",
+      "The interest calculation basis — different products use different balance methods (e.g. credit cards use Average Daily Balance)",
+      "Reporting",
+      "Customer scoring"
+    ],
+    "correct": 1,
+    "tip": "Different products compute interest on different balance methods. Credit cards typically use Average Daily Balance (sum balances each day, divide by days in period). Savings accounts might use Daily (point-in-time). Some products use Minimum Balance during the period (to discourage end-of-period gaming). The Interest Engine supports all these methods configurably."
+  },
+  {
+    "id": 672,
+    "topic": "Charges",
+    "q": "TRANSACTION.CHARGE captures fees tied to…",
+    "options": [
+      "Customer login",
+      "Specific transactions (e.g. fee per wire transfer, per ATM withdrawal abroad, per cheque issued)",
+      "Random fees",
+      "Account opening"
+    ],
+    "correct": 1,
+    "tip": "TRANSACTION.CHARGE configures per-transaction fees — a fee that triggers when a specific transaction type occurs. £25 per international wire, £2 per non-bank ATM, £0.50 per cheque. The fee is calculated and posted automatically as part of transaction processing — no manual fee entry, no leakage, no inconsistency between branches."
+  },
+  {
+    "id": 673,
+    "topic": "COB",
+    "q": "JOB.PROGRESS enquiry shows…",
+    "options": [
+      "Random",
+      "Real-time completion percentage of individual COB jobs — operators can see progress mid-batch",
+      "User progress",
+      "Customer scores"
+    ],
+    "correct": 1,
+    "tip": "JOB.PROGRESS is the operations team's window into running COB. It shows current job, % complete, estimated time remaining. AGENT.STATUS shows the health of each tSA worker. COB.PROGRESS shows the overall percentage. Together they let ops monitor a 4-hour overnight batch in real time — and predict when online services can resume the next day."
+  },
+  {
+    "id": 674,
+    "topic": "Testing",
+    "q": "The automated testing framework's 'trace' feature records…",
+    "options": [
+      "Random data",
+      "Number of I/Os, calls to subroutines, total elapsed time — performance metrics per test",
+      "User clicks",
+      "Customer responses"
+    ],
+    "correct": 1,
+    "tip": "Trace captures the technical performance of each test run: how many disk reads/writes the operation triggered, how many sub-routine calls it made, total elapsed CPU time. Developers analyze these to identify performance regressions. A change that doubles I/O count is suspicious even if functionally correct — it might blow up COB performance under production volume."
+  },
+  {
+    "id": 675,
+    "topic": "Account Closure",
+    "q": "Posting Restriction codes 90-99 are reserved for…",
+    "options": [
+      "Random",
+      "Closure flags — prevent unauthorized debits/credits once an account closure is initiated",
+      "Customer disputes",
+      "Random uses"
+    ],
+    "correct": 1,
+    "tip": "Codes 0-89 are general posting restrictions (Account Frozen, Deceased, etc.). 90-99 are RESERVED for the closure workflow. When ACCOUNT.CLOSURE starts, the system applies a 90-99 restriction; this is structurally distinct from operational restrictions and is final. Once 90-99 applies, the account is in unwind mode — only closure-related postings can occur."
+  },
+  {
+    "id": 676,
+    "topic": "AA Accounting",
+    "q": "AA.ACCOUNT.DETAILS holds…",
+    "options": [
+      "Random",
+      "Account-related fields specific to an AA arrangement — bridges generic AA structure to ACCOUNT-class behavior",
+      "Customer emails",
+      "User data"
+    ],
+    "correct": 1,
+    "tip": "AA arrangements can implement many product types (loans, deposits, accounts). When the arrangement IS an account, AA.ACCOUNT.DETAILS holds account-specific fields (e.g. statement frequency, overdraft features). It's the bridge between the generic AA framework and the specific ACCOUNT behaviors customers expect. Internal — most users never see it."
+  },
+  {
+    "id": 677,
+    "topic": "Provisioning",
+    "q": "PV.PROFILE defines…",
+    "options": [
+      "Random",
+      "The provisioning calculation profile — which method (Standard%/IFRS9 statistical), which inputs, how to post entries",
+      "Customer profiles",
+      "User salaries"
+    ],
+    "correct": 1,
+    "tip": "PV.PROFILE is the per-product-or-segment provisioning configuration. It specifies: which calculation method to use (simple % or statistical IFRS 9 with PD/LGD/LIP inputs), which categories to debit/credit, what frequency. Different products often need different profiles (mortgages vs unsecured personal loans have different risk dynamics). Centralizing in PV.PROFILE keeps provisioning consistent."
+  },
+  {
+    "id": 678,
+    "topic": "AA Accounting",
+    "q": "AC.PRE.CLOSURE.DETAILS is populated by…",
+    "options": [
+      "Customer service rep",
+      "Pre-closure simulation — recalculates final interest/charges, identifies any blocking overrides, all WITHOUT affecting live balances",
+      "Random",
+      "User typing"
+    ],
+    "correct": 1,
+    "tip": "Before committing a closure, AC.PRE.CLOSURE.DETAILS runs a SIMULATION. It computes: final accrued interest to date, any unbilled charges, the exact payout amount, any blocking issues (overrides not yet approved, missing documents). The branch officer reviews this. If anything's wrong, fix it before initiating REQUEST.CLOSURE. No partial closures, no surprises."
+  },
+  {
+    "id": 679,
+    "topic": "Audit",
+    "q": "Why is the CURR.NO audit field designed to monotonically increase?",
+    "options": [
+      "Random",
+      "Version tracking — CURR.NO=1 is the original input, CURR.NO=2 is the first amendment, etc. Combined with HIS suffix gives chronological audit",
+      "Customer count",
+      "User scores"
+    ],
+    "correct": 1,
+    "tip": "Every record's CURR.NO starts at 1 and increments with each authorized amendment. The HIS file's suffixes (;1, ;2, ;3) align with these. So 'show me CUSTOMER 123456 at CURR.NO=4' fetches the specific historical state. Combined with INPUTTER/AUTHORISER/DATE.TIME, it forms a complete forensic timeline — required for SOX, Basel, and similar standards."
+  },
+  {
+    "id": 680,
+    "topic": "Capability Map",
+    "q": "The 'Stateful Data Mapping' in Composite Screens uses SELECT.FROM to…",
+    "options": [
+      "Random",
+      "Pass selection criteria (e.g. a Customer ID from a primary frame) to other tabs/frames automatically — preserves context across the workspace",
+      "Filter customers",
+      "Login authentication"
+    ],
+    "correct": 1,
+    "tip": "Composite Screens divide the browser into multiple frames. SELECT.FROM and Enquiry Mapping pass the CONTEXT (e.g. the selected Customer ID) from one frame to another — so when you click a customer in the search frame, the detail frame automatically shows that customer's accounts, the third frame shows their last 10 transactions, etc. No re-keying; everything stays in sync."
+  },
+  {
+    "id": 681,
+    "topic": "Capability Map",
+    "q": "Role-Based Home Pages combine which elements?",
+    "options": [
+      "Random",
+      "Banners, menus, real-time operational dashboards into a unified landing page tailored to a specific role (Teller, Supervisor)",
+      "Customer accounts",
+      "Random data"
+    ],
+    "correct": 1,
+    "tip": "When a Teller logs in, they see a Teller-specific home page: prominent buttons for cash transactions, quick-search for customers, real-time queue of pending overrides. A Supervisor sees a different home page — dashboards for branch performance, pending authorizations awaiting their approval. Role-Based Home Pages compose all this from EB.COMPOSITE.SCREEN + dashboards + menus."
+  },
+  {
+    "id": 682,
+    "topic": "Capability Map",
+    "q": "The DE.OUTWARD routine and DE.PRINT pair handle…",
+    "options": [
+      "Customer outreach",
+      "Outbound transaction advice formatting (DE.OUTWARD via DE.FORMAT.PRINT) + delivery to physical printer or system disk (DE.PRINT)",
+      "Random",
+      "Customer emails"
+    ],
+    "correct": 1,
+    "tip": "When a transaction is authorized that requires customer notification (a deal slip, confirmation, advice), DE.OUTWARD formats the raw data into human-readable layout (per DE.FORMAT.PRINT). DE.PRINT then dispatches to physical printers OR a system disk hold queue (&HOLD&) for digital review. Banner pages use DEPT.ACCT.OFFICER data to route printouts to the correct internal department."
+  },
+  {
+    "id": 683,
+    "topic": "Capability Map",
+    "q": "AUTO.NEXT.REVIEW.DATE on a CUSTOMER record automates…",
+    "options": [
+      "Random",
+      "KYC re-review scheduling — system-calculated next review date based on risk profile (higher risk = more frequent review)",
+      "Random tracking",
+      "User scores"
+    ],
+    "correct": 1,
+    "tip": "KYC isn't a one-off — high-risk customers need re-review (e.g. annually); standard customers maybe every 3 years. AUTO.NEXT.REVIEW.DATE is computed by rules based on risk profile. The system flags upcoming reviews during COB; staff get alerts. MANUAL.NEXT.REVIEW.DATE lets staff override if a special situation requires earlier review."
+  },
+  {
+    "id": 684,
+    "topic": "Capability Map",
+    "q": "CR.CONTACT.LOG provides…",
+    "options": [
+      "Random",
+      "Interaction history — every customer touchpoint logged for 360-degree relationship view (calls, meetings, complaints, sales attempts)",
+      "Random data",
+      "Login times"
+    ],
+    "correct": 1,
+    "tip": "CR.CONTACT.LOG is the CRM-like interaction history. Every customer touchpoint — phone call (logged by call center), branch visit, email, complaint, sales pitch — gets a CR.CONTACT.LOG entry. Combined with profile changes (tracked in $HIS), this gives the relationship manager a TRUE 360-degree view. Helps avoid embarrassing situations like calling a customer who complained yesterday."
+  },
+  {
+    "id": 685,
+    "topic": "Capability Map",
+    "q": "MANDATORY.FIELD in a VERSION (Projection) does what compared to the DDD field's mandatory flag?",
+    "options": [
+      "No difference",
+      "Lets a Projection make an OPTIONAL DDD field MANDATORY for this specific UI — without changing the underlying DDD",
+      "Random",
+      "Encrypts the field"
+    ],
+    "correct": 1,
+    "tip": "The DDD says 'this field is optional in general'. A specific Projection (e.g. CORPORATE-CUSTOMER-OPEN) may need it to be MANDATORY for THIS role/scenario. The MANDATORY.FIELD override in the Projection enforces this without modifying the underlying DDD. Other Projections on the same Table see the original optional status. Per-role rule customization."
+  },
+  {
+    "id": 686,
+    "topic": "Capability Map",
+    "q": "REPGEN's 4-stage processing engine produces…",
+    "options": [
+      "Random",
+      "High-volume custom reports — Create → Source → Sort → Output stages compile and execute custom BASIC routines",
+      "Customer reports",
+      "User reports"
+    ],
+    "correct": 1,
+    "tip": "REPGEN is the BASIC-routine-based report engine. The four stages are: CREATE (compile the report definition), SOURCE (extract data from tables), SORT (order it as configured), OUTPUT (format and write to printer/disk). It's used for very high-volume reports that ENQUIRY isn't optimized for (millions of records). REPGEN.CREATE captures the definition."
+  },
+  {
+    "id": 687,
+    "topic": "Capability Map",
+    "q": "Output retention (purging) is governed by which controls?",
+    "options": [
+      "Random",
+      "HOLD.CONTROL with configurable retention periods — old printed reports purge automatically to maintain server performance",
+      "Customer requests",
+      "User passwords"
+    ],
+    "correct": 1,
+    "tip": "Printed reports stack up. HOLD.CONTROL defines retention periods per report type — e.g. tellers' end-of-day reports kept 30 days; regulatory reports 7 years. After retention, old reports are purged from &HOLD& disk space. Keeps server storage manageable. Banks configure retention based on regulatory requirements + operational needs."
+  },
+  {
+    "id": 688,
+    "topic": "Capability Map",
+    "q": "Banner pages on physical print output are generated automatically using metadata from…",
+    "options": [
+      "Random",
+      "USER and DEPT.ACCT.OFFICER records — ensuring prints reach the correct internal department",
+      "Customer photos",
+      "Server logs"
+    ],
+    "correct": 1,
+    "tip": "In a big bank, the printer prints reports for dozens of departments. Each printout gets a BANNER PAGE on top showing destination — pulled from USER and DEPT.ACCT.OFFICER records. So when the printer attendant looks at the stack, they know exactly which department each report is for. Distribution becomes automatic. Saves operations time and prevents misdelivered confidential reports."
+  },
+  {
+    "id": 689,
+    "topic": "Capability Map",
+    "q": "EB.GC.ACTIVE and EB.GC.PARAMETER are part of which framework?",
+    "options": [
+      "Random framework",
+      "Validation engine — Active rules, parameters, constraints managed centrally; supports Errors (block) vs Overrides (warn-approve)",
+      "Customer relationship",
+      "User management"
+    ],
+    "correct": 1,
+    "tip": "The Generic Constraints (GC) framework is the central validation engine. EB.GC.CONSTRAINTS = constraint definitions; EB.GC.ACTIVE = which are currently active; EB.GC.PARAMETER = configuration knobs. Constraints can be Errors (hard block) or Overrides (soft warn; approved by OVERRIDE.CLASS). Supports rule cumulative or hierarchical evaluation (User > Application > Group priority)."
+  },
+  {
+    "id": 690,
+    "topic": "Capability Map",
+    "q": "Group Limits and Liability Groups serve…",
+    "options": [
+      "Random purpose",
+      "Aggregating credit exposure across complex corporate webs — a parent and its subsidiaries share consolidated credit lines",
+      "Customer dating",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "Corporate banking deals with complex group structures: a parent has 5 subsidiaries; collectively they want a £50M facility. Liability Group ties members to a Group Master. Limit Sharing Group lets multiple parties draw against ONE shared facility. Real-time enforcement ensures total drawn across the group never exceeds the consolidated limit, even though drawn by different legal entities."
+  },
+  {
+    "id": 691,
+    "topic": "Audit",
+    "q": "Why does the Application Registry audit violations even when individual user logging is disabled?",
+    "options": [
+      "Random",
+      "Security violations are TOO IMPORTANT to be missed — PROTOCOL file captures them unconditionally as a mandatory audit floor",
+      "Vendor whim",
+      "Performance"
+    ],
+    "correct": 1,
+    "tip": "The PROTOCOL file enforces a security floor that overrides per-user logging settings. Even if a user has logging disabled (perhaps for privacy or operational reasons), VIOLATIONS — failed logins, unauthorized access attempts, password resets — ALWAYS land in PROTOCOL. The audit trail of security events is non-optional. EOD reporting from PROTOCOL provides regulators with the violation history."
+  },
+  {
+    "id": 692,
+    "topic": "Capability Map",
+    "q": "CARD.CHARGE allows the bank to…",
+    "options": [
+      "Random",
+      "Automatically calculate and apply card-specific fees (issuance, annual, replacement) based on tariff configurations",
+      "Customer photos",
+      "Login fees"
+    ],
+    "correct": 1,
+    "tip": "CARD.CHARGE handles fees specific to cards: card issuance fee (£25 for a new debit card), annual fee on credit cards, replacement fee for lost cards. Like all charge frameworks, it supports flat, percentage, or tiered structures. Linked to the primary account via CARD.ISSUE, so fees automatically debit the right account on the configured schedule."
+  },
+  {
+    "id": 693,
+    "topic": "Capability Map",
+    "q": "DD.RETURN handles…",
+    "options": [
+      "Random data",
+      "Direct Debit unpaid returns — when the receiving bank rejects the DD (e.g. account closed, NSF), the rejection comes back via DD.RETURN",
+      "Customer returns",
+      "User logouts"
+    ],
+    "correct": 1,
+    "tip": "Not every Direct Debit succeeds. The receiving bank may reject (account closed, no funds, mandate cancelled). DD.RETURN captures these rejections with reason codes. The originating bank then handles them: notify the customer, retry, escalate to manual collection, or write off. Without proper return handling, DD-based collections would be a mess."
+  },
+  {
+    "id": 694,
+    "topic": "Capability Map",
+    "q": "BULK.STO supports…",
+    "options": [
+      "Bulk customer creation",
+      "High-volume standing-order initiation — for instance, a payroll system pushing 50,000 salary credits to employees on the same day",
+      "Random",
+      "User logouts"
+    ],
+    "correct": 1,
+    "tip": "BULK.STO is for bulk recurring transfers. Classic use: a corporation's payroll — 50,000 salary payments to be made same day. Instead of 50,000 individual STO records, BULK.STO can be configured with the recipient list, and the system processes them as a batch via FT.BULK.CREDIT routing. Far more efficient than individual processing."
+  },
+  {
+    "id": 695,
+    "topic": "Capability Map",
+    "q": "STOP.TXN logic on documents is invoked at which point?",
+    "options": [
+      "Random",
+      "Transaction authorization time — if required documents missing or expired, AUTH is blocked",
+      "Customer login",
+      "Random moment"
+    ],
+    "correct": 1,
+    "tip": "STOP.TXN runs at the AUTHORIZATION moment of a financial transaction. The system checks: does this customer/contract have all required documents in valid status? If anything's Missing or Expired, AUTH is blocked. The user sees an error explaining which doc is needed. Prevents transactions from clearing into LIV while compliance is incomplete."
+  },
+  {
+    "id": 696,
+    "topic": "Capability Map",
+    "q": "STOCK.REGISTER vs STOCK.ENTRY in cheque management — what's the difference?",
+    "options": [
+      "No difference",
+      "STOCK.ENTRY = receiving new blank stationery into inventory; STOCK.REGISTER = maintaining the current inventory state",
+      "STOCK.ENTRY is internal",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "STOCK.ENTRY records the INTAKE event ('1000 new blank cheque books received from supplier'). STOCK.REGISTER maintains the current state ('Vault holds 800 books; Till 1 has 50; Till 2 has 50; Till 3 has 100'). Together they form a complete inventory tracking system — auditable from supplier to specific Till. Compliance for high-value blank instruments."
+  },
+  {
+    "id": 697,
+    "topic": "Capability Map",
+    "q": "DM.APPLICATION.INFO handles…",
+    "options": [
+      "Random",
+      "Document Management application-level integration metadata — links T24 applications to specific document requirements",
+      "Customer DMs",
+      "User messages"
+    ],
+    "correct": 1,
+    "tip": "DM.APPLICATION.INFO bridges document management to specific application records. It defines which applications require which document types, how documents map to records, and how lifecycle events (e.g. account closure) trigger document archive workflows. Without it, document management would be siloed; with it, documents tie back to specific contracts/customers automatically."
+  },
+  {
+    "id": 698,
+    "topic": "Capability Map",
+    "q": "EB.RULE.GATEWAY is the underlying engine used by…",
+    "options": [
+      "A single feature",
+      "Eligibility checks, Asset Classification rules, and other rules-driven workflows — the system's central rules-evaluation framework",
+      "Random",
+      "Customer service"
+    ],
+    "correct": 1,
+    "tip": "EB.RULE.GATEWAY is the generic rules engine. Eligibility (can customer X buy product Y?) uses it. Asset Classification (is this loan Standard or Watchlist?) uses it. Many other rule-driven flows. By centralizing in EB.RULE.GATEWAY (with EB.CONTEXT supplying inputs), the system avoids dozens of one-off rule engines — one consistent, configurable framework for every rules-based decision."
+  },
+  {
+    "id": 699,
+    "topic": "Capability Map",
+    "q": "IMAGE.APPLICATION maps digital images to specific records by…",
+    "options": [
+      "Random",
+      "Storing the application name (e.g. CUSTOMER), the record ID, and the image ID — providing cross-reference for retrieval",
+      "Encrypting them",
+      "Random data"
+    ],
+    "correct": 1,
+    "tip": "IMAGE.APPLICATION is the cross-reference Table. For each digital image (IM.DOCUMENT.IMAGE), it stores: which application (CUSTOMER, ACCOUNT, COLLATERAL), which record ID, and the image ID. So when a teller opens CUSTOMER 12345, the system queries IMAGE.APPLICATION for matching entries and displays the signature, passport scan, etc. — instant retrieval without complex search."
+  },
+  {
+    "id": 700,
+    "topic": "Capability Map",
+    "q": "Why does the cheque/card lifecycle decouple Product (CARD.TYPE / CHEQUE.TYPE) from Instance (CARD.ISSUE / CHEQUE.ISSUE)?",
+    "options": [
+      "Random design",
+      "Allows banks to define product behavior ONCE (expiry rules, billing) and deploy many instances; same Product/Contract pattern as in AA",
+      "More complex for fun",
+      "Vendor mandate"
+    ],
+    "correct": 1,
+    "tip": "The Product-vs-Instance split is consistent across the platform: CARD.TYPE defines behavior (VISA Platinum, 3-year expiry); CARD.ISSUE is an instance for a specific customer. CHEQUE.TYPE defines behavior; CHEQUE.ISSUE is the actual book. PRODUCT defines lending behavior; ARRANGEMENT is the customer loan. Same separation everywhere — change the product once, all instances benefit (or stay frozen if NON.TRACKING)."
   }
 ]

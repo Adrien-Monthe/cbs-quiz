@@ -6238,5 +6238,1305 @@
     ],
     "correct": 1,
     "tip": "The Schema in the Dynamic Data Dictionary is the source of truth for validation behavior. It tells you each Field's type, allowed values, mandatory/optional status, default values, and any attached validation routines. Because the DDD is hot-swappable, admins can also update validation rules here and they take effect immediately — no recompilation."
+  },
+  {
+    "id": 481,
+    "topic": "Virtual GL",
+    "q": "A retail bank wants the General Ledger to be assembled at runtime from transactional data rather than being a rigid pre-defined chart of accounts. This describes…",
+    "options": [
+      "Manual ledger",
+      "Virtual General Ledger (VGL)",
+      "Saga pattern",
+      "Static reporting"
+    ],
+    "correct": 1,
+    "tip": "The Virtual General Ledger (VGL) is a CBS concept where the GL is LOGICAL and constructed dynamically from underlying accounting entries using Consolidation Keys — instead of being a pre-defined chart of accounts. Benefits: dynamic grouping, support for multiple accounting standards (e.g. local GAAP + IFRS simultaneously), and creation of GL accounts only when needed (reducing data volume)."
+  },
+  {
+    "id": 482,
+    "topic": "Virtual GL",
+    "q": "A 'Transaction-Driven Accounting Model' means…",
+    "options": [
+      "Accounting entries are typed manually each night",
+      "Accounting entries are generated automatically as a direct result of business transactions",
+      "Accounting is done quarterly only",
+      "Accounting depends on hand-stamped paper slips"
+    ],
+    "correct": 1,
+    "tip": "Transaction-Driven Accounting means every business transaction (a payment, a fee, an interest accrual) AUTOMATICALLY raises the corresponding accounting entries in real time. The transaction is the SINGLE SOURCE OF TRUTH — operations and accounting cannot diverge. Compare with the legacy approach where accountants entered figures manually or batched them overnight."
+  },
+  {
+    "id": 483,
+    "topic": "Virtual GL",
+    "q": "Which Table in CBS stores entries reflecting account-level movements (Assets and Liabilities)?",
+    "options": [
+      "STMT.ENTRY",
+      "CATEGORY.ENTRY",
+      "PROGRAM",
+      "DATES"
+    ],
+    "correct": 0,
+    "tip": "STMT.ENTRY (Statement Entry) stores account movements affecting Asset and Liability balances. Key fields include ACCOUNT.NO (which account moved), DEBIT.CREDIT (which side), AMOUNT.FCY/AMOUNT.LCY (foreign and local currency amounts), CURRENCY, TRANSACTION.CODE, BOOKING.DATE/VALUE.DATE/PROCESSING.DATE, ACCOUNT.OFFICER/CO.CODE, and CONSOL.KEY for consolidation."
+  },
+  {
+    "id": 484,
+    "topic": "Virtual GL",
+    "q": "Which Table holds entries that affect the bank's Profit & Loss categories?",
+    "options": [
+      "STMT.ENTRY",
+      "CATEGORY.ENTRY",
+      "AA.ARRANGEMENT",
+      "USER"
+    ],
+    "correct": 1,
+    "tip": "CATEGORY.ENTRY (Category Entry) stores entries that hit specific P&L categories — typically used for fees, interest income/expense, and other revenue/cost items. Key fields include CATEGORY (the specific P&L category), DEBIT.CREDIT, AMOUNT.FCY/AMOUNT.LCY, TRANSACTION.CODE, and CONSOL.KEY. Together STMT.ENTRY and CATEGORY.ENTRY cover the full double-entry posting."
+  },
+  {
+    "id": 485,
+    "topic": "Virtual GL",
+    "q": "A bank cashier processes a customer wire transfer at 14:30 today. The funds will be available on the recipient's account on the next business day. Which date attribute tracks the 'when does this affect the account balance for calculation' moment?",
+    "options": [
+      "Booking Date",
+      "Value Date",
+      "Transaction Date",
+      "Processing Date"
+    ],
+    "correct": 1,
+    "tip": "VALUE DATE = the date from which the funds count for interest and balance calculations. It can differ from when the entry was BOOKED. BOOKING DATE = when the entry was recorded in the ledger. TRANSACTION DATE = when the customer initiated. PROCESSING DATE = when the system actually executed. For interest accrual, Value Date matters most."
+  },
+  {
+    "id": 486,
+    "topic": "Virtual GL",
+    "q": "A securities trade is executed Tuesday, settled Thursday. The bank records the trade on Tuesday for risk management but the cash moves Thursday. The date capturing the original deal moment is…",
+    "options": [
+      "Booking Date",
+      "Value Date",
+      "Transaction (Trade) Date",
+      "Processing Date"
+    ],
+    "correct": 2,
+    "tip": "TRANSACTION (TRADE) DATE captures when the deal was originally struck — the contractual moment. SETTLEMENT (often = Value Date) is when funds actually move. BOOKING DATE is when the entry was recorded in the books. Each date can be different; together they capture the full timeline for compliance, risk, and accounting purposes."
+  },
+  {
+    "id": 487,
+    "topic": "Virtual GL",
+    "q": "Which architectural property makes consolidation flexible enough to support local GAAP and IFRS simultaneously over the same transactions?",
+    "options": [
+      "Hardcoded chart of accounts",
+      "Consolidation Keys (parameterized criteria)",
+      "Manual journal entries",
+      "Random sampling"
+    ],
+    "correct": 1,
+    "tip": "CONSOLIDATION KEYS are parameterized criteria attached to each accounting entry — they can encode product, currency, sector, category, residency, balance type. Different KEY combinations roll up entries into different views: one consolidation key set rolls up by local GAAP, another by IFRS. Same underlying entries, multiple parallel reports — no parallel postings required."
+  },
+  {
+    "id": 488,
+    "topic": "Virtual GL",
+    "q": "Which is NOT one of the four primary date types tracked on STMT.ENTRY/CATEGORY.ENTRY records?",
+    "options": [
+      "Booking Date",
+      "Value Date",
+      "Processing Date",
+      "Tax Date"
+    ],
+    "correct": 3,
+    "tip": "The four primary date types are: BOOKING DATE (when recorded in ledger), VALUE DATE (when funds affect balance/interest), TRANSACTION/TRADE DATE (when initiated), and PROCESSING DATE (when system actually ran the operation). Tax Date is a separate concept handled by tax modules — not one of the canonical posting dates."
+  },
+  {
+    "id": 489,
+    "topic": "Virtual GL",
+    "q": "A bank operating across 6 countries needs to produce balance sheets per country, per currency, and per product line — all from the same underlying entries. Which architectural feature enables this?",
+    "options": [
+      "Manual reclassification each quarter",
+      "Dynamic consolidation via Consolidation Keys",
+      "Six separate databases",
+      "Hardcoded reports"
+    ],
+    "correct": 1,
+    "tip": "Consolidation Keys let one set of accounting entries be sliced multiple ways for reporting. By encoding country, currency, product line as dimensions in the key, the same transaction data rolls up differently per dimension. Six countries × multiple currencies × multiple product lines — no data duplication, just configurable key-based aggregation."
+  },
+  {
+    "id": 490,
+    "topic": "Virtual GL",
+    "q": "Comparing legacy vs modern accounting: which is characteristic of the LEGACY (Direct/Manual) approach?",
+    "options": [
+      "Granular, instant visibility per line item",
+      "Summary-based, delayed visibility; high error risk; slow month-end-focused processing",
+      "Automated, real-time recording",
+      "Seamless audit trail"
+    ],
+    "correct": 1,
+    "tip": "The Legacy/Direct/Manual approach is summary-based and delayed — accountants typed in or batched entries periodically. Errors were common (manual input), audit trails were hard to reconstruct, and visibility lagged. The modern Transaction-Driven approach reverses all these: automated, real-time, granular, low-risk, with seamless audit."
+  },
+  {
+    "id": 491,
+    "topic": "Virtual GL",
+    "q": "Soft Accounting allows…",
+    "options": [
+      "Only IT to change accounting rules via code",
+      "Banks to adjust postings via CONFIGURATION rather than code changes",
+      "Customers to write their own entries",
+      "Reports to be deleted"
+    ],
+    "correct": 1,
+    "tip": "Soft Accounting moves accounting decisions from CODE into CONFIGURATION. The bank defines, per product or event, what debit/credit movement, posting details, transaction codes, categories, and balance types should be raised — all in config. Hard parts (amounts, currencies, at least one essential entry reflecting the operation's nature) remain pre-set; the flexible parts are configurable."
+  },
+  {
+    "id": 492,
+    "topic": "Virtual GL",
+    "q": "An AC.EVENT is best described as…",
+    "options": [
+      "A user login event",
+      "A defined accounting event (like INTEREST-ACCRUAL or LOAN-DISBURSEMENT) that triggers postings",
+      "An audit log entry",
+      "A holiday flag"
+    ],
+    "correct": 1,
+    "tip": "AC.EVENT represents a specific accounting trigger — e.g. WITHDRAWAL-FEE, ACCRUAL-INTEREST-DAILY, DRAWDOWN-DISBURSE. Each AC.EVENT is mapped (via AC.ALLOCATION.RULE) to the specific debit/credit movements and balance impacts it generates. The chain: AC.EVENT → AC.ALLOCATION.RULE → AC.POSTING.DETAILS → Accounting entries (STMT.ENTRY / CATEGORY.ENTRY)."
+  },
+  {
+    "id": 493,
+    "topic": "Virtual GL",
+    "q": "AC.ALLOCATION.RULE defines…",
+    "options": [
+      "UI colors",
+      "How an AC.EVENT translates into specific debit/credit movements, codes, categories, and balance types",
+      "Password rules",
+      "Holiday rules"
+    ],
+    "correct": 1,
+    "tip": "AC.ALLOCATION.RULE is the heart of Soft Accounting. For each AC.EVENT, the rule specifies the debit/credit movement, posting details (transaction code, category, balance type) and may multiply by amounts/currencies. The rule transforms a single accounting event into one or more accounting entries — completely via configuration."
+  },
+  {
+    "id": 494,
+    "topic": "Virtual GL",
+    "q": "Why does the system insist that 'at least one essential entry type reflecting the nature of the operation' must be pre-set, not soft-configurable?",
+    "options": [
+      "Random rule",
+      "To ensure the accounting outcome at least respects fundamental business semantics — e.g. an interest accrual MUST raise entries between Accrual A&L and P&L",
+      "For UI display",
+      "To save disk"
+    ],
+    "correct": 1,
+    "tip": "Soft Accounting can adjust codes, posting details, and add extra entries — but the system requires that the CORE entry that captures the economic nature of the operation be hard-coded. For instance, an INTEREST accrual must hit Accrual A&L vs P&L. Otherwise, banks could mis-configure the system into hiding losses or misrepresenting income. The constraint preserves accounting integrity."
+  },
+  {
+    "id": 495,
+    "topic": "Virtual GL",
+    "q": "An 'AL Key' (in consolidation) refers to…",
+    "options": [
+      "A login credential",
+      "Asset & Liability consolidation key, used to group Asset/Liability entries",
+      "Encryption certificate",
+      "User assignment"
+    ],
+    "correct": 1,
+    "tip": "AL Keys are Asset & Liability consolidation keys — they group STMT.ENTRY records that affect Asset/Liability balances. The complementary PL keys group CATEGORY.ENTRY records hitting P&L categories. Consolidation distinguishes contingent (off-balance-sheet) from non-contingent items, supporting both balance sheets and P&L reports from the same underlying entries."
+  },
+  {
+    "id": 496,
+    "topic": "Virtual GL",
+    "q": "Real-time posting (vs batch posting) in modern CBS means…",
+    "options": [
+      "Postings happen weekly",
+      "Accounting entries are created INSTANTLY during transaction execution, not at end-of-day",
+      "Postings require manual approval per entry",
+      "Postings happen quarterly"
+    ],
+    "correct": 1,
+    "tip": "In a real-time posting engine, the moment a business transaction (e.g. a $1,250 wire transfer for a Berlin SME client) is authorized, the accounting entries are raised immediately. No batch wait. Financial position is instantly accurate. The Legacy batch model would create the entries overnight — delaying visibility and audit."
+  },
+  {
+    "id": 497,
+    "topic": "Virtual GL",
+    "q": "An entry in CATEGORY.ENTRY for 'Interest Income on Personal Loans' would primarily be classified as…",
+    "options": [
+      "An Asset entry",
+      "A Liability entry",
+      "A P&L (Profit & Loss) category entry — Income side",
+      "An Equity entry"
+    ],
+    "correct": 2,
+    "tip": "CATEGORY.ENTRY holds P&L entries. 'Interest Income on Personal Loans' is income earned by the bank — it credits a P&L income category. The matching Asset-side debit (interest receivable or cash) is in STMT.ENTRY. Together they form the double-entry posting; the consolidation engine assembles them into balance sheet and P&L reports."
+  },
+  {
+    "id": 498,
+    "topic": "Virtual GL",
+    "q": "In a contemporary CBS approach, when a bank teller authorizes a customer's $850 cash deposit, what happens to the GL?",
+    "options": [
+      "Nothing until month-end",
+      "The transaction immediately raises STMT.ENTRY/CATEGORY.ENTRY records and the virtual GL is updated in real time",
+      "An accountant types it in tomorrow",
+      "An email is sent for manual posting"
+    ],
+    "correct": 1,
+    "tip": "Transaction-Driven Accounting: the moment the deposit is authorized, the posting engine raises STMT.ENTRY records (debit Cash, credit the customer's account liability) and the virtual GL is automatically rolled up via Consolidation Keys. No manual entry, no waiting, no batch. The transaction is its own accounting event."
+  },
+  {
+    "id": 499,
+    "topic": "Virtual GL",
+    "q": "Why do modern systems decouple accounting from business processes?",
+    "options": [
+      "For UI styling",
+      "So contract logic (e.g. loan lifecycle) doesn't need to know GL specifics — both can evolve independently",
+      "To slow processing",
+      "To avoid auditing"
+    ],
+    "correct": 1,
+    "tip": "Tight coupling means every loan-product change risks breaking accounting, and every accounting change risks breaking products. Decoupling lets contracts emit AC.EVENTs; the Soft Accounting layer maps these to postings independently. Accounting rules can be tuned for new regulators without touching loan code; loan products can evolve without rewriting GL rules."
+  },
+  {
+    "id": 500,
+    "topic": "Virtual GL",
+    "q": "A 'Reporting (GL)' layer sits at the TOP of the accounting pyramid; what sits at the BOTTOM?",
+    "options": [
+      "Auditing",
+      "Raised entries (STMT.ENTRY / CATEGORY.ENTRY)",
+      "Manual journals",
+      "User logins"
+    ],
+    "correct": 1,
+    "tip": "The pyramid is: BOTTOM = Raised entries (atomic STMT.ENTRY / CATEGORY.ENTRY records, one per business event) → MIDDLE = Consolidation by Keys (aggregation via Consolidation Keys) → TOP = Reporting (GL) (the consolidated views: balance sheet, P&L, regulatory reports). Operations can be Manual (UI) or Automatic (API)."
+  },
+  {
+    "id": 501,
+    "topic": "Virtual GL",
+    "q": "In Trade Dating vs Value Dating accounting, what's the practical difference?",
+    "options": [
+      "Both are the same",
+      "Trade dating records by when the deal was struck; Value dating records by when funds count for balance/interest",
+      "Trade dating is monthly; Value dating is yearly",
+      "Only Trade dating is legal"
+    ],
+    "correct": 1,
+    "tip": "Trade dating accounting recognizes the transaction on the deal date (when it was contractually agreed). Value dating accounting recognizes on the value date (when funds actually count for interest/balance). For securities, Trade and Value are usually different (T+2 settlement). For deposits/loans, value date often matters more. Choice depends on regulatory framework and product type."
+  },
+  {
+    "id": 502,
+    "topic": "Virtual GL",
+    "q": "STMT.ENTRY and CATEGORY.ENTRY are similar — both hold accounting entries. Their KEY difference is…",
+    "options": [
+      "STMT.ENTRY is for online; CATEGORY.ENTRY is for offline",
+      "STMT.ENTRY tracks Asset/Liability movements at the ACCOUNT level; CATEGORY.ENTRY tracks P&L category movements",
+      "STMT.ENTRY is for staff; CATEGORY.ENTRY is for customers",
+      "No difference"
+    ],
+    "correct": 1,
+    "tip": "STMT.ENTRY = Statement Entry, tied to a specific ACCOUNT (its balance moves). It contains ACCOUNT.NO and tracks Asset/Liability impacts. CATEGORY.ENTRY = tied to a P&L CATEGORY (Globus P&L categories 1-19999). It tracks revenue/expense impacts. Both have CONSOL.KEY for aggregation, but they sit on different sides of the bank's books."
+  },
+  {
+    "id": 503,
+    "topic": "Virtual GL",
+    "q": "Consolidation Keys can be either…",
+    "options": [
+      "Hard-coded only",
+      "Pre-defined (fixed) OR customized (banks define their own at initial setup)",
+      "Random",
+      "User-typed each transaction"
+    ],
+    "correct": 1,
+    "tip": "Consolidation Keys come in two flavors: PRE-DEFINED (vendor-provided standard keys for common dimensions like product, currency, sector) and CUSTOMIZED (banks define additional dimensions during setup — e.g. internal cost-center hierarchies, custom risk pools). Together they let each bank produce reports tailored to its org chart, regulators, and analytics needs."
+  },
+  {
+    "id": 504,
+    "topic": "Virtual GL",
+    "q": "A 'TRANSACTION.CODE' on STMT.ENTRY identifies…",
+    "options": [
+      "The customer's tax ID",
+      "What KIND of accounting transaction this entry represents (e.g. cash deposit, fee accrual, interest payment)",
+      "The login session",
+      "A user role"
+    ],
+    "correct": 1,
+    "tip": "TRANSACTION.CODE is a classifier identifying the type of accounting movement — e.g. 'CASH-DEP' for cash deposits, 'CHK-WD' for cheque withdrawals, 'INT-ACR' for interest accruals. Reporting uses TRANSACTION.CODE to filter and group entries — e.g. 'show me all fee accruals in May 2026 across all branches'."
+  },
+  {
+    "id": 505,
+    "topic": "Virtual GL",
+    "q": "What does the AMOUNT.FCY field on STMT.ENTRY store, compared with AMOUNT.LCY?",
+    "options": [
+      "The same value twice",
+      "AMOUNT.FCY = the amount in the Foreign (transaction) Currency; AMOUNT.LCY = the equivalent in the Local (company) Currency",
+      "FCY = fixed; LCY = liquid",
+      "Both are random"
+    ],
+    "correct": 1,
+    "tip": "Multi-currency banking requires dual-currency tracking. AMOUNT.FCY is the original transaction amount in its native currency (e.g. €4,200 for a Madrid transaction). AMOUNT.LCY is the equivalent in the bank's local currency (e.g. £3,750 if the bank's local books are in GBP). The CURRENCY field tells you what FCY is denominated in."
+  },
+  {
+    "id": 506,
+    "topic": "Virtual GL",
+    "q": "'Synthetic and analytical accounting' (as STMT.ENTRY supports) refers to…",
+    "options": [
+      "AI-generated fake accounts",
+      "Two views of the same data: synthetic (aggregated by category) and analytical (granular by account/contract)",
+      "Mocking accounting for testing",
+      "Hidden offshore accounts"
+    ],
+    "correct": 1,
+    "tip": "Synthetic accounting = summarized/aggregated view (totals per category). Analytical accounting = detailed view (per account, per contract). STMT.ENTRY supports BOTH because it captures both account-level details AND category-level groupings. CATEGORY.ENTRY supports synthetic accounting only (no account-level granularity)."
+  },
+  {
+    "id": 507,
+    "topic": "Virtual GL",
+    "q": "Why does a bank prefer GL accounts to be CREATED only when required (rather than all pre-existing)?",
+    "options": [
+      "For UI display",
+      "Reduces unnecessary data volume — keeps the chart of accounts lean and dynamic",
+      "Saves printer ink",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "Pre-creating thousands of empty GL accounts wastes storage and clutters reports. By creating accounts only when actually needed (driven by Consolidation Key combinations encountered in real entries), the system stays lean. Reports show only meaningful accounts; admins manage less; queries run faster. This is a core advantage of the Virtual GL approach over rigid chart-of-accounts."
+  },
+  {
+    "id": 508,
+    "topic": "Virtual GL",
+    "q": "If a Swiss subsidiary reports under local GAAP while the Group reports under IFRS, a Virtual GL handles this by…",
+    "options": [
+      "Maintaining two parallel sets of postings",
+      "One set of underlying entries, multiple consolidation key configurations rolling up differently per standard",
+      "Manually re-keying entries",
+      "Quarterly reconciliation"
+    ],
+    "correct": 1,
+    "tip": "The Virtual GL's killer feature: ONE source of accounting entries, MANY parallel views via different consolidation key configurations. Local GAAP rolls up by one set of keys; IFRS rolls up by another. Both views are always in sync because they reference the same underlying entries. No parallel postings, no reconciliation, no risk of divergence."
+  },
+  {
+    "id": 509,
+    "topic": "Virtual GL",
+    "q": "Soft Accounting allows the bank to ADJUST which of the following per AC.EVENT?",
+    "options": [
+      "The bank's logo",
+      "Transaction codes, posting details, added extra entries — flexibility to fine-tune accounting outcomes",
+      "Customer names",
+      "Holiday dates"
+    ],
+    "correct": 1,
+    "tip": "Soft Accounting's adjustability covers: TRANSACTION CODES (refine the classification), POSTING DETAILS (which sub-accounts/categories), and ADDED EXTRA ENTRIES (add supplementary postings for specific scenarios). Amounts and currencies are NOT adjustable in Soft Accounting — they're driven by the underlying business transaction; you can't make an event post different amounts than it economically represents."
+  },
+  {
+    "id": 510,
+    "topic": "Virtual GL",
+    "q": "A bank's 'CONSOL.KEY' field on STMT.ENTRY for a fixed-rate mortgage interest accrual on a USD denominated loan in the Sydney branch might look like…",
+    "options": [
+      "Just 'MORTGAGE'",
+      "A compound string encoding dimensions like product code, currency, sector, category, country, balance type",
+      "The customer's phone number",
+      "A random UUID"
+    ],
+    "correct": 1,
+    "tip": "CONSOL.KEY is a composite string encoding multiple dimensions: product code, currency, sector, category range, country/residency, balance type — separated by delimiters. The reporting layer groups entries sharing key prefixes for any required slice (e.g. 'all USD mortgage entries in Australia', 'all fee-revenue entries across Europe')."
+  },
+  {
+    "id": 511,
+    "topic": "Architecture",
+    "q": "The proposed CBS target architecture is described as 'metadata-driven'. What does this mean in practice?",
+    "options": [
+      "All data is metadata",
+      "Behavior — fields, validations, workflows, UI — is configured via metadata records rather than hardcoded in code",
+      "Metadata is the only thing stored",
+      "It only stores file timestamps"
+    ],
+    "correct": 1,
+    "tip": "A metadata-driven architecture stores the rules of behavior in configurable metadata records (TABLE.DEF for schema, FIELD.DEF for field rules, PROJECTION.DEF for UI, VALIDATION.PRGM for rules). Code becomes a generic engine that READS metadata and acts on it. Result: changing behavior = editing metadata = no code change, no recompile, no redeploy."
+  },
+  {
+    "id": 512,
+    "topic": "Architecture",
+    "q": "What is the role of an 'Activity Orchestrator' in the target architecture?",
+    "options": [
+      "A motivational coach",
+      "Centrally manages the entire business transaction (locking accounts, validating limits, posting accounting) in a deterministic atomic sequence",
+      "Runs ads",
+      "Connects to social media"
+    ],
+    "correct": 1,
+    "tip": "The Activity Orchestrator replaces distributed 'choreography' (events bouncing across microservices via message bus) with central 'orchestration' — one engine drives the full transaction (lock, validate, post, calculate) atomically. Eliminates race conditions, simplifies debugging, and prevents the half-committed state problem of saga-style designs."
+  },
+  {
+    "id": 513,
+    "topic": "Architecture",
+    "q": "Why is atomicity (all-or-nothing) of a complex banking transaction (e.g. a loan restructure) critical?",
+    "options": [
+      "For UI display",
+      "To prevent partial failures where balances update but schedules don't — which would corrupt data",
+      "To save processing time",
+      "To enable replay"
+    ],
+    "correct": 1,
+    "tip": "A loan restructure typically updates many things: principal, schedule, interest rate, accounting entries. If only some succeed and others fail, the loan is in a corrupt state. Atomicity (via the Activity Orchestrator) ensures the entire operation either fully completes or fully rolls back — leaving no half-updated mess that requires manual reconciliation."
+  },
+  {
+    "id": 514,
+    "topic": "Architecture",
+    "q": "In the legacy distributed-sagas architecture, what frameworks are typically used to pass events between microservices?",
+    "options": [
+      "Axon Framework and RabbitMQ",
+      "Apache Kafka only",
+      "REST APIs only",
+      "Email"
+    ],
+    "correct": 0,
+    "tip": "The legacy approach uses Axon Framework (which dictates a specific CQRS/Event Sourcing model) and RabbitMQ for messaging. The downside: distributed transaction failures, complex Saga management, and difficult rollback when events fail mid-flight. The target architecture replaces this with Apache Kafka for unified event streaming plus the Activity Orchestrator for transactional coordination."
+  },
+  {
+    "id": 515,
+    "topic": "Architecture",
+    "q": "Why is Apache Kafka preferred in the target architecture for asynchronous messaging?",
+    "options": [
+      "It's cheaper",
+      "Persistent + replayable + high-throughput event log — single source of truth for async data flows",
+      "It uses XML",
+      "It's slower"
+    ],
+    "correct": 1,
+    "tip": "Kafka offers: PERSISTENT (events are stored, not just delivered), REPLAYABLE (consumers can re-read history), and HIGH-THROUGHPUT (scales to millions of events/sec). For a bank with webhooks to external partners and many internal subscribers, this is critical. Compared with Axon's restrictive programming model + RabbitMQ's transient messages, Kafka simplifies the architecture significantly."
+  },
+  {
+    "id": 516,
+    "topic": "Architecture",
+    "q": "The Application (Table) Registry as a kernel-level component acts as…",
+    "options": [
+      "A clock",
+      "A single source of truth for all executable programs and data tables — enforcing 'no program runs and no data is accessed without registration'",
+      "A printer queue",
+      "A backup tool"
+    ],
+    "correct": 1,
+    "tip": "The Application Registry is the 'constitution' of the system — every program is registered (PROGRAM Registry) and every Table is registered (FILE Registry). The kernel refuses to execute unregistered code or access unregistered Tables. This central control eliminates uncontrolled data creation, enforces classification (INT/FIN/CUS), and supports the 4-Eyes Principle at the platform level."
+  },
+  {
+    "id": 517,
+    "topic": "Architecture",
+    "q": "The native $HIS and $NAU file architecture provides which key benefit for auditing?",
+    "options": [
+      "Faster CPU",
+      "Audit metadata (INPUTTER, AUTHORISER, timestamps) is STRUCTURALLY MANDATED inside every record at the storage level — no risk of message-bus failures losing logs",
+      "Smaller screen",
+      "No benefit"
+    ],
+    "correct": 1,
+    "tip": "In the legacy approach, audit logs were sent over a message bus to a separate Audit service. If the bus dropped a message, the audit trail had a gap. Native $HIS (History) and $NAU (Not Authorized) files structurally embed audit data INSIDE every record — INPUTTER, AUTHORISER, timestamps are committed atomically with the data itself. No async log loss possible."
+  },
+  {
+    "id": 518,
+    "topic": "Architecture",
+    "q": "Schema-less Extension (LOCAL.REF) lets developers and admins do what?",
+    "options": [
+      "Delete the database",
+      "Inject new fields DYNAMICALLY at runtime without recompiling microservices or altering DB schemas",
+      "Encrypt fields",
+      "Slow the system"
+    ],
+    "correct": 1,
+    "tip": "LOCAL.REF is the kernel mechanism for extending records with bank-specific fields. New fields are declared in metadata (LOCAL.REF.TABLE) and immediately appear in the record without database DDL or code recompile. Critical for regulatory adaptability — when a new compliance field is mandated, the bank adds it via config the same week, not via a 6-month project."
+  },
+  {
+    "id": 519,
+    "topic": "Architecture",
+    "q": "How does the target architecture handle the bank's day-end batch processing?",
+    "options": [
+      "Generic 'automated processes' that compete with online traffic",
+      "A dedicated, multi-threaded 5-Phase COB engine tailored for massive financial datasets",
+      "Manual cron jobs",
+      "External batch service"
+    ],
+    "correct": 1,
+    "tip": "The target introduces a purpose-built 5-Phase Close of Business (COB) engine — multi-threaded, dedicated to batch processing of interest accruals, statements, reports, etc. It DECOUPLES the system date from the business date — so batch processing doesn't degrade online API performance. Compare with legacy 'automated processes' that competed for the same DB resources as user transactions."
+  },
+  {
+    "id": 520,
+    "topic": "Architecture",
+    "q": "Why is the legacy approach of GraphQL BFF (Backend-For-Frontend) doing data-stitching across PostgreSQL and MongoDB a problem?",
+    "options": [
+      "GraphQL is illegal",
+      "Heavy joins across two DB engines make the BFF a performance bottleneck",
+      "MongoDB is too fast",
+      "PostgreSQL is unreliable"
+    ],
+    "correct": 1,
+    "tip": "When the BFF has to query PostgreSQL for Party data, then MongoDB for Accounts, then merge them in memory, it becomes the slowest link in every request. The target moves data-stitching back into the core database engine (where joins are optimized) and uses Next.js BFF purely for frontend view optimization — drastically reducing API latency."
+  },
+  {
+    "id": 521,
+    "topic": "Architecture",
+    "q": "What is the benefit of using Istio Service Mesh in the target Kubernetes stack?",
+    "options": [
+      "Pretty graphs",
+      "Out-of-the-box mTLS (zero-trust security between pods) plus intelligent traffic routing",
+      "Faster CPU",
+      "Free coffee"
+    ],
+    "correct": 1,
+    "tip": "Istio provides automatic mutual TLS (mTLS) between all pods — meaning all internal microservice traffic is encrypted by default with zero application-level configuration. It also handles intelligent routing (canary deploys, A/B tests, retries). Combined with the observability stack (Jaeger for tracing, Mimir for metrics), it gives operators full visibility into a distributed banking platform."
+  },
+  {
+    "id": 522,
+    "topic": "Architecture",
+    "q": "HashiCorp Vault is introduced in the target architecture for…",
+    "options": [
+      "Storing customer money",
+      "Dynamic secrets management and certificate rotation",
+      "Backups",
+      "User passwords"
+    ],
+    "correct": 1,
+    "tip": "HashiCorp Vault manages secrets dynamically — database credentials, API keys, TLS certificates — generating short-lived credentials and rotating them automatically. This replaces the legacy 'config-level secret management' (static secrets in config files, easy to leak). For a regulated bank, dynamic secrets dramatically reduce attack surface."
+  },
+  {
+    "id": 523,
+    "topic": "Architecture",
+    "q": "Ceph is introduced in the target architecture for…",
+    "options": [
+      "Customer data",
+      "High-performance distributed block and S3 object storage — esp. for Document Management (binary blobs)",
+      "Calculating interest",
+      "Sending email"
+    ],
+    "correct": 1,
+    "tip": "Ceph handles large binary blobs (scanned KYC documents, statements, contracts) on a distributed storage cluster — offloading them from the core transactional databases. This preserves IOPS (disk operations/sec) for high-speed transactional workloads. Legacy systems often store blobs inside the DB itself, dragging down core banking performance."
+  },
+  {
+    "id": 524,
+    "topic": "Architecture",
+    "q": "Which observability stack does the target architecture use?",
+    "options": [
+      "None",
+      "Prometheus, Mimir, Alloy, Jaeger, Logstash",
+      "Excel",
+      "Email reports"
+    ],
+    "correct": 1,
+    "tip": "The target observability stack: Prometheus (metrics scraping), Mimir (long-term metrics storage), Alloy (telemetry collection), Jaeger (distributed tracing), Logstash (log aggregation). Together they give developers and operators deep insight into the running system — for instance, Jaeger can pinpoint exactly which microservice and DB query is causing a latency spike."
+  },
+  {
+    "id": 525,
+    "topic": "Architecture",
+    "q": "Why does the target architecture introduce a SINGLE definition framework for products (vs services-per-channel)?",
+    "options": [
+      "For fun",
+      "Ensures consistent product logic and behavior across ALL channels (mobile, web, branch, API) without duplication",
+      "To slow rollout",
+      "For UI variety"
+    ],
+    "correct": 1,
+    "tip": "Legacy systems often have product logic duplicated in different services per channel — leading to drift (mobile loan calculator gives different result than branch one). A single product definition framework (the Product Factory) ensures one source of truth — every channel computes the same interest, same fees, same schedules. No drift, no reconciliation."
+  },
+  {
+    "id": 526,
+    "topic": "Architecture",
+    "q": "Activity History (in the target Product Factory) stores…",
+    "options": [
+      "Random data",
+      "Detailed records of exactly what changed (e.g. 'Interest Rate changed from 5% to 6%'), who did it, and when",
+      "Holiday tracking",
+      "Weather logs"
+    ],
+    "correct": 1,
+    "tip": "Activity History captures every change to an Arrangement as a structured event: which Activity ran, who triggered it, what fields changed, before and after values. This is far richer than a generic 'audit log' — it's specifically tied to the business semantics of the product. Regulators love this because it answers 'who reduced the rate?' or 'who waived the fee?' immediately."
+  },
+  {
+    "id": 527,
+    "topic": "Architecture",
+    "q": "Why store business rules ON the Product definition rather than in UI or COB code?",
+    "options": [
+      "Random preference",
+      "Centralization reduces 'spaghetti code' and makes the system easier to upgrade and maintain",
+      "Vendor mandate",
+      "It's slower"
+    ],
+    "correct": 1,
+    "tip": "If a rule like 'charge a fee if balance < $500' lives in UI code AND in COB code, you have to update both whenever the threshold changes — and risk drift. Storing the rule ON the Product centralizes it: one place to update, every channel respects it. The target architecture explicitly puts rules in Product definitions, not scattered across UIs or batch jobs."
+  },
+  {
+    "id": 528,
+    "topic": "Architecture",
+    "q": "Multi-company data segregation in the target architecture is enforced…",
+    "options": [
+      "Loosely via headers (legacy approach)",
+      "Built-in separation of data across INT, FIN, and CUS classifications at the kernel level",
+      "Not at all",
+      "By the customer"
+    ],
+    "correct": 1,
+    "tip": "Legacy approach often used HTTP headers or loose conventions to segregate company data — error-prone and bypassable. The target architecture bakes segregation INTO the kernel via classifications: INT (Installation, globally shared), FIN (Financial, strictly per-company), CUS (Customer, configurable). The kernel REFUSES to mix data across boundaries — making leakage architecturally impossible."
+  },
+  {
+    "id": 529,
+    "topic": "Architecture",
+    "q": "Edit Locking in the target architecture is described as a 'single active record per entity with collision detection and controlled lock handling'. Which file enables this?",
+    "options": [
+      "$ARC",
+      "$NAU (Unauthorized)",
+      "$SIM",
+      "$DEL"
+    ],
+    "correct": 1,
+    "tip": "$NAU is the singleton file holding in-flight changes (one record per entity ID). When user A's draft is in $NAU for record X, user B trying to edit X gets a controlled 'Record Locked' error. This native edit-locking is enforced at the file level — no distributed lock manager required, no race conditions possible."
+  },
+  {
+    "id": 530,
+    "topic": "Architecture",
+    "q": "Why does the target architecture place 'Centralized Governance' in the system kernel rather than in applications?",
+    "options": [
+      "Vendor whim",
+      "Reduces complexity and prevents 'spaghetti logic' across many apps each enforcing their own version of rules",
+      "Lazy programming",
+      "Hardware constraint"
+    ],
+    "correct": 1,
+    "tip": "Kernel-level governance = ONE place implements segregation, 4-Eyes, edit locking, audit. Applications just use these primitives. Scattered governance (different rules in different apps) causes drift, gaps, and 'whose-version-is-right?' chaos. Centralization simplifies upgrades, audits, and security reviews — the kernel is the trusted layer."
+  },
+  {
+    "id": 531,
+    "topic": "Architecture",
+    "q": "Compare legacy 'fragmented brokers' (Axon + RabbitMQ) vs target unified event streaming. What's eliminated?",
+    "options": [
+      "Customer data",
+      "The steep learning curve of Axon's CQRS/Event-Sourcing programming model + the dual-broker complexity",
+      "Banking transactions",
+      "User accounts"
+    ],
+    "correct": 1,
+    "tip": "Axon imposes a rigid CQRS/Event Sourcing programming style — developers must learn it before contributing. Plus RabbitMQ handled standard messaging. Two brokers = two operational stacks = two failure modes. Kafka alone handles everything (events, webhooks, async messaging) with a simpler model — fewer moving parts, lower cognitive load."
+  },
+  {
+    "id": 532,
+    "topic": "Architecture",
+    "q": "An 'External Event Publisher' (webhooks) in the target architecture is built on top of which broker?",
+    "options": [
+      "Email server",
+      "Apache Kafka",
+      "FTP",
+      "Carrier pigeon"
+    ],
+    "correct": 1,
+    "tip": "Kafka's persistence and replayability make it ideal for webhooks: even if an external partner's endpoint is down, events sit in Kafka and are delivered when they recover. Replay enables re-sending if a partner needs to recover from their outage. High throughput handles thousands of partners. Compare with RabbitMQ's transient delivery (lost if not consumed)."
+  },
+  {
+    "id": 533,
+    "topic": "Architecture",
+    "q": "Configurable validation framework (target arch) means validations are…",
+    "options": [
+      "Hardcoded in Java",
+      "Defined and executed dynamically based on metadata — admins can change rules without code changes",
+      "Random",
+      "Manual paper checks"
+    ],
+    "correct": 1,
+    "tip": "Instead of compiling validation logic into code, the framework reads validation rules from metadata (e.g. 'this field must be a positive amount in [USD, EUR, GBP]'). Admins update rules; the framework picks them up at runtime. Release cycles shrink from months to minutes for rule changes — critical for regulatory compliance."
+  },
+  {
+    "id": 534,
+    "topic": "Architecture",
+    "q": "Virtual Tables (in the target DDD) reduce the need for…",
+    "options": [
+      "Disk space",
+      "Physical Tables holding small static dictionaries (Risk Levels, Statuses, Country Codes for one form)",
+      "Database servers",
+      "Backups"
+    ],
+    "correct": 1,
+    "tip": "Without virtual tables, every small reference list ('Risk Level: HIGH/MEDIUM/LOW') becomes its own physical Table — clutter, schema bloat, migration overhead. Virtual Tables centralize all such lists in ONE physical table (EB.LOOKUP), distinguished by compound keys. The DDD reports 90% reduction in physical schema for simple reference data."
+  },
+  {
+    "id": 535,
+    "topic": "Architecture",
+    "q": "Per the target architecture, what's the benefit of 'Effective Dating & Versioning' on products?",
+    "options": [
+      "Random",
+      "Each product record is effective-dated — supports historical tracking AND scheduling future product launches/condition updates",
+      "Random pricing",
+      "Customer confusion"
+    ],
+    "correct": 1,
+    "tip": "Effective dating means each product version has start/end dates. The bank can schedule a fee structure change to take effect on a future date (e.g. 2027-01-01) — when that date arrives, the system automatically switches versions. Historical reports always use the version that was effective at the report date. No weekend deployments to flip versions."
+  },
+  {
+    "id": 536,
+    "topic": "Architecture",
+    "q": "The 5 primary triggers for Activities (in target architecture) include…",
+    "options": [
+      "Tarot cards, dreams, etc.",
+      "User (manual), Transaction (external apps), Scheduled (COB), OFS (external systems), Secondary (cascade from primary)",
+      "Only manual",
+      "Only batch"
+    ],
+    "correct": 1,
+    "tip": "Activities can originate from: USER (a manager manually edits), TRANSACTION (an external app submits a payment that drives an activity), SCHEDULED (the COB engine triggers daily accruals), OFS (Open Financial Service — external system integrations), or SECONDARY (one Activity automatically chains to another). All five paths converge through the same Activity Orchestrator."
+  },
+  {
+    "id": 537,
+    "topic": "Architecture",
+    "q": "Why is 'separating system date from business date' important for COB?",
+    "options": [
+      "For aesthetics",
+      "Lets the COB engine process the day's batch without users seeing the date change until business reopens",
+      "To slow processing",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "System date = the OS clock; business date = the 'banking day' the system considers current. If COB takes 4 hours overnight, you don't want users seeing the business date 'flicker' mid-batch. Decoupling means the business date advances only when COB completes successfully. Plus 24/7 operation: batches can run while branches in other time zones operate."
+  },
+  {
+    "id": 538,
+    "topic": "Architecture",
+    "q": "Determinism (in 'centralized transaction orchestration') means…",
+    "options": [
+      "The result depends on weather",
+      "Same inputs always produce the same outputs in the same order — making behavior predictable and debuggable",
+      "Random",
+      "Manual override"
+    ],
+    "correct": 1,
+    "tip": "Deterministic orchestration: given the same starting state and the same operation, the result is identical every time, in a predictable sequence. Compare distributed sagas: events bouncing across microservices may arrive in different orders, causing race conditions and non-deterministic outcomes. Determinism makes debugging tractable — you can reproduce any production issue locally."
+  },
+  {
+    "id": 539,
+    "topic": "Architecture",
+    "q": "Per the target architecture, the LOCAL.REF mechanism (Schema-less Extension) primarily serves which need?",
+    "options": [
+      "Game development",
+      "Adding bank-specific or region-specific fields (e.g. a unique national tax ID format) without changing core code",
+      "Customer dating",
+      "Sending email"
+    ],
+    "correct": 1,
+    "tip": "Different countries have different fields: a German bank may need a unique tax identifier (Steueridentifikationsnummer); a Singapore bank needs an FIN ID; a Japanese bank needs a different ID format. LOCAL.REF lets the local team add these fields via metadata without modifying the vendor's core code — preserving the upgrade path."
+  },
+  {
+    "id": 540,
+    "topic": "Architecture",
+    "q": "Compared to a generic distributed event-driven approach, what kind of debugging advantage does the centralized Activity Orchestrator provide?",
+    "options": [
+      "None",
+      "Simpler debugging — the full transaction lives in one place; no need to trace events across multiple services and brokers",
+      "Less code",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "In a saga-based system, debugging a failed transaction means tracing the event chain across services, brokers, and timing windows — often impossible to reproduce. A centralized Orchestrator runs the whole transaction in one process with a clear sequence. Failures have a single stack trace, a single timeline, and are 100% reproducible. Operations team's life is dramatically easier."
+  },
+  {
+    "id": 541,
+    "topic": "Capability Map",
+    "q": "Which Table holds system-wide immutable rules like floating-point precision, cache settings, and password requirements?",
+    "options": [
+      "DATES",
+      "SPF (System Parameter File)",
+      "USER",
+      "CUSTOMER"
+    ],
+    "correct": 1,
+    "tip": "SPF = System Parameter File. It holds GLOBAL system parameters that govern installation-wide behavior — precision rules, cache settings, password complexity requirements, default session timeouts. Editing SPF changes the bank's 'operational constitution'. The COMPANY Table holds per-company config; SPF is for installation-wide."
+  },
+  {
+    "id": 542,
+    "topic": "Capability Map",
+    "q": "A bank running multiple Companies in one installation typically has…",
+    "options": [
+      "Many Lead Companies",
+      "One Lead Company and many Branch companies",
+      "Only customers",
+      "Only vendors"
+    ],
+    "correct": 1,
+    "tip": "Standard topology: ONE Lead Company per installation + many Branch companies underneath. The Lead Company is the primary autonomous banking entity; Branches share its tables and operate centrally. The COMPANY Table holds this topology. Initial deployments often start with just the Lead Company and add Branches as the bank scales."
+  },
+  {
+    "id": 543,
+    "topic": "Capability Map",
+    "q": "The PGM.FILE (Program File) and FILE.CONTROL Tables together implement…",
+    "options": [
+      "A reporting engine",
+      "The Application (Table) Registry — central code governance and data table classification",
+      "The customer KYC engine",
+      "Random storage"
+    ],
+    "correct": 1,
+    "tip": "PGM.FILE = Program Registry (registers all executable programs and enforces execution types). FILE.CONTROL = File Registry (registers logical data tables with their classifications: FIN, INT, CUS, plus links to physical storage including $HIS and $NAU files). Together they form the kernel-level Application Registry — the system's 'service directory'."
+  },
+  {
+    "id": 544,
+    "topic": "Capability Map",
+    "q": "What does the EB.LOOKUP Table provide that complements STANDARD.SELECTION?",
+    "options": [
+      "Login authentication",
+      "Virtual table support — central storage of dynamic lookup lists (dropdowns) defined via metadata",
+      "Encryption",
+      "Backups"
+    ],
+    "correct": 1,
+    "tip": "STANDARD.SELECTION holds the DDD field-level metadata (types, validation routines). EB.LOOKUP holds VIRTUAL TABLES — the dropdown values, reference lists, and dynamic dictionaries. Together they let admins define both 'what kind of field this is' (STANDARD.SELECTION) and 'what values it can take' (EB.LOOKUP) entirely via metadata."
+  },
+  {
+    "id": 545,
+    "topic": "Capability Map",
+    "q": "What does the CURR.NO (Current Number) audit Field record?",
+    "options": [
+      "The phone number",
+      "The current sequential version number of the record (e.g. 1 = original, 2 = first amendment, etc.)",
+      "The currency code",
+      "The user count"
+    ],
+    "correct": 1,
+    "tip": "CURR.NO is the version counter for a record. CURR.NO=1 means it's the original input; CURR.NO=3 means there have been 2 amendments. Combined with INPUTTER, AUTHORISER, DATE.TIME, the audit block provides the complete forensic timeline of every action on a record from creation onward — meeting SOX and Basel requirements without custom code."
+  },
+  {
+    "id": 546,
+    "topic": "Capability Map",
+    "q": "A 'LOCAL.REF.TABLE' record extends a core application (e.g. CUSTOMER) by…",
+    "options": [
+      "Replacing it",
+      "Injecting new bank-specific fields into the LOCAL.REF segment of the application; STANDARD.SELECTION automatically rebuilds to make them queryable",
+      "Encrypting it",
+      "Backing it up"
+    ],
+    "correct": 1,
+    "tip": "LOCAL.REF.TABLE is the mechanism to add custom fields without modifying the core. Define the new fields (e.g. PREFERRED.LANGUAGE, REGIONAL.TAX.ID) in LOCAL.REF.TABLE; the system injects them into LOCAL.REF on CUSTOMER records; STANDARD.SELECTION auto-rebuilds so the fields are immediately queryable via enquiries. Upgrade-safe — vendor upgrades preserve custom fields."
+  },
+  {
+    "id": 547,
+    "topic": "Capability Map",
+    "q": "The SUB.ASSOC.CODE attribute is used to…",
+    "options": [
+      "Sub-account currency",
+      "Group custom fields into associated multi-value sets (e.g. building a custom 'Address Block' with several related fields)",
+      "Random codes",
+      "Subscriber count"
+    ],
+    "correct": 1,
+    "tip": "Custom multi-value blocks (e.g. multiple addresses each with street, city, postal code) need their member fields kept index-aligned. SUB.ASSOC.CODE designates fields as members of the same association — so adding a new index shifts all members consistently. Same principle as core associated multi-value fields, but for bank-defined extensions."
+  },
+  {
+    "id": 548,
+    "topic": "Capability Map",
+    "q": "Why does the system DECOUPLE the business date from the server clock?",
+    "options": [
+      "For aesthetics",
+      "Ensures financial integrity regardless of the physical clock — the COB batch is the only entity that advances the business date",
+      "To slow processing",
+      "For backup"
+    ],
+    "correct": 1,
+    "tip": "If the server clock advances, the business date shouldn't automatically — interest, schedules, and reports all key off the business date. The DATES Table (storing TODAY, LAST.WORKING.DAY) is updated ONLY by Close of Business (COB). This means batch processing controls when 'a new day starts' in banking terms. Branches in different time zones see the same business date globally."
+  },
+  {
+    "id": 549,
+    "topic": "Capability Map",
+    "q": "The system supports a 3-tier holiday calendar structure. Which is NOT one of the three tiers?",
+    "options": [
+      "OFFICIAL.HOLIDAY (country legal holidays)",
+      "BRANCH.HOLIDAY (branch physical opening)",
+      "BATCH.HOLIDAY (system processing days)",
+      "CUSTOMER.HOLIDAY (per-customer days off)"
+    ],
+    "correct": 3,
+    "tip": "The 3 tiers are: OFFICIAL.HOLIDAY (country legal holidays — for interest calc rules), BRANCH.HOLIDAY (when the physical branch is open — can differ from official, e.g. a branch open Saturday morning), and BATCH.HOLIDAY (when COB runs — usually 365/year). 'Customer Holiday' isn't a thing — customers don't dictate the bank's calendar."
+  },
+  {
+    "id": 550,
+    "topic": "Capability Map",
+    "q": "Branch opening on a Saturday WITHOUT advancing the financial business date is supported via…",
+    "options": [
+      "Manual override",
+      "The hierarchical calendar — BRANCH.HOLIDAY differs from OFFICIAL.HOLIDAY/BATCH.HOLIDAY",
+      "Hardware change",
+      "Bribery"
+    ],
+    "correct": 1,
+    "tip": "If your branch in São Paulo wants to open Saturday morning to serve customers, you set BRANCH.HOLIDAY to NOT mark Saturday as a holiday — but OFFICIAL.HOLIDAY still marks it as non-business. So customers can transact, but interest accrual, value dating, and ledger close treat it as a non-business day. Best of both worlds."
+  },
+  {
+    "id": 551,
+    "topic": "Capability Map",
+    "q": "CURRENT.DAY status can be NORMAL, RESTRICTED, or CLOSED. What does RESTRICTED indicate?",
+    "options": [
+      "A user is restricted",
+      "The branch is open even though it's officially a holiday or weekend — accept transactions but with adjusted financial treatment",
+      "Restricted area only",
+      "Restricted to admins"
+    ],
+    "correct": 1,
+    "tip": "NORMAL = regular business day. CLOSED = no operations at all. RESTRICTED = an unusual day where the branch operates but the official calendar marks it as non-business. Useful for special events, regulatory exceptional days, or branch-specific Saturday openings. The status influences how transactions value-date themselves."
+  },
+  {
+    "id": 552,
+    "topic": "Capability Map",
+    "q": "EB.TIME.ZONES handles…",
+    "options": [
+      "Customer time zones",
+      "Multi-region processing — adjusting audit timestamps based on each Company's location relative to the server",
+      "UI clocks only",
+      "Random data"
+    ],
+    "correct": 1,
+    "tip": "A bank with branches in Singapore, London, and New York needs audit timestamps that make sense to each local team. EB.TIME.ZONES lets the system normalize timestamps based on each Company's location. The Sydney branch sees their actions in Sydney time; HQ sees consolidated logs in HQ time. Same underlying data, locale-aware presentation."
+  },
+  {
+    "id": 553,
+    "topic": "Capability Map",
+    "q": "Date Conventions for handling scheduled dates that fall on holidays include Forward, Backward, and Modified Following. What does 'Modified Following' mean?",
+    "options": [
+      "Random rule",
+      "Move to the next business day, but if that crosses a month-end, move BACKWARD to the previous business day instead",
+      "Skip the payment entirely",
+      "Same as Forward"
+    ],
+    "correct": 1,
+    "tip": "Modified Following is a common banking convention: if a scheduled date (e.g. month-end interest accrual) lands on a holiday, MOVE FORWARD to the next business day — UNLESS that moves into the next month, in which case move BACKWARD. Ensures payments stay in the original month. Used widely in FX, derivatives, and structured products."
+  },
+  {
+    "id": 554,
+    "topic": "Capability Map",
+    "q": "In the LANGUAGE Table, Language 1 is reserved for…",
+    "options": [
+      "Customers' native language",
+      "English",
+      "Programming languages",
+      "Russian"
+    ],
+    "correct": 1,
+    "tip": "LANGUAGE 1 = English (by convention, system-wide reserved). Languages 2, 3, ... are bank-defined per region (French, Mandarin, Spanish, Arabic, etc.). The reservation means all base error messages, dictionary terms, and system documentation have a defined Language 1 fallback. Bank-specific languages extend the base."
+  },
+  {
+    "id": 555,
+    "topic": "Capability Map",
+    "q": "DYNAMIC.TEXT handles application messages containing variable data (like 'Account & has insufficient funds'). What's the role of the '&' placeholder?",
+    "options": [
+      "A magic symbol",
+      "Replaced by actual values (e.g. the specific Account ID) at runtime when the message is translated and displayed",
+      "Just decoration",
+      "An error"
+    ],
+    "correct": 1,
+    "tip": "DYNAMIC.TEXT messages have placeholders (often '&') that the system substitutes at runtime — so the user sees 'Account 12345 has insufficient funds' (with the actual account ID). The placeholder mechanism works across all configured languages: the English template 'Account & has insufficient funds' has counterparts in French, German, etc., each with the placeholder. The runtime substitutes the actual value."
+  },
+  {
+    "id": 556,
+    "topic": "Capability Map",
+    "q": "If a Japanese branch needs Japanese characters validated correctly, which mechanism enables this?",
+    "options": [
+      "Hardcoded only-Latin validation",
+      "ASCII.VAL.TABLE / ASCII.VALUES — define valid characters per language, supporting multi-byte characters like Japanese, Chinese",
+      "Reject everything non-Latin",
+      "Manual review"
+    ],
+    "correct": 1,
+    "tip": "ASCII.VAL.TABLE (despite the name) supports multi-byte and Unicode characters per language. Japanese (with hiragana, katakana, kanji), Chinese, Arabic, and Hebrew all need different valid-character sets. The validation engine reads ASCII.VAL.TABLE per LANGUAGE and rejects characters outside the allowed set — preventing data corruption or display issues."
+  },
+  {
+    "id": 557,
+    "topic": "Capability Map",
+    "q": "The CURRENCY framework supports up to 99 distinct currency MARKETS. Why?",
+    "options": [
+      "Random number",
+      "Different exchange rates per channel — e.g. Cash/Notes (market 10) vs Interbank (market 1) for the same currency pair",
+      "Only Forex traders use it",
+      "Random pricing"
+    ],
+    "correct": 1,
+    "tip": "Same currency, different rates depending on context: an Interbank market (market 1) has tight spreads for institutional deals; Cash/Notes (market 10) has wider spreads to cover handling costs; Wire transfer market might be different again. 99 markets gives enough headroom for any bank's product/channel mix. Driven by CURRENCY.MARKET configuration."
+  },
+  {
+    "id": 558,
+    "topic": "Capability Map",
+    "q": "CURRENCY.PARAM enforces…",
+    "options": [
+      "Random rules",
+      "IMMUTABLE structural standards (Numeric Code, Decimals) across a multi-company environment — same code, same decimals, every Company",
+      "Currency conversion only",
+      "User passwords"
+    ],
+    "correct": 1,
+    "tip": "Even in a multi-company installation where different Companies might use different exchange rates (CURRENCY.MARKET), the STRUCTURE of a currency must be uniform — Numeric Code (ISO 4217), decimal places. CURRENCY.PARAM enforces this immutably so reconciliation across Companies is reliable. JPY always has 0 decimals everywhere; USD always has 2."
+  },
+  {
+    "id": 559,
+    "topic": "Capability Map",
+    "q": "QUOTATION.CODE is used for low-value currencies. Example use case?",
+    "options": [
+      "Random pricing",
+      "Quoting rates per 100 or 1000 units (e.g. for JPY/KRW), making the rate display human-readable",
+      "Hiding the rate",
+      "Boosting prices"
+    ],
+    "correct": 1,
+    "tip": "Some currencies have very low per-unit value (Japanese Yen, Korean Won, Vietnamese Dong). Quoting 'USD/JPY = 0.0067' is awkward; 'USD/100 JPY = 0.67' or 'USD per 1000 KRW = 0.85' is easier to read. QUOTATION.CODE tells the system to quote in units of 100 or 1000 for these currencies. Calculations always use the underlying rate; display uses the friendly quotation."
+  },
+  {
+    "id": 560,
+    "topic": "Capability Map",
+    "q": "USER.SMS.GROUP enables…",
+    "options": [
+      "Sending SMS messages",
+      "Role-based provisioning — define 'Job Types' (Teller, Manager, etc.) with bundled permissions; assign users to groups instead of editing each user",
+      "User group chat",
+      "Random groupings"
+    ],
+    "correct": 1,
+    "tip": "USER.SMS.GROUP (SMS = Security Management System, not text messages) is the role-based permissions engine. Define a TELLER group with INPUT rights on certain Tables; users in that group inherit the rights. Updating the group updates all members. Bulk permission management — critical at scale. Users link to groups via '@GROUPNAME' in their profile."
+  },
+  {
+    "id": 561,
+    "topic": "Capability Map",
+    "q": "The 4-Level RBAC matrix dimensions are…",
+    "options": [
+      "Random",
+      "Company, Application, Function (Input/Authorise/Delete/Reverse/See), Field",
+      "Just Company",
+      "Just Field"
+    ],
+    "correct": 1,
+    "tip": "4-Level RBAC controls access along four axes: (1) Company — which branches/legal entities; (2) Application — which Tables/Versions; (3) Function — what verbs (INPUT, AUTHORISE, DELETE, REVERSE, SEE); (4) Field — data-level masking (e.g. hide salary from regular tellers). All four together = 'zero trust' permission model."
+  },
+  {
+    "id": 562,
+    "topic": "Capability Map",
+    "q": "Temporal access logic in the USER Table allows the bank to enforce…",
+    "options": [
+      "Random restrictions",
+      "Permitted system usage by time of day (START.TIME, END.TIME) and day of week (ALLOWED.DAYS), including holiday-specific rules",
+      "Customer waiting times",
+      "Login speeds"
+    ],
+    "correct": 1,
+    "tip": "Temporal restrictions: a teller might be allowed access only Mon-Fri 8am-6pm; an external auditor only on specific days. START.TIME / END.TIME / ALLOWED.DAYS enforce this — login outside the window is rejected. Holiday-specific extensions allow exceptions (e.g. operations team can log in on a holiday for emergency support). Reduces attack surface during off-hours."
+  },
+  {
+    "id": 563,
+    "topic": "Capability Map",
+    "q": "Data Access Control (DATA.ACCESS) is used to…",
+    "options": [
+      "Encrypt data",
+      "Restrict a user's ability to view/process specific records based on field-level values (e.g. preventing standard staff from seeing 'Staff Accounts')",
+      "Block all data",
+      "Random restrictions"
+    ],
+    "correct": 1,
+    "tip": "DATA.ACCESS is row-level + field-level security. Example: 'Staff Accounts' (the personal accounts of bank employees) are identified by a specific category range. Standard tellers should NOT see them (privacy + integrity). DATA.ACCESS lets you define this filter so the standard teller's enquiries never return Staff Accounts — even though the same Table holds them."
+  },
+  {
+    "id": 564,
+    "topic": "Capability Map",
+    "q": "EB.ROLE manages…",
+    "options": [
+      "A film role",
+      "Specific roles or legal capacities (Signatory, Proxy, Guarantor) for staff and external parties involved in customer relationships",
+      "User passwords",
+      "UI roles"
+    ],
+    "correct": 1,
+    "tip": "EB.ROLE captures legal/business capacities a party can have in a relationship: SIGNATORY (can sign on behalf of), PROXY (legally represents), GUARANTOR (backs a credit). These roles are critical for compliance, contract enforceability, and AML. They sit alongside the standard CUSTOMER profile, attached via the RELATION table."
+  },
+  {
+    "id": 565,
+    "topic": "Capability Map",
+    "q": "Password complexity (Minimum length, required uppercase/lowercase/numeric/special character counts) is defined where?",
+    "options": [
+      "Each user picks",
+      "Centrally in the SPF — system-wide rules everyone must respect",
+      "Hard-coded in app code",
+      "Random per branch"
+    ],
+    "correct": 1,
+    "tip": "SPF (System Parameter File) holds the password syntax rules — minimum 12 characters, at least 1 upper, 1 lower, 2 numeric, 1 special. The system enforces these centrally; no app can override. Changing the SPF rule applies to next password change for every user. Critical for meeting regulatory standards (e.g. NIST guidelines) consistently."
+  },
+  {
+    "id": 566,
+    "topic": "Capability Map",
+    "q": "AUTOLOG.TIME.MINS enforces…",
+    "options": [
+      "Random timeouts",
+      "Auto-logout for users holding RECORD LOCKS — ensuring locks don't persist forever if a user walks away",
+      "Backup interval",
+      "UI refresh rate"
+    ],
+    "correct": 1,
+    "tip": "If a user holds a $NAU draft (record lock) and walks away, the lock would block other users indefinitely. AUTOLOG.TIME.MINS automatically logs out users who've been inactive WHILE holding locks — releasing the locks for others. Distinct from TIME.OUT.MINUTES which is general inactivity logout. Prevents the 'forgotten draft' from blocking team productivity."
+  },
+  {
+    "id": 567,
+    "topic": "Capability Map",
+    "q": "The PROTOCOL file captures…",
+    "options": [
+      "A communication protocol",
+      "Security violations and unauthorized access attempts — even if individual user logging is off, violations are ALWAYS recorded here",
+      "Network packets",
+      "Customer interactions"
+    ],
+    "correct": 1,
+    "tip": "PROTOCOL is the security audit file — failed login attempts, unauthorized access tries, password resets, security setting changes. Critically, it's MANDATORY: even if individual user logging is disabled, security violations still land in PROTOCOL. The EOD report generator produces a regular PROTOCOL report for compliance and forensic readiness."
+  },
+  {
+    "id": 568,
+    "topic": "Capability Map",
+    "q": "OVERRIDE.CLASS.DETAILS allows the bank to set…",
+    "options": [
+      "Random restrictions",
+      "Specific value thresholds per override (e.g. amounts > 10,000 USD require manager-class approval; below that, supervisor-class is enough)",
+      "Customer details",
+      "User passwords"
+    ],
+    "correct": 1,
+    "tip": "Different overrides require different authority levels. OVERRIDE.CLASS.DETAILS encodes thresholds: 'unauthorised overdraft up to $5,000 = supervisor; up to $50,000 = branch manager; above $50,000 = regional director'. The override flow automatically routes to the right tier based on the amount — no human triage needed. Smarter exception handling."
+  },
+  {
+    "id": 569,
+    "topic": "Capability Map",
+    "q": "DISPO.OFFICER is the…",
+    "options": [
+      "Disposable officer",
+      "Designated officer to whom an override of a specific class/type is routed for review/approval",
+      "Random",
+      "Customer service rep"
+    ],
+    "correct": 1,
+    "tip": "When an override is raised, it doesn't just go to 'somebody' — it goes to the DISPO.OFFICER assigned to that override class/type. Each officer has a defined competence area and hierarchy level. Combined with DISPO.ITEM (the override record itself), the system manages an exception WORKFLOW with defined responsibility — no overrides get lost in inboxes."
+  },
+  {
+    "id": 570,
+    "topic": "Capability Map",
+    "q": "DISPO.ITEM tracks…",
+    "options": [
+      "A disposable item",
+      "Individual override records — preventing final authorization of the master transaction until ALL associated DISPO.ITEMs are marked 'APPROVED'",
+      "Customer items",
+      "Random data"
+    ],
+    "correct": 1,
+    "tip": "A transaction might breach multiple soft rules and raise multiple overrides. Each override is a DISPO.ITEM in the queue. The master transaction CANNOT be authorized until every DISPO.ITEM is marked APPROVED by an authorized officer. This ensures exceptions aren't accidentally skipped — every override is explicitly handled."
+  },
+  {
+    "id": 571,
+    "topic": "Capability Map",
+    "q": "DEPT.ACCT.OFFICER stores…",
+    "options": [
+      "Department petty cash",
+      "The bank's organizational hierarchy — divisions, departments, account officers/relationship managers — linked to users and to accounting entries",
+      "Random data",
+      "User photos"
+    ],
+    "correct": 1,
+    "tip": "DEPT.ACCT.OFFICER is the org-chart Table. It defines business units, divisions, departments, and individual Account Officers/Relationship Managers, with reporting lines to parents. Every accounting entry can carry an ACCOUNT.OFFICER code, letting the bank consolidate financial activity by department for P&L attribution and accountability."
+  },
+  {
+    "id": 572,
+    "topic": "Capability Map",
+    "q": "Why does the system maintain a MNEMONIC.CUSTOMER mapping?",
+    "options": [
+      "For UI styling",
+      "Provides a human-readable alternate key for CUSTOMER records — users can search by mnemonic instead of long customer numbers",
+      "Random",
+      "Customer slogans"
+    ],
+    "correct": 1,
+    "tip": "Customer numbers are usually long, opaque sequences (e.g. CUSTOMER 178293461). Tellers don't memorize those. MNEMONIC.CUSTOMER gives each customer a short, memorable alternate key — like 'SMITH-J-LON-1' for John Smith in London. Search by mnemonic; the system resolves to the underlying customer number. Quality-of-life feature for high-volume teller work."
+  },
+  {
+    "id": 573,
+    "topic": "Capability Map",
+    "q": "The RELATION Table manages…",
+    "options": [
+      "Customer dating apps",
+      "Complex party relationships (Corporate Groups, Parent/Child, Signatory, Proxy, Guarantor) — automatically generating reverse-relationship records",
+      "User chats",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "Banking parties have many possible relationships: corporate parent/subsidiary, beneficial ownership, guarantor, signatory, joint account holder, power-of-attorney. RELATION captures these as bidirectional records — defining one direction automatically creates the reverse (parent → child also creates child → parent). Critical for 360-degree risk views and KYC."
+  },
+  {
+    "id": 574,
+    "topic": "Capability Map",
+    "q": "The AML.CHECK field captures…",
+    "options": [
+      "The bank's AML policy text",
+      "Persistent state of whether AML screening has been sent, accepted, or rejected for this customer",
+      "AML certificates",
+      "Random checks"
+    ],
+    "correct": 1,
+    "tip": "AML.CHECK has values like SENT, YES (passed), NO (failed/blocked). It's the customer-level state of AML screening — alongside AML.RESULT (awaited/positive/negative). These persistent fields drive workflow: positive results may block account opening; awaited results trigger KYC re-checks. Combined with AUTO.NEXT.REVIEW.DATE, they automate KYC lifecycle management."
+  },
+  {
+    "id": 575,
+    "topic": "Capability Map",
+    "q": "FATCA and MiFID are…",
+    "options": [
+      "Programming languages",
+      "Regional regulatory compliance frameworks (FATCA = US tax; MiFID = EU investor protection); the system has fields for each",
+      "Backup formats",
+      "Currencies"
+    ],
+    "correct": 1,
+    "tip": "FATCA = Foreign Account Tax Compliance Act (US law requiring foreign banks to report US persons' accounts to the IRS). MiFID = Markets in Financial Instruments Directive (EU regulation governing investment-services suitability). The system has dedicated fields (US TIN for FATCA, investor risk profile for MiFID) — config rather than custom development per regulation."
+  },
+  {
+    "id": 576,
+    "topic": "Capability Map",
+    "q": "The AA.PRODUCT.MANAGER service enforces…",
+    "options": [
+      "UI styling",
+      "The Product Factory's 3-stage lifecycle (Design → Proof → Publish) — including the Proof quality gate that blocks misconfigured products",
+      "Random validation",
+      "Vendor advertising"
+    ],
+    "correct": 1,
+    "tip": "AA.PRODUCT.MANAGER is the orchestrator of the product lifecycle. Design = sandbox configuration. Proof = compile-and-validate; checks inherited conditions resolve, mandatory attributes exist, conditions don't conflict. Publish = commits to PRODUCT.CATALOG for live origination. Failed Proof blocks publication — protecting customers from misconfigured products that could mis-price loans or skip required accounting."
+  },
+  {
+    "id": 577,
+    "topic": "Capability Map",
+    "q": "ARR.LINK options include TRACKING, NON.TRACKING, and CUSTOMER.TRACKING. What does CUSTOMER.TRACKING enable?",
+    "options": [
+      "Tracking customer location",
+      "Allows negotiation on certain attributes (per-customer rate, fee waiver) while the OTHER attributes still track product changes",
+      "Tracking customers in shops",
+      "Random tracking"
+    ],
+    "correct": 1,
+    "tip": "ARR.LINK governs how Arrangements (customer contracts) follow Product updates. TRACKING = inherits all product changes (mass updates apply). NON.TRACKING = fixed at creation, never changes. CUSTOMER.TRACKING = hybrid — negotiated attributes (e.g. a special VIP rate) stay fixed, but other attributes still follow product updates. Best of both worlds for negotiated customers."
+  },
+  {
+    "id": 578,
+    "topic": "Capability Map",
+    "q": "The AA.ARR.PRODUCT.TRACKER service is responsible for…",
+    "options": [
+      "User tracking",
+      "AUTOMATICALLY updating Arrangement condition records when a Product is re-published — propagating changes to thousands of live contracts in one click",
+      "Random updates",
+      "Backup"
+    ],
+    "correct": 1,
+    "tip": "Re-publishing a Product (e.g. changing a fee) should propagate to all live customer contracts using that Product. AA.ARR.PRODUCT.TRACKER scans Arrangements, identifies those linked TRACKING (or partially TRACKING) to the updated Product, and applies the changes. One product update = mass contract maintenance, no batch script writing needed."
+  },
+  {
+    "id": 579,
+    "topic": "Capability Map",
+    "q": "EB.DUPLICATE.TYPE supports duplicate prevention by…",
+    "options": [
+      "Random rules",
+      "Letting the bank define field combinations (e.g. Debit Account + Amount + Value Date) to form a composite key — duplicates detected against this key",
+      "Just dates",
+      "Manual review only"
+    ],
+    "correct": 1,
+    "tip": "Duplicate prevention is critical — accidentally processing a $250,000 wire twice is catastrophic. EB.DUPLICATE.TYPE lets you define what counts as a duplicate per transaction type: a payment might dup-check on (Debit Acct + Amount + Value Date); a loan disbursement on (Customer + Amount + Date). Composite keys catch both technical (same message ID) and functional (same business intent) duplicates."
+  },
+  {
+    "id": 580,
+    "topic": "Capability Map",
+    "q": "ARCHIVE / ARC.GENERIC handle…",
+    "options": [
+      "Historical games",
+      "Migrating high-volume historical records (old STMT.ENTRY, closed transactions) from live files to read-only archive ($ARC suffixed tables) based on PURGE.DATE or RETENTION.PERIOD",
+      "User backups",
+      "Customer history only"
+    ],
+    "correct": 1,
+    "tip": "Over time, live tables accumulate millions of records and slow down. The ARCHIVE engine, driven by ARC.GENERIC.REQUEST, migrates old data to $ARC suffixed tables (e.g. STMT.ENTRY$ARC). The migration uses PURGE.DATE (absolute) or RETENTION.PERIOD (rolling window) rules. Archive Tables are read-only and live on cheaper storage — preserving compliance access while keeping live tables fast."
   }
 ]

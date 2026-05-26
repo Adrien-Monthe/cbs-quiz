@@ -42,5 +42,5 @@ const CONFIG = {
   FIREBASE_URL: "",   // e.g. "https://cbs-quiz-default-rtdb.firebaseio.com"
 
   // OPTION B — Pantry ID (UUID from getpantry.cloud)
-  PANTRY_ID:    "",   // e.g. "12345678-90ab-cdef-1234-567890abcdef"
+  PANTRY_ID:    "ebdbac36-21fe-4efa-8c56-6be4207880c8",   // e.g. "12345678-90ab-cdef-1234-567890abcdef"
 };

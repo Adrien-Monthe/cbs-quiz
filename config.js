@@ -1,26 +1,46 @@
 // =========================================================
-// CBS Quiz - Leaderboard configuration
+// CBS Quiz - Shared Leaderboard configuration
 // =========================================================
 //
-// LEAVE EMPTY for local-only leaderboard (each browser sees its own scores).
-// FILL IN to enable a global shared leaderboard (all players see everyone).
+// Pick ONE option below and fill it in. Leave the others empty.
+// If you leave them all empty, the app falls back to local-only
+// (each browser sees only its own scores). The quiz still works.
 //
-// Quick setup (5 minutes, FREE):
-//   1. Go to https://jsonbin.io and sign up (free).
-//   2. Click "API Keys" in the sidebar -> copy your X-MASTER-KEY.
-//   3. Click "Bins" -> "Create Bin" -> paste this JSON:
-//          { "scores": [] }
-//      Click "Create".
-//   4. From the bin URL, copy the BIN ID (the long string after /b/).
-//   5. Paste both below.
+// ---------------------------------------------------------
+// OPTION A — Firebase Realtime Database  (RECOMMENDED — most reliable)
+// ---------------------------------------------------------
+// Setup (~5 min, free):
+//   1. Go to https://console.firebase.google.com and sign in with Google.
+//   2. Click "Add project" -> any name -> skip Analytics -> Create.
+//   3. In the left sidebar click "Build" -> "Realtime Database".
+//   4. Click "Create Database" -> pick any location -> choose
+//      "Start in test mode" (allows public read/write — fine for a quiz app).
+//      Click Enable.
+//   5. At the top of the database page you'll see a URL like:
+//          https://your-project-default-rtdb.firebaseio.com
+//      Copy that URL (no trailing slash) and paste it below.
 //
-// Security note: the master key here is exposed in your public repo.
-// JSONBin lets you create a separate "Access Key" with PUT permission
-// only for that specific bin — recommended for production use. For a
-// personal study app this is fine.
+// Test-mode rules expire in 30 days. To keep it open longer, go to
+// the "Rules" tab and set:
+//      { "rules": { ".read": true, ".write": true } }
+// then click Publish. Or set time-limited rules for stricter security.
+//
+// ---------------------------------------------------------
+// OPTION B — Pantry  (SIMPLEST — no Google account needed)
+// ---------------------------------------------------------
+// Setup (~2 min, free):
+//   1. Go to https://getpantry.cloud and enter any email.
+//   2. They'll create a Pantry and show you a Pantry ID
+//      (a UUID like 12345678-90ab-cdef-1234-567890abcdef).
+//   3. Copy the Pantry ID and paste it below.
+// That's it — no API key, no console, nothing else to configure.
+//
 // =========================================================
 
 const CONFIG = {
-  JSONBIN_KEY:    "",   // e.g. "$2a$10$abc123..."
-  JSONBIN_BIN_ID: "",   // e.g. "65f1a2b3c4d5e6f7..."
+  // OPTION A — Firebase Realtime Database URL (no trailing slash)
+  FIREBASE_URL: "",   // e.g. "https://cbs-quiz-default-rtdb.firebaseio.com"
+
+  // OPTION B — Pantry ID (UUID from getpantry.cloud)
+  PANTRY_ID:    "",   // e.g. "12345678-90ab-cdef-1234-567890abcdef"
 };

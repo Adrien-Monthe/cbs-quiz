@@ -1,11 +1,13 @@
 # 🏦 CBS Core Knowledge Quiz
 
 A quiz app to help you master the **CBS Core Knowledge Book** — built around
-a pool of **300 multiple-choice questions** covering Tables, the Registry,
+a pool of **360 multiple-choice questions** covering Tables, the Registry,
 Lifecycle Spaces (LIV/NAU/HIS/DEL/SIM), Standard Operations, the Dynamic
 Data Dictionary, Projections, Plugins, Enquiries, and the Product Factory.
+The pool now includes **60 business/scenario questions** that test
+understanding through realistic banking situations, not just memorization.
 
-Every quiz round picks **20 random questions** from the pool. Pass it. Fail
+Every quiz round picks **30 random questions** from the pool. Pass it. Fail
 it. Take it again until you nail it.
 
 Comes in two flavors:
@@ -94,34 +96,58 @@ That's it! Open the link in any browser. Share with friends.
 
 By default the leaderboard works **locally per browser** (each visitor sees
 their own scores). To make it **truly shared** (everyone sees everyone's
-scores worldwide), connect it to **JSONBin.io** — a free service.
+scores worldwide), pick **one** of the two backends below and fill in
+`config.js`.
 
-### Setup (5 minutes, free)
+### 🅰️ Option A — Firebase Realtime Database (recommended, most reliable)
 
-1. Go to **https://jsonbin.io** and sign up (free, no card needed).
-2. Click **API Keys** in the sidebar → copy your **`X-MASTER-KEY`** value.
-3. Click **Bins** in the sidebar → **Create Bin**.
-4. Paste this exact JSON into the bin editor:
-   ```json
-   { "scores": [] }
+This is Google infrastructure — rock-solid, free tier is huge.
+
+1. Go to **https://console.firebase.google.com** and sign in with Google.
+2. Click **Add project** → give it any name → skip Analytics → **Create project**.
+3. In the left sidebar click **Build** → **Realtime Database**.
+4. Click **Create Database** → pick any location → choose **Start in test mode**
+   (that's fine for a quiz app) → **Enable**.
+5. At the top of the database page, copy the URL — it looks like:
    ```
-   Click **Create**.
-5. After creation, look at the bin URL. It will look like:
-   `https://jsonbin.io/app/bins/65f1a2b3c4d5e6f7a8b9c0d1`
-   The long string at the end is your **BIN ID** — copy it.
+   https://your-project-default-rtdb.firebaseio.com
+   ```
+6. Open `config.js` and paste:
+   ```js
+   const CONFIG = {
+     FIREBASE_URL: "https://your-project-default-rtdb.firebaseio.com",
+     PANTRY_ID:    "",
+   };
+   ```
+7. Commit and push. Done — leaderboard is global.
 
-### Paste into `config.js`
+> ℹ️ Test-mode rules expire after 30 days. To keep it open longer, in the
+> Firebase console go to **Realtime Database → Rules** and paste:
+> ```json
+> { "rules": { ".read": true, ".write": true } }
+> ```
+> Click **Publish**. (Public read/write is fine for a personal study app.)
 
-Open `config.js` and fill in:
+### 🅱️ Option B — Pantry (simplest, no Google account)
 
-```js
-const CONFIG = {
-  JSONBIN_KEY:    "$2a$10$YOUR_KEY_HERE...",
-  JSONBIN_BIN_ID: "65f1a2b3c4d5e6f7a8b9c0d1",
-};
-```
+If you don't want to use Google, **Pantry** is dead simple — just an email.
 
-Commit and push. The leaderboard now syncs globally:
+1. Go to **https://getpantry.cloud**.
+2. Enter any email address → click **Get Started**.
+3. The site will show you a **Pantry ID** — a UUID like
+   `12345678-90ab-cdef-1234-567890abcdef`. Copy it.
+4. Open `config.js` and paste:
+   ```js
+   const CONFIG = {
+     FIREBASE_URL: "",
+     PANTRY_ID:    "12345678-90ab-cdef-1234-567890abcdef",
+   };
+   ```
+5. Commit and push. Done — leaderboard is global.
+
+That's it: no API key, no console, no rules to configure.
+
+### Either way, commit and deploy:
 
 ```bash
 git add config.js
@@ -129,14 +155,9 @@ git commit -m "Enable shared leaderboard"
 git push
 ```
 
-> ⚠️ **Security note:** the key here is visible in your public repo.
-> Anyone could in theory overwrite the bin. For a personal study app
-> that's fine. For something stricter, JSONBin lets you create a
-> separate **Access Key** with PUT permissions on a single bin only —
-> use that instead of the master key.
->
-> If you don't fill in the config, the app silently falls back to
-> per-browser localStorage — still totally functional, just not shared.
+> If you leave both fields empty, the app silently falls back to
+> per-browser localStorage — still totally functional, just not shared
+> across devices.
 
 ---
 

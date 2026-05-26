@@ -386,7 +386,7 @@
       "Branch hours",
       "Phone numbers"
     ],
-    "correct": 1,
+    "correct": 0,
     "tip": "FILE registry defines physical location, operational behavior, and data classification (INT, FIN, CUS)."
   },
   {
@@ -3898,5 +3898,785 @@
     ],
     "correct": 0,
     "tip": "Products and conditions are versioned by PRODUCT.ID + EFFECTIVE.DATE — supports future-dated changes."
+  },
+  {
+    "id": 301,
+    "topic": "Scenario",
+    "q": "Teller Alice starts editing CUSTOMER record C123 and pauses to take a phone call. Teller Bob tries to edit the same record. What does the system do, and why?",
+    "options": [
+      "Bob is allowed to edit — last write wins",
+      "System returns 'Record Locked' to Bob because Alice's draft is in NAU",
+      "Both edits merge automatically",
+      "The record is wiped to avoid conflict"
+    ],
+    "correct": 1,
+    "tip": "Because Alice's draft sits in the NAU file and NAU is a singleton (one record per ID), Bob cannot create a second draft. The system returns 'Record Locked' to protect against concurrent modification. This is one of the main reasons NAU exists."
+  },
+  {
+    "id": 302,
+    "topic": "Scenario",
+    "q": "A teller's PC crashes mid-input on a deposit slip after she pressed 'Hold'. She logs back in. What does she expect, and where was the data?",
+    "options": [
+      "Data is gone — HOLD doesn't persist",
+      "The draft is in NAU with status HOLD, ready to resume",
+      "The draft was auto-promoted to LIV",
+      "Recovered from a printer queue"
+    ],
+    "correct": 1,
+    "tip": "HOLD intentionally saves an unvalidated draft into NAU with status HOLD. It survives crashes because it's persisted. On next login, the projection's Resolution Waterfall finds the draft in NAU first and surfaces it for resumption."
+  },
+  {
+    "id": 303,
+    "topic": "Scenario",
+    "q": "A junior officer enters a new customer record. The branch manager reviews and wants to make it live. Which standard operation does the manager use?",
+    "options": [
+      "INPUT",
+      "HOLD",
+      "AUTH",
+      "REVERSE"
+    ],
+    "correct": 2,
+    "tip": "The 4-Eyes Principle requires a second user to approve. AUTH moves the UNAU record from NAU to LIV (and archives any prior LIV to HIS). INPUT was the junior officer's action — AUTH is the manager's job."
+  },
+  {
+    "id": 304,
+    "topic": "Scenario",
+    "q": "A loan officer authorized a $50,000 disbursement to the wrong customer 10 minutes ago. The transaction is now LIVE. Correct way to undo it?",
+    "options": [
+      "DELETE on the LIV record",
+      "REVERSE on the LIV record (creates RNAU pending second-user AUTH)",
+      "HOLD the existing record",
+      "Edit the LIV record directly via SQL"
+    ],
+    "correct": 1,
+    "tip": "DELETE only works on NAU drafts. Because the record is already LIVE, you must use REVERSE — which creates an RNAU record in NAU. A second user AUTHs the reversal, moving it to HIS with status REVE. Audit trail intact."
+  },
+  {
+    "id": 305,
+    "topic": "Scenario",
+    "q": "Regulators want evidence of a now-deleted customer draft. The draft was new (SEQ.NO=1) and canceled before authorization. Where does this evidence live?",
+    "options": [
+      "It's gone — DELETE removes it",
+      "In DEL — forensic delete preserves it",
+      "In SIM",
+      "In ARC"
+    ],
+    "correct": 1,
+    "tip": "For brand-new (SEQ.NO=1) records, DELETE moves the draft from NAU to DEL specifically to preserve a forensic audit trail. This is the only purpose of the DEL file — letting auditors see data that was input but never became live."
+  },
+  {
+    "id": 306,
+    "topic": "Scenario",
+    "q": "A user deletes an AMENDMENT (SEQ.NO=3) draft from NAU before authorization. Where does the deleted data go, and why is this different from a SEQ.NO=1 deletion?",
+    "options": [
+      "To DEL — same as new records",
+      "Physically removed from NAU; nothing written to DEL — because the base record still exists in LIV/HIS",
+      "To HIS as a new version",
+      "To SIM"
+    ],
+    "correct": 1,
+    "tip": "For amendments (SEQ.NO > 1), the deletion is a 'cancel amendment' — the base record still safely exists in LIV and HIS, so no forensic trail is needed. The draft simply vanishes from NAU. DEL is only used when the entire record would otherwise be lost forever."
+  },
+  {
+    "id": 307,
+    "topic": "Scenario",
+    "q": "A bank wants to validate every customer's national ID against a government API the moment the user tabs out of the ID field — without waiting for form submit. Right mechanism?",
+    "options": [
+      "A nightly batch job",
+      "A 'Hot Field' configured in the projection, linked to a plugin that calls the API on onBlur",
+      "A new physical table",
+      "Manual approval"
+    ],
+    "correct": 1,
+    "tip": "Hot Fields are configured directly in the projection and trigger plugin logic on the onBlur event. The plugin synchronously calls the external API. This gives instant feedback without modifying the core system or making the user wait for full submission."
+  },
+  {
+    "id": 308,
+    "topic": "Scenario",
+    "q": "Compliance demands that every loan disbursement above $100K trigger a Credit Check API call before the record reaches the database. Where do you put this logic?",
+    "options": [
+      "Inside the user's web browser",
+      "A pre-hook plugin on the loan projection, registered in VALIDATION.PRGM",
+      "A post-hook after the data is saved",
+      "Manual phone call only"
+    ],
+    "correct": 1,
+    "tip": "Pre-hooks run BEFORE commit. A pre-hook plugin can make a synchronous Credit Check call and reject the operation if the result is unfavorable — before the record ever reaches NAU or LIV. Post-hooks would be too late."
+  },
+  {
+    "id": 309,
+    "topic": "Scenario",
+    "q": "The risk team needs a real-time report of ALL loans above $1M, including the customer's name (which lives on CUSTOMER, not the loan). Right framework?",
+    "options": [
+      "A Projection on the loan table",
+      "An Enquiry using Soft Links (Virtual Joins) to fetch customer name",
+      "A new physical join table",
+      "Manual export to Excel"
+    ],
+    "correct": 1,
+    "tip": "Projections are bound to ONE physical table and are for write operations. Enquiries traverse multiple tables via Soft Links (Virtual Joins), which dynamically fetch related fields without physical foreign keys. Reporting = Enquiry."
+  },
+  {
+    "id": 310,
+    "topic": "Scenario",
+    "q": "A teller's UI shouldn't show all 200+ CUSTOMER fields — only 5 that matter for deposits. Cleanest solution?",
+    "options": [
+      "Hide fields in CSS",
+      "Create a targeted subset projection like CUSTOMER~TELLER with just the 5 fields",
+      "Edit the physical CUSTOMER table",
+      "Buy a new product"
+    ],
+    "correct": 1,
+    "tip": "Targeted Subset Views are the recommended pattern: create a projection (e.g. CUSTOMER~TELLER) that exposes only the 5 relevant fields. The Master View (CUSTOMER) stays untouched for managers who need all fields. Same table — different lens per role."
+  },
+  {
+    "id": 311,
+    "topic": "Scenario",
+    "q": "A bank wants to add a custom local field MIDDLE.NAME to CUSTOMER. The vendor doesn't allow kernel changes. How is this possible?",
+    "options": [
+      "Impossible without vendor",
+      "DDD's customization injection adds user-defined fields to TABLE.DEF — no kernel change",
+      "Stored in a separate flat file",
+      "Stored in a comment field"
+    ],
+    "correct": 1,
+    "tip": "DDD (Dynamic Data Dictionary) was designed exactly for this. Custom local fields are automatically injected into TABLE.DEF and instantly extend the business object. No DDL, no kernel recompilation, no vendor code change — that's the whole point of the metadata layer."
+  },
+  {
+    "id": 312,
+    "topic": "Scenario",
+    "q": "The bank wants a 'FULL.NAME' field that's just FIRST.NAME + ' ' + LAST.NAME. Storing it on disk would waste space and risk going out of sync. Right System Type?",
+    "options": [
+      "D (Data)",
+      "I (I-Descriptor / virtual, computed at runtime)",
+      "J (Join)",
+      "K"
+    ],
+    "correct": 1,
+    "tip": "I-Descriptor fields are computed in memory at runtime — never persisted. Perfect for derived values like FULL.NAME that are simple combinations of other stored fields. D would store it redundantly; J is for fetching from related tables, not for combining same-record fields."
+  },
+  {
+    "id": 313,
+    "topic": "Scenario",
+    "q": "On the ACCOUNT screen, you want to display the customer's name (stored on CUSTOMER, not ACCOUNT). Most efficient System Type?",
+    "options": [
+      "D — duplicate the data",
+      "I — compute it",
+      "J — dynamic join to CUSTOMER via the foreign key",
+      "Hardcode it"
+    ],
+    "correct": 2,
+    "tip": "J (Join) fields fetch data from a related table at display time via a foreign key. No data duplication, no stale copies, and no physical FK needed at the DB level."
+  },
+  {
+    "id": 314,
+    "topic": "Scenario",
+    "q": "A risk admin needs to change a field's validation from 'Numeric only' to 'Alphanumeric'. The change must apply immediately. Does the system need to restart?",
+    "options": [
+      "Yes — full reboot",
+      "No — DDD's validation engine is hot-swappable; the update takes effect on the next input",
+      "Yes — only at month-end",
+      "Only the database needs to restart"
+    ],
+    "correct": 1,
+    "tip": "The Hot-Swappable Validation Engine binds Field.type to pre-compiled validation routines. Changing the field's type in the dictionary applies instantly — subsequent inputs use the new rule without any restart or recompilation."
+  },
+  {
+    "id": 315,
+    "topic": "Scenario",
+    "q": "The product team wants to launch 'Diamond Mortgage' — identical to 'Gold Mortgage' except 0.5% lower interest. Fastest correct approach?",
+    "options": [
+      "Re-create everything from scratch",
+      "Define a new PRODUCT with PARENT.PRODUCT = Gold Mortgage and override only the interest rate",
+      "Edit Gold Mortgage in place",
+      "Copy and paste the SQL"
+    ],
+    "correct": 1,
+    "tip": "PARENT.PRODUCT inheritance is built for this. Define Diamond as a child of Gold and override only the delta (the rate). All other attributes are inherited. Saves time and reduces drift between similar products."
+  },
+  {
+    "id": 316,
+    "topic": "Scenario",
+    "q": "A bank wants a new fee structure to take effect on 2026-07-01 — configure now, activate automatically. Feature?",
+    "options": [
+      "Manual cron job",
+      "EFFECTIVE.DATE versioning on PRODUCT — system auto-switches on the date",
+      "An IT ticket on July 1",
+      "The fee will activate manually"
+    ],
+    "correct": 1,
+    "tip": "Products are version-controlled by composite key PRODUCT.ID + EFFECTIVE.DATE. The bank can stage new conditions today with EFFECTIVE.DATE = 2026-07-01; the system automatically switches on that date — no weekend intervention required."
+  },
+  {
+    "id": 317,
+    "topic": "Scenario",
+    "q": "A developer accidentally configures a new product with two conflicting interest rules and no mandatory Accounting attribute. What protects customers from this misconfiguration?",
+    "options": [
+      "Nothing — it goes live",
+      "The Validate Capability stage (PRODUCT.MANAGER) blocks products with conflicts or missing mandatories",
+      "Marketing approval",
+      "Manual review by every customer"
+    ],
+    "correct": 1,
+    "tip": "The 3-Stage Lifecycle Engine (Define → Validate → Enable) includes an automated Quality Gate. PRODUCT.MANAGER recursively compiles the product, resolves inherited conditions, and refuses to publish to PRODUCT.CATALOG if conflicts exist or mandatory attributes are missing."
+  },
+  {
+    "id": 318,
+    "topic": "Scenario",
+    "q": "COUNTRY codes are the same across every country office of the bank. ACCOUNT balances must be strictly separated by branch. How is this efficiently modeled?",
+    "options": [
+      "Both as CUS",
+      "COUNTRY as INT (globally shared), ACCOUNT as FIN (segregated per company/book)",
+      "Both as INT",
+      "Both as FIN"
+    ],
+    "correct": 1,
+    "tip": "Classification drives data segregation. INT = Installation: one shared copy across all companies (perfect for COUNTRY, LANGUAGE). FIN = Financial: strictly partitioned by lead company/book (essential for ACCOUNT, FUNDS.TRANSFER)."
+  },
+  {
+    "id": 319,
+    "topic": "Scenario",
+    "q": "An auditor asks: 'Show me the CUSTOMER record exactly as it looked 6 months ago.' Which operation and file?",
+    "options": [
+      "SEE on LIV",
+      "HISTORY.RESTORE / read the appropriate HIS suffix (e.g. ID;n)",
+      "DELETE from HIS",
+      "REVERSE the record"
+    ],
+    "correct": 1,
+    "tip": "HIS stores immutable historical versions, indexed by suffixes ID;1, ID;2, ID;3, etc. The auditor reads the right historical record, or uses HISTORY.RESTORE to reinstate it. Copy-on-Write at AUTH ensures every previous version is preserved."
+  },
+  {
+    "id": 320,
+    "topic": "Scenario",
+    "q": "A senior developer adds a tooltip to a field in the customer onboarding form. What needs to happen on end-user computers after the change?",
+    "options": [
+      "A full app reinstall",
+      "A browser restart",
+      "Nothing — SDUI delivers the new schema dynamically on next request",
+      "Manual patch download"
+    ],
+    "correct": 2,
+    "tip": "Server-Driven UI (SDUI): the backend returns the form schema dynamically as JSON. Editing the projection updates the schema; clients receive it on the next request — no redeploy, no patching, no restart."
+  },
+  {
+    "id": 321,
+    "topic": "Scenario",
+    "q": "Two AUTH officers click 'Approve' on the same UNAU record at the same millisecond. What prevents data corruption?",
+    "options": [
+      "Random luck",
+      "NAU's singleton constraint and atomic AUTH operation — only one transition succeeds; the other gets 'record not found'",
+      "Both succeed silently",
+      "The system goes down"
+    ],
+    "correct": 1,
+    "tip": "NAU is a singleton (1 record per ID). AUTH is atomic: it moves the NAU record to LIV and archives the prior LIV to HIS. Once the first AUTH completes, the NAU entry is gone — the second AUTH finds nothing to authorize and fails cleanly."
+  },
+  {
+    "id": 322,
+    "topic": "Scenario",
+    "q": "A risk officer needs stress-test scenarios for loan portfolios that don't impact real accounts or the GL. Which file space?",
+    "options": [
+      "LIV",
+      "NAU",
+      "HIS",
+      "SIM"
+    ],
+    "correct": 3,
+    "tip": "SIM (Simulation) is dedicated to what-if data and is completely isolated from live and financial records. Anything written to SIM cannot trigger accounting entries — perfect for stress testing without risk."
+  },
+  {
+    "id": 323,
+    "topic": "Scenario",
+    "q": "A teller starts entering a USD 10,000 deposit but needs to verify something with the customer. She wants to save and resume later — WITHOUT triggering validation (the form isn't complete). Which operation?",
+    "options": [
+      "INPUT",
+      "HOLD",
+      "VALIDATE",
+      "AUTH"
+    ],
+    "correct": 1,
+    "tip": "HOLD saves an unvalidated, incomplete draft into NAU with status HOLD. Unlike INPUT, it does NOT run validation rules, so partial data is fine. She can return later and use INPUT to validate and commit. HOLD = pause; INPUT = commit."
+  },
+  {
+    "id": 324,
+    "topic": "Scenario",
+    "q": "After a successful AUTH on an amendment to CUSTOMER C123, where can you find the version that existed BEFORE this amendment?",
+    "options": [
+      "Permanently deleted",
+      "HIS file with the next sequential suffix (e.g. C123;n) — Copy-on-Write archived it during AUTH",
+      "Still in NAU",
+      "Stuck in LIV"
+    ],
+    "correct": 1,
+    "tip": "Copy-on-Write: when AUTH commits an amendment, the OLD LIV record is automatically moved to HIS with the next sequential suffix. This is how the audit trail builds up over time — every prior version remains accessible via HIS."
+  },
+  {
+    "id": 325,
+    "topic": "Scenario",
+    "q": "A bank wants a 'Risk Level' dropdown with values High/Medium/Low. Should they create a new physical table for these three values?",
+    "options": [
+      "Yes — every reference needs its own table",
+      "No — store entries in VIRTUAL.TABLES with a compound key; DDD auto-generates the UI dropdown",
+      "Hardcode in HTML",
+      "Store as text comments"
+    ],
+    "correct": 1,
+    "tip": "Creating thousands of tiny reference tables would bloat the database. VIRTUAL.TABLES centralizes all static reference lists in one physical table, distinguished by compound keys. DDD auto-generates the dropdown and validates input — clean and efficient."
+  },
+  {
+    "id": 326,
+    "topic": "Scenario",
+    "q": "A junior teller should VIEW account info but never modify it. Which projection-level configuration achieves this without changing the underlying DDD?",
+    "options": [
+      "Delete the fields",
+      "Mark the fields as NOINPUT in the teller's projection (read-only in this view)",
+      "Hide them via CSS",
+      "Restrict the database"
+    ],
+    "correct": 1,
+    "tip": "NOINPUT makes a field read-only in that specific projection while leaving the DDD definition untouched. Other roles using a different projection can still write to the same fields. Field Property Overrides give per-role behavior from one underlying schema."
+  },
+  {
+    "id": 327,
+    "topic": "Scenario",
+    "q": "The CSO wants a dashboard with a pie chart of accounts by branch, plus a tree view of GL accounts. Framework?",
+    "options": [
+      "Projections",
+      "Plugins",
+      "Enquiries — they render SVG-based charts and Tree Views",
+      "HIS browser"
+    ],
+    "correct": 2,
+    "tip": "Enquiries are designed for data presentation: grids, Tree Views (great for GLs), and SVG-based Bar/Pie/Line charts. Projections handle data ENTRY. Reporting and dashboards = Enquiries."
+  },
+  {
+    "id": 328,
+    "topic": "Scenario",
+    "q": "A loan officer focuses on the 'Debit Account' field, and you want a side panel showing that account's balance to appear automatically. Feature?",
+    "options": [
+      "Manual button click",
+      "Context-Sensitive Enquiries — the frontend broadcasts focus, triggering an enquiry side panel",
+      "CSS hover effect",
+      "A nightly batch"
+    ],
+    "correct": 1,
+    "tip": "Context-Sensitive Enquiries listen for focus events and automatically launch relevant side panels with contextual data. This actively drives the workflow rather than waiting for explicit clicks."
+  },
+  {
+    "id": 329,
+    "topic": "Scenario",
+    "q": "From an Enquiry list of pending loan approvals, you want users to click a row and immediately open the approval projection pre-filled with that loan's data. Mechanism?",
+    "options": [
+      "Email link",
+      "Hypermedia Drill-Down / Fast Path — passes the @ID into the target Projection",
+      "Manual ID re-entry",
+      "A new window opens blank"
+    ],
+    "correct": 1,
+    "tip": "Fast Path is the synergy between Enquiry and Projection: rows in an Enquiry grid are actionable. Clicking can launch a target Projection (e.g. LOAN|AUTH) with the @ID auto-passed, opening a pre-filled form."
+  },
+  {
+    "id": 330,
+    "topic": "Scenario",
+    "q": "A compliance team needs every successful loan disbursement to publish an event to a downstream Kafka topic for audit. Where to add this?",
+    "options": [
+      "Pre-hook plugin (would block writes)",
+      "Post-hook plugin — runs after successful commit, ideal for events/notifications/cascades",
+      "Inside the DDD",
+      "On the user's PC"
+    ],
+    "correct": 1,
+    "tip": "Post-hooks fire after successful commit. They're right for downstream side-effects: publishing events, notifications, cascades. Pre-hooks would block waiting for the message to send."
+  },
+  {
+    "id": 331,
+    "topic": "Scenario",
+    "q": "A reporting engineer needs IF/THEN coloring in a grid column: red if balance < 0, green otherwise. Right tool?",
+    "options": [
+      "A hardcoded JS file",
+      "The Enquiry Designer's visual Expression Builder",
+      "A new projection",
+      "SIM"
+    ],
+    "correct": 1,
+    "tip": "The Enquiry Designer includes a visual Expression Builder where admins write conditional formatting logic like IF AMOUNT > 1000 THEN 'RED' ELSE 'GREEN'. The WYSIWYG canvas plus Expression Builder lets non-developers build complex views."
+  },
+  {
+    "id": 332,
+    "topic": "Scenario",
+    "q": "A user changes the 'Principal' field on a loan form. The 'Monthly Payment' field below should recalculate immediately — before submit. Feature?",
+    "options": [
+      "A nightly batch",
+      "A 'Hot Field' (ON.CHANGE) on Principal triggering recalculation",
+      "Manual refresh",
+      "CSS animation"
+    ],
+    "correct": 1,
+    "tip": "Hot Fields trigger on the onBlur/change event. The associated plugin recalculates and updates Monthly Payment instantly — without form submission."
+  },
+  {
+    "id": 333,
+    "topic": "Scenario",
+    "q": "During quarter-end the system must reject new transactions on weekends. What table controls this, and which other table does it consult?",
+    "options": [
+      "DATES table, consulting HOLIDAY",
+      "CUSTOMER, consulting USER",
+      "ACCOUNT, consulting CATEGORY",
+      "CURRENCY, consulting BRANCH"
+    ],
+    "correct": 0,
+    "tip": "DATES controls the Bank Date and works with HOLIDAY to determine if a given day is a working day. If today is a holiday/weekend per HOLIDAY, DATES enforces the right behavior — including blocking certain transactions and skipping interest accrual."
+  },
+  {
+    "id": 334,
+    "topic": "Scenario",
+    "q": "Allow a transaction in JPY (no decimals) but the same transaction in USD (two decimals). Where is this rule configured?",
+    "options": [
+      "In the projection",
+      "In the CURRENCY table — defines ISO codes and exchange-rate decimals",
+      "In the plugin code",
+      "In the HTML"
+    ],
+    "correct": 1,
+    "tip": "The CURRENCY table defines ISO codes and allowed decimal places per currency. This single source of truth ensures any amount field validated against CURRENCY respects the right decimal rule."
+  },
+  {
+    "id": 335,
+    "topic": "Scenario",
+    "q": "A junior officer creates a new ACCOUNT record. The system reports 'Cannot execute — program not registered'. Likely cause?",
+    "options": [
+      "The customer is missing",
+      "The PROGRAM Registry doesn't have an active record for the executable; system blocks unauthorized code",
+      "Network issue",
+      "Disk full"
+    ],
+    "correct": 1,
+    "tip": "The PROGRAM Registry strictly blocks any program lacking an active registration. This is a core security control — only authorized code runs. Fix: register the program rather than bypass the registry."
+  },
+  {
+    "id": 336,
+    "topic": "Scenario",
+    "q": "A user gets 'Record not found' when opening CUSTOMER C999. What does this mean about the record's existence?",
+    "options": [
+      "It exists somewhere",
+      "Record exists in none of NAU, LIV, HIS, or ARC (entire Resolution Waterfall returned empty)",
+      "It exists only in LIV",
+      "It exists only in SIM"
+    ],
+    "correct": 1,
+    "tip": "SEE uses the Resolution Waterfall: NAU first, then LIV, HIS, ARC. 'Record not found' is returned only when ALL spaces are empty for that ID. So the record genuinely doesn't exist anywhere in the lifecycle."
+  },
+  {
+    "id": 337,
+    "topic": "Scenario",
+    "q": "The bank's COUNTRY table is updated (configured as 0-Auth INT). What happens to the previous LIV record?",
+    "options": [
+      "It's lost forever",
+      "Written to HIS as a previous version while the new input goes directly to LIV",
+      "Buffered in NAU",
+      "Sent to DEL"
+    ],
+    "correct": 1,
+    "tip": "Under 0-Auth, the system bypasses NAU entirely. The OLD LIV record is written to HIS and the new input goes straight to LIV. Audit trail preserved without 4-eyes."
+  },
+  {
+    "id": 338,
+    "topic": "Scenario",
+    "q": "A teller can both create AND authorize the same transaction. Is this allowed by the 4-Eyes Principle?",
+    "options": [
+      "Yes — fewer steps is better",
+      "No — 4-Eyes requires a SECOND, different user to AUTH; the original inputter cannot authorize their own record",
+      "Yes — at year-end only",
+      "Yes — for INT tables only"
+    ],
+    "correct": 1,
+    "tip": "The 4-Eyes Principle (enforced via AUTH.REQUIRED with the record in NAU as UNAU) explicitly requires a different second user to approve. The whole point is fraud and error prevention through separation of duties."
+  },
+  {
+    "id": 339,
+    "topic": "Scenario",
+    "q": "A mortgage product has a Repayment Schedule of 240 monthly entries inside each contract. Should each entry be a separate child-table row?",
+    "options": [
+      "Yes — one row per installment",
+      "No — DDD's Non-1NF support and Field Associations natively store repeating blocks inside a single record",
+      "Store as JSON text",
+      "Don't store it"
+    ],
+    "correct": 1,
+    "tip": "DDD allows Non-First Normal Form: a single record can natively hold multi-dimensional arrays and repeating blocks using Field Association markers (<, -, >). No child tables; index alignment is maintained automatically."
+  },
+  {
+    "id": 340,
+    "topic": "Scenario",
+    "q": "A field on a projection is marked NOCHANGE. A user creates a new record and fills it in. Later, they try to edit the same field. What happens?",
+    "options": [
+      "The edit succeeds",
+      "Blocked — NOCHANGE means immutable after CREATION; you can set it once but not modify later",
+      "Random behavior",
+      "The field disappears"
+    ],
+    "correct": 1,
+    "tip": "NOCHANGE = set at creation, frozen thereafter. Useful for fields like 'Customer ID' or 'Account Opening Date' that should be permanent. Different from NOINPUT (always read-only) — NOCHANGE allows the initial write."
+  },
+  {
+    "id": 341,
+    "topic": "Scenario",
+    "q": "A user notices a row in a customer Enquiry list is highlighted as 'INAU'. What does that tell them?",
+    "options": [
+      "The record is deleted",
+      "An unauthorized modification draft is pending in NAU on top of the LIV record — second-user approval required",
+      "The record has never existed",
+      "The customer was rejected"
+    ],
+    "correct": 1,
+    "tip": "Virtual Data Merging in Enquiries combines LIV + NAU + HIS. When a LIV record has a pending NAU draft, the row is flagged INAU to alert the viewer that a pending change exists."
+  },
+  {
+    "id": 342,
+    "topic": "Scenario",
+    "q": "A regulator wants assurance that no part of the system can bypass the 4-Eyes Principle. Which architectural feature gives this guarantee?",
+    "options": [
+      "A trust-the-developers policy",
+      "Strict Gateway Enforcement: all writes must pass through a registered PROJECTION.DEF, which enforces AUTH.REQUIRED",
+      "Firewall rules",
+      "Manual reviews of every transaction"
+    ],
+    "correct": 1,
+    "tip": "Direct DB writes are forbidden. Every mutation goes through a registered PROJECTION.DEF, which enforces AUTH.REQUIRED, plugin validations, and field properties. This architectural rule makes the 4-Eyes Principle non-bypassable by code."
+  },
+  {
+    "id": 343,
+    "topic": "Scenario",
+    "q": "A marketing Black Friday promo product must auto-deactivate on Dec 1. Best feature?",
+    "options": [
+      "Manual delete on Dec 1",
+      "EFFECTIVE.DATE versioning — schedule a new product version effective Dec 1",
+      "Send an email reminder",
+      "Manual code change"
+    ],
+    "correct": 1,
+    "tip": "Products are versioned by PRODUCT.ID + EFFECTIVE.DATE. Stage a future-dated 'deactivation' version effective Dec 1. The system switches automatically — no weekend ops work."
+  },
+  {
+    "id": 344,
+    "topic": "Scenario",
+    "q": "The product manager wants product validation to flow directly into catalog publication without an extra approval click — but only when validation succeeds. Which flag?",
+    "options": [
+      "AUTH.REQUIRED",
+      "COMBINE.ACTIONS = YES",
+      "HIDDEN",
+      "REVE"
+    ],
+    "correct": 1,
+    "tip": "COMBINE.ACTIONS = YES tells the 3-Stage Lifecycle Engine to auto-execute the cataloging (Enable Capability) step immediately after successful validation — no extra prompt."
+  },
+  {
+    "id": 345,
+    "topic": "Scenario",
+    "q": "A teller tries to HOLD a draft for ACCOUNT 5001, but the system blocks the action. Most likely cause?",
+    "options": [
+      "NAU already contains an UNAU record for ACCOUNT 5001; NAU singleton constraint blocks writing HOLD on top",
+      "No reason — random failure",
+      "Disk is full",
+      "User permission expired"
+    ],
+    "correct": 0,
+    "tip": "NAU is a singleton (1 record per ID). If a UNAU draft already exists (awaiting authorization), saving a HOLD on the same ID would corrupt the pending committed record. The system blocks the HOLD to protect it."
+  },
+  {
+    "id": 346,
+    "topic": "Scenario",
+    "q": "A senior analyst wants to expose a runtime filter (e.g. 'AMOUNT > 5000') to end-users in a report. Selection type?",
+    "options": [
+      "Fixed Selection — hardcoded",
+      "Dynamic Selection — exposed to user at runtime",
+      "Mandatory Selection — must be indexed",
+      "Validation Selection"
+    ],
+    "correct": 1,
+    "tip": "Fixed Selection is hardcoded (e.g. SECTOR = 1001 always). Dynamic Selection exposes a filter to users at runtime. Use Dynamic for user-facing filters; Fixed for invariants."
+  },
+  {
+    "id": 347,
+    "topic": "Scenario",
+    "q": "A new field added to a customer form via DDD must NOT impact existing production records on disk. What DDD characteristic ensures this?",
+    "options": [
+      "Manual DBA migration",
+      "Logical-to-physical abstraction: new fields are positions in TABLE.DEF; existing physical records are unchanged",
+      "A full reindex",
+      "Re-creating the table"
+    ],
+    "correct": 1,
+    "tip": "DDD decouples logical schema from physical storage. Adding a new field is a metadata change. Existing physical records remain untouched; the new field simply has no value until written. No migration, no downtime."
+  },
+  {
+    "id": 348,
+    "topic": "Scenario",
+    "q": "A consultant builds an Enquiry that scans 30 million transactions without using indexed fields as filters. What's likely to happen, and why?",
+    "options": [
+      "Lightning-fast results",
+      "System enforces Mandatory Selection rules on Indexed Fields and refuses or warns — to prevent performance-killing full-table scans",
+      "Returns random data",
+      "Crashes the bank"
+    ],
+    "correct": 1,
+    "tip": "Performance Protection is built in: Mandatory Selection rules enforce filtering on Indexed Fields only. This prevents naive full-table scans on huge datasets. The consultant must redesign the query."
+  },
+  {
+    "id": 349,
+    "topic": "Scenario",
+    "q": "A consultant edits a projection's pre-hook plugin to add a new validation. Tellers across all branches need the change immediately. What do they need to do?",
+    "options": [
+      "Reinstall the app",
+      "Nothing — the new plugin is registered in PROGRAM and the projection is loaded on next request via SDUI",
+      "Restart their PC",
+      "Wait for monthly patch cycle"
+    ],
+    "correct": 1,
+    "tip": "Combining SDUI (projections delivered dynamically) and the PROGRAM registry (plugins loaded on demand) means changes propagate instantly. Tellers' next form request returns the new schema with the updated plugin."
+  },
+  {
+    "id": 350,
+    "topic": "Scenario",
+    "q": "A teller authorizes a transaction created by herself from a different terminal earlier. Acceptable under 4-Eyes?",
+    "options": [
+      "Yes — different terminals count",
+      "No — 4-Eyes requires a different USER ID, not a different terminal. INPUTTER and AUTHORISER audit fields must differ",
+      "Yes — if it's a small amount",
+      "Only with admin override"
+    ],
+    "correct": 1,
+    "tip": "4-Eyes is enforced by USER ID, not by device. INPUTTER and AUTHORISER are captured in the audit block and must be different user IDs. Using two terminals doesn't satisfy the principle."
+  },
+  {
+    "id": 351,
+    "topic": "Scenario",
+    "q": "A loan officer wants to compare a draft amendment against the live version side-by-side, with field-level differences highlighted. Feature?",
+    "options": [
+      "Manual line-by-line read",
+      "The Diff Engine in projections — highlights field-level changes between draft and baseline",
+      "SQL query",
+      "A printed report"
+    ],
+    "correct": 1,
+    "tip": "The Diff Engine is part of the projection framework. During authorization or review, it visually highlights exactly which fields changed between the unauthorized draft (NAU) and the live baseline (LIV). It can also diff between two HIS versions."
+  },
+  {
+    "id": 352,
+    "topic": "Scenario",
+    "q": "A fraud officer wants to enrich every customer onboarding submission by calling an external KYC API before commit. Where to add this?",
+    "options": [
+      "Email after the fact",
+      "A pre-hook plugin on the CUSTOMER input projection — synchronous external call before commit",
+      "A nightly cron job",
+      "Manual phone call"
+    ],
+    "correct": 1,
+    "tip": "Pre-hook plugins are designed for synchronous external integrations (KYC, sanctions check, credit bureau). The hook can reject the operation if KYC fails — preventing bad data from reaching NAU."
+  },
+  {
+    "id": 353,
+    "topic": "Scenario",
+    "q": "After a SUCCESSFUL reverse-authorization (AUTH on an RNAU), where is the record ultimately stored?",
+    "options": [
+      "Back in NAU",
+      "In HIS with status REVE — reversal is a terminal state",
+      "Back in LIV",
+      "Deleted permanently"
+    ],
+    "correct": 1,
+    "tip": "REVERSE moves LIV → NAU as RNAU. The second user's AUTH then moves the record from NAU to HIS with status REVE. The cancellation is now permanent and auditable. LIV no longer holds an active version."
+  },
+  {
+    "id": 354,
+    "topic": "Scenario",
+    "q": "A field needs to be visible to backend logic and used in defaulting, but NEVER shown to end users. Property?",
+    "options": [
+      "NOINPUT",
+      "NOCHANGE",
+      "HIDDEN — used in background logic, removed from the UI",
+      "MANDATORY"
+    ],
+    "correct": 2,
+    "tip": "HIDDEN tells the projection to use the field in background logic (defaulting, validation, plugins) but strip it from the UI payload. Different from NOINPUT (visible but read-only) and NOCHANGE (visible, editable once)."
+  },
+  {
+    "id": 355,
+    "topic": "Scenario",
+    "q": "A bank wants a single underlying CUSTOMER table but DIFFERENT forms for corporates vs individuals. Best pattern?",
+    "options": [
+      "Two physical CUSTOMER tables",
+      "One CUSTOMER table with TWO projections — e.g. CUSTOMER,CORP and CUSTOMER,IND",
+      "Two separate databases",
+      "Hide fields with CSS"
+    ],
+    "correct": 1,
+    "tip": "Projections decouple UI from the underlying table. One CUSTOMER table can have a CORP projection and an IND projection — same physical data, different lenses, no duplication."
+  },
+  {
+    "id": 356,
+    "topic": "Scenario",
+    "q": "An admin wants to test a complex enquiry against live data WITHOUT compiling or saving the configuration. What helps?",
+    "options": [
+      "Trust and pray",
+      "The Live Preview feature in the Enquiry Designer — runs unsaved config against live data",
+      "SIM file",
+      "Manual SQL"
+    ],
+    "correct": 1,
+    "tip": "Live Preview executes the unsaved configuration against live data and returns the first page of results immediately. This shortens the design cycle — admins iterate visually without compiling or deploying."
+  },
+  {
+    "id": 357,
+    "topic": "Scenario",
+    "q": "An officer wants the accounting team to receive a notification every time a high-value funds-transfer is authorized. Where?",
+    "options": [
+      "Pre-hook (would block the commit)",
+      "Post-hook on the FUNDS.TRANSFER AUTH projection — fires after commit",
+      "Inside SIM",
+      "Manual phone calls"
+    ],
+    "correct": 1,
+    "tip": "Post-hooks run after a successful AUTH commit. They're the right place for notifications, event publication, and downstream cascades that should happen ONLY when the operation truly succeeded."
+  },
+  {
+    "id": 358,
+    "topic": "Scenario",
+    "q": "The PRODUCT.CLASS for a 'Personal Loan' is most likely…",
+    "options": [
+      "ACCOUNT",
+      "LENDING",
+      "DEPOSIT",
+      "CURRENCY"
+    ],
+    "correct": 1,
+    "tip": "PRODUCT.CLASS is the highest tier and defines the permitted base components. LENDING is the class for loans (Personal Loan, Mortgage). ACCOUNT class is for current/savings accounts. PRODUCT.TYPE underneath might be 'PERSONAL.LOAN'."
+  },
+  {
+    "id": 359,
+    "topic": "Scenario",
+    "q": "The PRODUCT.CATALOG is described as read-only and serving origination APIs. Why is the PRODUCT.BUILDER environment important?",
+    "options": [
+      "Marketing fun",
+      "Zero-Downtime Maintenance: staging changes in PRODUCT.BUILDER leaves the live PRODUCT.CATALOG intact, so customer journeys keep working during edits",
+      "To hide products",
+      "Just a draft folder"
+    ],
+    "correct": 1,
+    "tip": "Live products serve customer journeys 24/7. Editing them in place would risk inconsistency. PRODUCT.BUILDER sandboxes changes; the read-only PRODUCT.CATALOG keeps serving until the new version is officially published. Strict Data Isolation = Zero Downtime."
+  },
+  {
+    "id": 360,
+    "topic": "Scenario",
+    "q": "The bank wants to enhance the 'Charges' Product Attribute (e.g. add a new fee type) so it improves ALL existing products that use it. What architectural property makes this possible?",
+    "options": [
+      "Each product needs separate update",
+      "Modular Building-Block Assembly: enhancements to a shared Product Attribute instantly propagate to every product that uses it — no code duplication",
+      "Manual update per product",
+      "Hardcoded charges"
+    ],
+    "correct": 1,
+    "tip": "Product Attributes (Interest, Charges, Schedules, Limits, Events) are reusable building blocks. Because functionality is encapsulated in the attribute, enhancing 'Charges' propagates to every product that uses it — a single change, system-wide benefit."
   }
 ]

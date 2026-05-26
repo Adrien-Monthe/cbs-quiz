@@ -215,7 +215,7 @@
 
   <header>
     <h1>🏦 CBS Core Knowledge Quiz</h1>
-    <p>20 random questions from a 300-question pool · Master the Core Banking System</p>
+    <p>30 random questions from the question pool · Master the Core Banking System</p>
   </header>
 
   <!-- START SCREEN -->
@@ -223,15 +223,15 @@
     <h2 style="margin-top:0">Ready to test yourself?</h2>
     <p style="color:var(--muted)">Enter your name to start. Your score will be added to the global leaderboard.</p>
     <input id="player-name" class="input" placeholder="Your name (e.g. Adrien)" maxlength="40" />
-    <button id="start-btn" class="btn">Start Quiz (20 questions)</button>
+    <button id="start-btn" class="btn">Start Quiz (30 questions)</button>
     <button id="show-leaderboard-btn" class="btn btn-secondary" style="margin-top:10px">🏆 View Leaderboard</button>
-    <div class="small">300 questions in the pool · Each quiz: 20 random questions</div>
+    <div class="small">Including scenario questions that test understanding, not just memory</div>
   </div>
 
   <!-- QUIZ SCREEN -->
   <div id="quiz-screen" class="card hidden">
     <div class="meta">
-      <span id="q-counter">Question 1 / 20</span>
+      <span id="q-counter">Question 1 / 30</span>
       <span id="q-score">Score: 0</span>
     </div>
     <div class="progress-bar"><div id="progress-fill" class="progress-fill" style="width:0%"></div></div>
@@ -246,7 +246,7 @@
   <div id="results-screen" class="card hidden">
     <div class="score-display">
       <div id="verdict" class="verdict">🎉 Well done!</div>
-      <div class="score-number"><span id="final-score">0</span> / 20</div>
+      <div class="score-number"><span id="final-score">0</span> / 30</div>
       <div class="score-label"><span id="percent-label">0%</span> correct</div>
     </div>
 
@@ -286,7 +286,7 @@
    Pure vanilla JS. No build step. GitHub Pages ready.
    ========================================================= */
 
-const QUIZ_LENGTH = 20;
+const QUIZ_LENGTH = 30;
 const STATE = {
   playerName: '',
   picked: [],          // 20 picked questions for this round
@@ -435,51 +435,84 @@ async function finishQuiz() {
 }
 
 /* =========================================================
-   LEADERBOARD - Tries shared backend (JSONBin.io), falls
-   back to localStorage if not configured.
+   LEADERBOARD — auto-detects which backend is configured:
+     1. Firebase Realtime Database (CONFIG.FIREBASE_URL)
+     2. Pantry (CONFIG.PANTRY_ID)
+     3. localStorage fallback (per-browser)
    ========================================================= */
 
-function getJSONBinConfig() {
-  // CONFIG.JSONBIN_KEY and CONFIG.JSONBIN_BIN_ID are set in config.js
-  if (typeof CONFIG !== 'undefined' && CONFIG.JSONBIN_KEY && CONFIG.JSONBIN_BIN_ID) {
-    return { key: CONFIG.JSONBIN_KEY, bin: CONFIG.JSONBIN_BIN_ID };
+function getBackend() {
+  if (typeof CONFIG === 'undefined') return null;
+  if (CONFIG.FIREBASE_URL && CONFIG.FIREBASE_URL.trim()) {
+    return { type: 'firebase', url: CONFIG.FIREBASE_URL.replace(/\/$/, '') };
+  }
+  if (CONFIG.PANTRY_ID && CONFIG.PANTRY_ID.trim()) {
+    return { type: 'pantry', id: CONFIG.PANTRY_ID.trim() };
   }
   return null;
 }
 
 async function fetchSharedScores() {
-  const cfg = getJSONBinConfig();
-  if (!cfg) return null;
+  const b = getBackend();
+  if (!b) return null;
   try {
-    const res = await fetch(`https://api.jsonbin.io/v3/b/${cfg.bin}/latest`, {
-      headers: { 'X-Master-Key': cfg.key, 'X-Bin-Meta': 'false' }
-    });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    return Array.isArray(data.scores) ? data.scores : [];
+    if (b.type === 'firebase') {
+      // Firebase REST: GET <url>/scores.json
+      const res = await fetch(`${b.url}/scores.json`);
+      if (!res.ok) throw new Error('Firebase HTTP ' + res.status);
+      const data = await res.json();
+      // Firebase POST gives us {auto-id: entry, ...}. Normalize to an array.
+      if (!data) return [];
+      if (Array.isArray(data)) return data.filter(Boolean);
+      return Object.values(data);
+    }
+    if (b.type === 'pantry') {
+      // Pantry: GET basket; if missing, return empty
+      const res = await fetch(`https://getpantry.cloud/apiv1/pantry/${b.id}/basket/cbs_quiz_scores`);
+      if (res.status === 400) return []; // basket doesn't exist yet
+      if (!res.ok) throw new Error('Pantry HTTP ' + res.status);
+      const data = await res.json();
+      return Array.isArray(data.scores) ? data.scores : [];
+    }
   } catch (e) {
     console.warn('Shared scores fetch failed, falling back to local.', e);
     return null;
   }
+  return null;
 }
 
-async function pushSharedScores(scores) {
-  const cfg = getJSONBinConfig();
-  if (!cfg) return false;
+async function pushSharedScore(entry) {
+  const b = getBackend();
+  if (!b) return false;
   try {
-    const res = await fetch(`https://api.jsonbin.io/v3/b/${cfg.bin}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Master-Key': cfg.key,
-      },
-      body: JSON.stringify({ scores })
-    });
-    return res.ok;
+    if (b.type === 'firebase') {
+      // POST appends a child with an auto-id — no race conditions.
+      const res = await fetch(`${b.url}/scores.json`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entry)
+      });
+      return res.ok;
+    }
+    if (b.type === 'pantry') {
+      // Pantry has no "append" — fetch, push, replace the basket.
+      const current = await fetchSharedScores() || [];
+      current.push(entry);
+      // Keep top 200 by score (then fastest) to bound size
+      current.sort((a,b) => b.score - a.score || a.seconds - b.seconds);
+      const trimmed = current.slice(0, 200);
+      const res = await fetch(`https://getpantry.cloud/apiv1/pantry/${b.id}/basket/cbs_quiz_scores`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scores: trimmed })
+      });
+      return res.ok;
+    }
   } catch (e) {
-    console.warn('Push shared scores failed.', e);
+    console.warn('Push shared score failed.', e);
     return false;
   }
+  return false;
 }
 
 function getLocalScores() {
@@ -500,15 +533,8 @@ async function saveScore(name, score, total, seconds) {
     seconds,
     date: new Date().toISOString(),
   };
-  // Try shared first
-  const shared = await fetchSharedScores();
-  if (shared !== null) {
-    shared.push(entry);
-    // keep top 100 by score (then fastest)
-    shared.sort((a,b) => b.score - a.score || a.seconds - b.seconds);
-    const trimmed = shared.slice(0, 100);
-    await pushSharedScores(trimmed);
-  }
+  // Push to the configured backend (if any)
+  await pushSharedScore(entry);
   // Always keep a local copy too
   const local = getLocalScores();
   local.push(entry);
@@ -516,17 +542,18 @@ async function saveScore(name, score, total, seconds) {
 }
 
 async function renderLeaderboard() {
-  const cfg = getJSONBinConfig();
+  const b = getBackend();
   const statusEl = $('leaderboard-status');
   const bodyEl = $('leaderboard-body');
   bodyEl.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted)">Loading…</td></tr>';
 
   let scores = null;
-  if (cfg) {
+  if (b) {
     scores = await fetchSharedScores();
+    const label = b.type === 'firebase' ? 'Firebase' : 'Pantry';
     statusEl.textContent = scores !== null
-      ? '🌐 Showing global leaderboard (shared across all players).'
-      : '⚠️ Could not reach shared leaderboard — showing local scores only.';
+      ? `🌐 Showing global leaderboard (shared via ${label}).`
+      : `⚠️ Could not reach shared leaderboard (${label}) — showing local scores only.`;
   } else {
     statusEl.textContent = 'ℹ️ Shared leaderboard not configured — showing local scores only. (See README to enable.)';
   }

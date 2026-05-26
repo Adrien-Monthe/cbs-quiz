@@ -1,0 +1,3902 @@
+[
+  {
+    "id": 1,
+    "topic": "Table Entity",
+    "q": "In CBS, what is a Table (or Application)?",
+    "options": [
+      "A spreadsheet visible to the end user",
+      "A fundamental system entity governed by a centralized Table Registry",
+      "A SQL database view",
+      "A backup file of customer records"
+    ],
+    "correct": 1,
+    "tip": "A Table represents a logical business entity. Its execution, data structures, and physical storage are governed by a centralized and immutable Table Registry."
+  },
+  {
+    "id": 2,
+    "topic": "Table Entity",
+    "q": "What governs the execution, data structures, and physical storage of a Table?",
+    "options": [
+      "The Customer",
+      "The Table Registry",
+      "The Branch Manager",
+      "The Database Admin manually"
+    ],
+    "correct": 1,
+    "tip": "The centralized and immutable Table Registry acts as the system's service directory and ensures only authorized applications can operate."
+  },
+  {
+    "id": 3,
+    "topic": "Table Entity",
+    "q": "What is the role of the Table Registry?",
+    "options": [
+      "A static documentation tool",
+      "The system's service directory enforcing authorization and multi-company segregation",
+      "A monitoring dashboard",
+      "A reporting engine"
+    ],
+    "correct": 1,
+    "tip": "The Table Registry acts as the system's service directory, enforcing authorization and strict multi-company data segregation rules."
+  },
+  {
+    "id": 4,
+    "topic": "Table Entity",
+    "q": "A Table contains records related to which kind of object?",
+    "options": [
+      "UI components",
+      "Specific banking objects (logical business entity)",
+      "Operating system files",
+      "Network packets"
+    ],
+    "correct": 1,
+    "tip": "A Table represents a logical business entity containing a structured set of records related to a specific type of banking object."
+  },
+  {
+    "id": 5,
+    "topic": "Table Entity",
+    "q": "Which of the following is NOT defined by a Table?",
+    "options": [
+      "Data model",
+      "Business processing rules",
+      "Access controls",
+      "Physical disk firmware"
+    ],
+    "correct": 3,
+    "tip": "Tables define data models, business processing rules, access controls, and integration points — not hardware-level firmware."
+  },
+  {
+    "id": 6,
+    "topic": "Table Entity",
+    "q": "How are Tables categorized?",
+    "options": [
+      "By color and size",
+      "By functionality and how they handle financial data",
+      "Alphabetically only",
+      "By the user who created them"
+    ],
+    "correct": 1,
+    "tip": "Tables are categorized by their functionality and by how they handle financial data."
+  },
+  {
+    "id": 7,
+    "topic": "Table Entity",
+    "q": "Which Table stores master data for individuals or corporates?",
+    "options": [
+      "ACCOUNT",
+      "CUSTOMER",
+      "TELLER",
+      "DATES"
+    ],
+    "correct": 1,
+    "tip": "The CUSTOMER table stores Master Data for individuals or corporates, assigning a unique Customer ID used to link future accounts and loans."
+  },
+  {
+    "id": 8,
+    "topic": "Table Entity",
+    "q": "What are key fields in the CUSTOMER table?",
+    "options": [
+      "SHORT.NAME, SECTOR, TARGET, NATIONALITY",
+      "DEBIT.ACCT.NO, CREDIT.ACCT.NO",
+      "WORKING.BALANCE, CURRENCY",
+      "DATE, HOLIDAY"
+    ],
+    "correct": 0,
+    "tip": "Key fields include SHORT.NAME, SECTOR, TARGET, and NATIONALITY."
+  },
+  {
+    "id": 9,
+    "topic": "Table Entity",
+    "q": "What is the USER table used for?",
+    "options": [
+      "Customer onboarding",
+      "Internal staff management (login credentials, access rights)",
+      "Loan management",
+      "Currency exchange"
+    ],
+    "correct": 1,
+    "tip": "The USER table manages internal staff: tellers, branch managers, login credentials, department access rights."
+  },
+  {
+    "id": 10,
+    "topic": "Table Entity",
+    "q": "Which classification typically applies to the CUSTOMER table?",
+    "options": [
+      "INT",
+      "CUS",
+      "FIN",
+      "SIM"
+    ],
+    "correct": 1,
+    "tip": "CUSTOMER-related entities are typically classified as CUS (Customer level) or INT (Installation level)."
+  },
+  {
+    "id": 11,
+    "topic": "Table Entity",
+    "q": "Which table maintains current, savings, or internal GL balances?",
+    "options": [
+      "ACCOUNT",
+      "CUSTOMER",
+      "CATEGORY",
+      "DATES"
+    ],
+    "correct": 0,
+    "tip": "The ACCOUNT table maintains current, savings, or internal GL balances with fields like WORKING.BALANCE and CURRENCY."
+  },
+  {
+    "id": 12,
+    "topic": "Table Entity",
+    "q": "Which field on ACCOUNT updates when a customer deposits cash?",
+    "options": [
+      "SECTOR",
+      "WORKING.BALANCE",
+      "NATIONALITY",
+      "CATEGORY"
+    ],
+    "correct": 1,
+    "tip": "When a customer deposits cash, the system updates the WORKING.BALANCE on the ACCOUNT table."
+  },
+  {
+    "id": 13,
+    "topic": "Table Entity",
+    "q": "What does the CATEGORY table define?",
+    "options": [
+      "Holidays",
+      "Product definitions and groupings",
+      "Customers",
+      "Tellers"
+    ],
+    "correct": 1,
+    "tip": "CATEGORY defines and groups products. E.g. accounts 1000-1999 may be Current and 6000-6999 Savings."
+  },
+  {
+    "id": 14,
+    "topic": "Table Entity",
+    "q": "Account range 1000-1999 in CATEGORY might represent…",
+    "options": [
+      "Loan accounts",
+      "Current Accounts",
+      "Savings Accounts",
+      "Suspense accounts"
+    ],
+    "correct": 1,
+    "tip": "In the example, the 1000-1999 range was used for Current Accounts and 6000-6999 for Savings Accounts."
+  },
+  {
+    "id": 15,
+    "topic": "Table Entity",
+    "q": "FUNDS.TRANSFER table is used to…",
+    "options": [
+      "Define holidays",
+      "Execute payments (Internal, SWIFT, Local)",
+      "Onboard customers",
+      "Define currency decimals"
+    ],
+    "correct": 1,
+    "tip": "FUNDS.TRANSFER drives the movement of funds via Internal, SWIFT, or Local payments."
+  },
+  {
+    "id": 16,
+    "topic": "Table Entity",
+    "q": "Which fields are key to FUNDS.TRANSFER?",
+    "options": [
+      "DEBIT.ACCT.NO, CREDIT.ACCT.NO, DEBIT.AMOUNT, TRANSACTION.TYPE",
+      "SECTOR, TARGET",
+      "HOLIDAY, DATES",
+      "SHORT.NAME"
+    ],
+    "correct": 0,
+    "tip": "FUNDS.TRANSFER key fields include DEBIT.ACCT.NO, CREDIT.ACCT.NO, DEBIT.AMOUNT, and TRANSACTION.TYPE."
+  },
+  {
+    "id": 17,
+    "topic": "Table Entity",
+    "q": "What is the TELLER table used for?",
+    "options": [
+      "Online banking",
+      "Over-the-counter cash operations",
+      "Loan calculations",
+      "Currency definitions"
+    ],
+    "correct": 1,
+    "tip": "TELLER handles over-the-counter cash operations like USD 500 withdrawals at the branch."
+  },
+  {
+    "id": 18,
+    "topic": "Table Entity",
+    "q": "What does AA.ARRANGEMENT manage?",
+    "options": [
+      "The lifecycle of a specific loan or deposit contract",
+      "Currency rates",
+      "User passwords",
+      "Holiday calendars"
+    ],
+    "correct": 0,
+    "tip": "AA.ARRANGEMENT manages the lifecycle of a specific loan or deposit contract (e.g. a 20-year mortgage)."
+  },
+  {
+    "id": 19,
+    "topic": "Table Entity",
+    "q": "A 20-year mortgage would be tracked in which table?",
+    "options": [
+      "DATES",
+      "CUSTOMER",
+      "AA.ARRANGEMENT",
+      "CATEGORY"
+    ],
+    "correct": 2,
+    "tip": "AA.ARRANGEMENT tracks contracts, linking interest rates, repayment schedules and penalties into one Arrangement."
+  },
+  {
+    "id": 20,
+    "topic": "Table Entity",
+    "q": "Which table controls the Bank Date?",
+    "options": [
+      "CURRENCY",
+      "DATES",
+      "HOLIDAY",
+      "TIME"
+    ],
+    "correct": 1,
+    "tip": "The DATES table controls the Bank Date and works with HOLIDAY to decide working days."
+  },
+  {
+    "id": 21,
+    "topic": "Table Entity",
+    "q": "What does the DATES table reference to decide whether interest should accrue?",
+    "options": [
+      "The HOLIDAY table",
+      "The CUSTOMER table",
+      "The TELLER table",
+      "The CATEGORY table"
+    ],
+    "correct": 0,
+    "tip": "DATES references HOLIDAY to determine if today is a working day before accruing interest or processing payments."
+  },
+  {
+    "id": 22,
+    "topic": "Table Entity",
+    "q": "Which table defines ISO currency codes and exchange-rate decimals?",
+    "options": [
+      "DATES",
+      "CURRENCY",
+      "ACCOUNT",
+      "TELLER"
+    ],
+    "correct": 1,
+    "tip": "CURRENCY defines ISO codes and exchange rate decimals (e.g. JPY allows no decimals, USD allows 2)."
+  },
+  {
+    "id": 23,
+    "topic": "Table Entity",
+    "q": "In CURRENCY, which property prevents JPY from having decimal places?",
+    "options": [
+      "NATIONALITY",
+      "SECTOR",
+      "Exchange rate decimal definition",
+      "HOLIDAY flag"
+    ],
+    "correct": 2,
+    "tip": "CURRENCY defines exchange rate decimals — JPY has zero allowed, USD has two."
+  },
+  {
+    "id": 24,
+    "topic": "Table Entity",
+    "q": "Internal staff and their department access rights are managed by which table?",
+    "options": [
+      "CUSTOMER",
+      "TELLER",
+      "USER",
+      "BRANCH"
+    ],
+    "correct": 2,
+    "tip": "USER table defines internal staff access rights, departments, and login credentials."
+  },
+  {
+    "id": 25,
+    "topic": "Table Entity",
+    "q": "The CUSTOMER ID created at onboarding is used to…",
+    "options": [
+      "Link future accounts and loans to that customer",
+      "Encrypt the database",
+      "Replace the SECTOR field",
+      "Lock the branch"
+    ],
+    "correct": 0,
+    "tip": "The unique Customer ID created during onboarding links all future accounts and loans to that customer."
+  },
+  {
+    "id": 26,
+    "topic": "Anatomy",
+    "q": "What is the foundation of every Table in CBS?",
+    "options": [
+      "A spreadsheet template",
+      "Mandatory registration in the system index",
+      "An IP address",
+      "A user profile"
+    ],
+    "correct": 1,
+    "tip": "Every Table's foundation is mandatory registration in the system's index, which controls execution and storage."
+  },
+  {
+    "id": 27,
+    "topic": "Anatomy",
+    "q": "Which registry governs the executable artifacts associated with a Table?",
+    "options": [
+      "FILE",
+      "PROGRAM",
+      "DATA",
+      "SECURITY"
+    ],
+    "correct": 1,
+    "tip": "The PROGRAM Registry governs executable artifacts. The system blocks execution of any program lacking an active record there."
+  },
+  {
+    "id": 28,
+    "topic": "Anatomy",
+    "q": "What happens if a program is NOT registered in the PROGRAM registry?",
+    "options": [
+      "It runs slowly",
+      "The system strictly blocks its execution",
+      "It auto-registers",
+      "It runs only on weekends"
+    ],
+    "correct": 1,
+    "tip": "The system strictly blocks the execution of any program that does not have an active record in the PROGRAM registry."
+  },
+  {
+    "id": 29,
+    "topic": "Anatomy",
+    "q": "Which registry determines the Table's physical database location?",
+    "options": [
+      "FILE",
+      "PROGRAM",
+      "TABLE",
+      "CUSTOMER"
+    ],
+    "correct": 0,
+    "tip": "The FILE Registry determines the Table's physical database location, operational behavior, and data classification."
+  },
+  {
+    "id": 30,
+    "topic": "Anatomy",
+    "q": "What does the FILE registry define besides location?",
+    "options": [
+      "Operational behavior and data classification",
+      "User salaries",
+      "Branch hours",
+      "Phone numbers"
+    ],
+    "correct": 1,
+    "tip": "FILE registry defines physical location, operational behavior, and data classification (INT, FIN, CUS)."
+  },
+  {
+    "id": 31,
+    "topic": "Anatomy",
+    "q": "What is the purpose of the CLASSIFICATION attribute?",
+    "options": [
+      "UI color",
+      "Strict multi-company data segregation",
+      "Naming convention",
+      "Backup frequency"
+    ],
+    "correct": 1,
+    "tip": "CLASSIFICATION enforces strict multi-company data segregation."
+  },
+  {
+    "id": 32,
+    "topic": "Anatomy",
+    "q": "INT classification means…",
+    "options": [
+      "Internet-facing",
+      "Installation: stores global parameters shared across all companies",
+      "Internal staff only",
+      "Initial setup"
+    ],
+    "correct": 1,
+    "tip": "INT (Installation) stores global parameters like COUNTRY or LANGUAGE that are universally shared across all companies."
+  },
+  {
+    "id": 33,
+    "topic": "Anatomy",
+    "q": "FIN classification stores…",
+    "options": [
+      "Final reports",
+      "Transactional data segregated by the lead company or book",
+      "Finger-print authentication",
+      "Fixed assets only"
+    ],
+    "correct": 1,
+    "tip": "FIN (Financial) houses transactional data (ACCOUNT, FUNDS.TRANSFER) that must be strictly segregated by company."
+  },
+  {
+    "id": 34,
+    "topic": "Anatomy",
+    "q": "CUS classification is used for…",
+    "options": [
+      "Currency",
+      "Customer client data, which may be shared or segregated per config",
+      "Cash storage",
+      "Customs declarations"
+    ],
+    "correct": 1,
+    "tip": "CUS (Customer) manages client data that may be shared or segregated based on configuration rules."
+  },
+  {
+    "id": 35,
+    "topic": "Anatomy",
+    "q": "COUNTRY and LANGUAGE tables would most likely be classified as…",
+    "options": [
+      "INT",
+      "FIN",
+      "CUS",
+      "SIM"
+    ],
+    "correct": 0,
+    "tip": "Global parameters like COUNTRY or LANGUAGE are INT (Installation) — universally shared."
+  },
+  {
+    "id": 36,
+    "topic": "Anatomy",
+    "q": "ACCOUNT and FUNDS.TRANSFER are classified as…",
+    "options": [
+      "INT",
+      "FIN",
+      "CUS",
+      "DEL"
+    ],
+    "correct": 1,
+    "tip": "Transactional data like ACCOUNT and FUNDS.TRANSFER is FIN (Financial) — strictly segregated by company."
+  },
+  {
+    "id": 37,
+    "topic": "Anatomy",
+    "q": "To resolve physical storage, a Table is linked to…",
+    "options": [
+      "A MODULE code (e.g. AC or ST)",
+      "A user phone number",
+      "A browser cookie",
+      "A vendor ID"
+    ],
+    "correct": 0,
+    "tip": "Every Table must be linked to a valid MODULE code (AC, ST, etc.), which determines its directory path in the database."
+  },
+  {
+    "id": 38,
+    "topic": "Anatomy",
+    "q": "How is the physical structure of a Table partitioned?",
+    "options": [
+      "By alphabet",
+      "Into distinct lifecycle spaces (LIV, NAU, HIS, DEL, SIM)",
+      "Into rows only",
+      "By currency"
+    ],
+    "correct": 1,
+    "tip": "The physical structure is divided into distinct lifecycle spaces with strict cardinality rules to ensure data integrity."
+  },
+  {
+    "id": 39,
+    "topic": "Anatomy",
+    "q": "LIV (Live) is a…",
+    "options": [
+      "Many-records-per-ID space",
+      "Singleton file (strictly 1 record per ID)",
+      "Backup tape",
+      "User session"
+    ],
+    "correct": 1,
+    "tip": "LIV is a singleton — strictly 1 record per ID — representing the currently active authorized state."
+  },
+  {
+    "id": 40,
+    "topic": "Anatomy",
+    "q": "NAU is a…",
+    "options": [
+      "Many-records-per-ID space",
+      "Singleton acting as transaction buffer for uncommitted drafts",
+      "A printer queue",
+      "A backup file"
+    ],
+    "correct": 1,
+    "tip": "NAU is a singleton (1 record per ID) that buffers uncommitted drafts (HOLD) and pending records (UNAU)."
+  },
+  {
+    "id": 41,
+    "topic": "Anatomy",
+    "q": "HIS supports…",
+    "options": [
+      "Only one record per ID",
+      "Many records per ID, with sequential suffixes (;1, ;2, ;3)",
+      "Zero records",
+      "Encrypted records only"
+    ],
+    "correct": 1,
+    "tip": "HIS supports many records per ID, distinguished by sequential suffixes like ;1, ;2, ;3 — the highest is the most recent historical state."
+  },
+  {
+    "id": 42,
+    "topic": "Anatomy",
+    "q": "DEL file stores…",
+    "options": [
+      "Live records",
+      "Deleted unauthorized copies",
+      "Database indexes",
+      "Currency tables"
+    ],
+    "correct": 1,
+    "tip": "DEL is a singleton file that stores deleted unauthorized copies, preserving a forensic audit trail."
+  },
+  {
+    "id": 43,
+    "topic": "Anatomy",
+    "q": "SIM is used for…",
+    "options": [
+      "Simulation / what-if data",
+      "Live production data",
+      "User authentication",
+      "Network simulation"
+    ],
+    "correct": 0,
+    "tip": "SIM holds simulation or what-if data, completely isolated from active or financial records."
+  },
+  {
+    "id": 44,
+    "topic": "Anatomy",
+    "q": "What appears at the end of every Table's data structure?",
+    "options": [
+      "A signature line",
+      "System-maintained read-only audit fields",
+      "A free-text comment",
+      "Random padding"
+    ],
+    "correct": 1,
+    "tip": "The system automatically appends mandatory audit fields (RECORD.STATUS, INPUTTER, AUTHORISER, DATE.TIME, COMPANY) at the end of every Table."
+  },
+  {
+    "id": 45,
+    "topic": "Anatomy",
+    "q": "RECORD.STATUS represents…",
+    "options": [
+      "The current operational state (UNAU, HOLD, LIVE, REVE)",
+      "The customer's age",
+      "The exchange rate",
+      "The signature"
+    ],
+    "correct": 0,
+    "tip": "RECORD.STATUS reflects the operational state: UNAU, HOLD, LIVE, REVE etc."
+  },
+  {
+    "id": 46,
+    "topic": "Anatomy",
+    "q": "INPUTTER and AUTHORISER are…",
+    "options": [
+      "Single-value strings",
+      "Multi-valued arrays of User ID and Department",
+      "Currency codes",
+      "Booleans"
+    ],
+    "correct": 1,
+    "tip": "INPUTTER & AUTHORISER are multi-valued arrays capturing the User ID and Department of staff who created/modified and approved the record."
+  },
+  {
+    "id": 47,
+    "topic": "Anatomy",
+    "q": "DATE.TIME audit field tracks…",
+    "options": [
+      "Holidays only",
+      "Exact timestamps for every input and authorization",
+      "The customer's birthdate",
+      "Random sampling time"
+    ],
+    "correct": 1,
+    "tip": "DATE.TIME tracks the exact timestamps for every input and authorization."
+  },
+  {
+    "id": 48,
+    "topic": "Anatomy",
+    "q": "COMPANY audit field stores…",
+    "options": [
+      "A logo URL",
+      "The specific companies where the actions were made",
+      "Holding company stock price",
+      "An email"
+    ],
+    "correct": 1,
+    "tip": "COMPANY field stores the specific companies in which input/authorization actions occurred."
+  },
+  {
+    "id": 49,
+    "topic": "Anatomy",
+    "q": "Audit fields are…",
+    "options": [
+      "Optional",
+      "System-maintained, read-only",
+      "Manually editable",
+      "Stored only in HIS"
+    ],
+    "correct": 1,
+    "tip": "Audit fields are system-maintained and read-only — they preserve a forensic trail and cannot be tampered with."
+  },
+  {
+    "id": 50,
+    "topic": "Anatomy",
+    "q": "The MODULE code (e.g. AC, ST) controls…",
+    "options": [
+      "Print queue",
+      "The directory path within the database structure",
+      "Login screen",
+      "Phone country code"
+    ],
+    "correct": 1,
+    "tip": "MODULE codes (AC, ST, etc.) determine the exact directory path where the Table is stored physically."
+  },
+  {
+    "id": 51,
+    "topic": "File Types",
+    "q": "Which file represents the current authoritative state of a record?",
+    "options": [
+      "LIV",
+      "NAU",
+      "HIS",
+      "DEL"
+    ],
+    "correct": 0,
+    "tip": "LIV (Live) is the primary source of truth for the system's operational calculations."
+  },
+  {
+    "id": 52,
+    "topic": "File Types",
+    "q": "How many records can the LIV file hold per ID?",
+    "options": [
+      "Strictly 1 (singleton)",
+      "Up to 5",
+      "Unlimited",
+      "Zero"
+    ],
+    "correct": 0,
+    "tip": "LIV is a singleton — strictly 1 record per ID."
+  },
+  {
+    "id": 53,
+    "topic": "File Types",
+    "q": "What does the NAU file store?",
+    "options": [
+      "Live authorized records",
+      "Uncommitted drafts (HOLD) and pending records (UNAU)",
+      "Currency rates",
+      "Branch addresses"
+    ],
+    "correct": 1,
+    "tip": "NAU holds uncommitted data: drafts in HOLD status and edits awaiting approval in UNAU status."
+  },
+  {
+    "id": 54,
+    "topic": "File Types",
+    "q": "Can records in NAU generate accounting entries?",
+    "options": [
+      "Yes, always",
+      "No — they are financially isolated",
+      "Only on weekends",
+      "Only with manager override"
+    ],
+    "correct": 1,
+    "tip": "Financial Isolation: Records residing in NAU cannot generate accounting entries or update the General Ledger."
+  },
+  {
+    "id": 55,
+    "topic": "File Types",
+    "q": "Can a record be in both HOLD and UNAU simultaneously in NAU?",
+    "options": [
+      "Yes",
+      "No — cardinality constraint, only one record per ID",
+      "Yes, with manager approval",
+      "Only at year-end"
+    ],
+    "correct": 1,
+    "tip": "NAU allows only one record per ID, so a record cannot be in UNAU and HOLD at the same time."
+  },
+  {
+    "id": 56,
+    "topic": "File Types",
+    "q": "What does the system do if a user tries to edit a LIV record that already has an active NAU draft by someone else?",
+    "options": [
+      "Silently overwrites",
+      "Returns a Record Locked error",
+      "Sends email",
+      "Doubles the data"
+    ],
+    "correct": 1,
+    "tip": "Edit Locking via NAU prevents concurrent modification — the system returns a Record Locked error."
+  },
+  {
+    "id": 57,
+    "topic": "File Types",
+    "q": "What kind of structure is HIS?",
+    "options": [
+      "Singleton",
+      "Supports multiple records per ID",
+      "Encrypted vault",
+      "Pure cache"
+    ],
+    "correct": 1,
+    "tip": "HIS supports multiple records per ID and acts as an immutable, read-only archive."
+  },
+  {
+    "id": 58,
+    "topic": "File Types",
+    "q": "What triggers the move of a LIV record into HIS?",
+    "options": [
+      "Time of day",
+      "Authorization of an amendment (Copy-on-Write)",
+      "User logout",
+      "Disk full"
+    ],
+    "correct": 1,
+    "tip": "Copy-on-Write: upon authorization of an amendment, the pre-amendment LIV record is moved to HIS before the new version becomes active."
+  },
+  {
+    "id": 59,
+    "topic": "File Types",
+    "q": "How are historical records distinguished?",
+    "options": [
+      "By color",
+      "Sequential suffixes (;1, ;2, ;3)",
+      "By owner name",
+      "By timestamp only"
+    ],
+    "correct": 1,
+    "tip": "Historical records use sequential suffixes (ID;1, ID;2…), with the highest representing the most recent historical state."
+  },
+  {
+    "id": 60,
+    "topic": "File Types",
+    "q": "What is HISTORY_RESTORE used for?",
+    "options": [
+      "Retrieving a specific HIS version and reinstating it as the active record",
+      "Resetting passwords",
+      "Restoring the OS",
+      "Deleting history"
+    ],
+    "correct": 0,
+    "tip": "HISTORY_RESTORE retrieves a specific version from HIS and reinstates it as the active record."
+  },
+  {
+    "id": 61,
+    "topic": "File Types",
+    "q": "DEL is best described as…",
+    "options": [
+      "A many-record archive",
+      "A singleton for deleted unauthorized copies",
+      "A network share",
+      "An encryption key store"
+    ],
+    "correct": 1,
+    "tip": "DEL is a singleton file holding deleted unauthorized copies."
+  },
+  {
+    "id": 62,
+    "topic": "File Types",
+    "q": "When a brand-new record (SEQ.NO=1) is deleted from NAU, what happens?",
+    "options": [
+      "It vanishes silently",
+      "It is moved to the DEL file",
+      "It moves to LIV",
+      "It becomes HIS;1"
+    ],
+    "correct": 1,
+    "tip": "Forensic Delete: a brand-new record (SEQ.NO=1) deleted from NAU is moved to DEL to preserve a forensic trail."
+  },
+  {
+    "id": 63,
+    "topic": "File Types",
+    "q": "When an amendment (SEQ.NO>1) is deleted from NAU, what happens?",
+    "options": [
+      "Moved to DEL",
+      "Physically removed from NAU without writing to DEL",
+      "Sent to HIS",
+      "Locked permanently"
+    ],
+    "correct": 1,
+    "tip": "For amendments (SEQ.NO>1), the draft is physically removed from NAU without writing to DEL because the base still exists in LIV and HIS."
+  },
+  {
+    "id": 64,
+    "topic": "File Types",
+    "q": "SIM file is used for…",
+    "options": [
+      "Simulation / what-if data",
+      "Active production transactions",
+      "Live audit only",
+      "Server monitoring"
+    ],
+    "correct": 0,
+    "tip": "SIM holds simulation data and is completely isolated from active or financial records."
+  },
+  {
+    "id": 65,
+    "topic": "File Types",
+    "q": "Why is SIM isolated from LIV and FIN data?",
+    "options": [
+      "Network performance",
+      "To prevent simulation from impacting real financial records",
+      "Security clearance",
+      "Disk capacity"
+    ],
+    "correct": 1,
+    "tip": "SIM is completely isolated so what-if scenarios never impact real financial records."
+  },
+  {
+    "id": 66,
+    "topic": "File Types",
+    "q": "Which file ensures concurrent edit protection?",
+    "options": [
+      "NAU",
+      "LIV",
+      "HIS",
+      "SIM"
+    ],
+    "correct": 0,
+    "tip": "NAU enforces edit-locking by holding the uncommitted draft and blocking concurrent edits to the same LIV record."
+  },
+  {
+    "id": 67,
+    "topic": "File Types",
+    "q": "Which file is the immutable, read-only archive?",
+    "options": [
+      "LIV",
+      "NAU",
+      "HIS",
+      "DEL"
+    ],
+    "correct": 2,
+    "tip": "HIS is the immutable, read-only archive storing previous versions."
+  },
+  {
+    "id": 68,
+    "topic": "File Types",
+    "q": "What is the cardinality rule of LIV?",
+    "options": [
+      "Strictly 1 record per ID",
+      "Multiple per ID",
+      "Unlimited",
+      "Zero"
+    ],
+    "correct": 0,
+    "tip": "LIV is strictly 1 record per ID (singleton)."
+  },
+  {
+    "id": 69,
+    "topic": "File Types",
+    "q": "What is the cardinality rule of HIS?",
+    "options": [
+      "1 record per ID",
+      "Multiple records per ID",
+      "Always 0",
+      "Limited to 10"
+    ],
+    "correct": 1,
+    "tip": "HIS supports multiple records per ID using sequential suffixes."
+  },
+  {
+    "id": 70,
+    "topic": "File Types",
+    "q": "What is the cardinality rule of NAU?",
+    "options": [
+      "1 record per ID",
+      "Many records per ID",
+      "Zero",
+      "Unlimited"
+    ],
+    "correct": 0,
+    "tip": "NAU is a singleton — only 1 record per ID, enforcing the cardinality constraint."
+  },
+  {
+    "id": 71,
+    "topic": "File Types",
+    "q": "What is the cardinality rule of DEL?",
+    "options": [
+      "Singleton (1 per ID)",
+      "Many per ID",
+      "Two per ID",
+      "Zero"
+    ],
+    "correct": 0,
+    "tip": "DEL is also a singleton file (1 record per ID)."
+  },
+  {
+    "id": 72,
+    "topic": "File Types",
+    "q": "The FILE registry dictates…",
+    "options": [
+      "The valid physical file types for every Table",
+      "The user passwords",
+      "Customer addresses",
+      "Branch hours"
+    ],
+    "correct": 0,
+    "tip": "The FILE registry dictates the valid physical file types (spaces or buckets) for every registered Table."
+  },
+  {
+    "id": 73,
+    "topic": "File Types",
+    "q": "What partitioning principle does the FILE registry enforce?",
+    "options": [
+      "Partitioning by user",
+      "Partitioning a single record ID across distinct physical files based on its current state",
+      "Random sharding",
+      "Round-robin"
+    ],
+    "correct": 1,
+    "tip": "Records of the same ID are partitioned across LIV, NAU, HIS, DEL, SIM based on the current state."
+  },
+  {
+    "id": 74,
+    "topic": "File Types",
+    "q": "In NAU, the status HOLD means…",
+    "options": [
+      "Authorized",
+      "Saved draft (unvalidated)",
+      "Reversed",
+      "Deleted"
+    ],
+    "correct": 1,
+    "tip": "HOLD is an unvalidated, incomplete draft saved in NAU."
+  },
+  {
+    "id": 75,
+    "topic": "File Types",
+    "q": "In NAU, status UNAU means…",
+    "options": [
+      "A draft",
+      "A completed edit awaiting authorization",
+      "A reversed record",
+      "A deleted record"
+    ],
+    "correct": 1,
+    "tip": "UNAU is a completed edit pending second-user approval."
+  },
+  {
+    "id": 76,
+    "topic": "File Types",
+    "q": "REVE status in HIS means…",
+    "options": [
+      "Revenue",
+      "Reversed (the record was canceled)",
+      "Reviewed",
+      "Recovered"
+    ],
+    "correct": 1,
+    "tip": "REVE indicates a reversed transaction archived in HIS."
+  },
+  {
+    "id": 77,
+    "topic": "File Types",
+    "q": "HNAU stands for…",
+    "options": [
+      "History Not Authorized",
+      "History Restore Not Authorized",
+      "Hold New Auth",
+      "Holiday Not Auth"
+    ],
+    "correct": 1,
+    "tip": "HNAU is a History Restore Not Authorized record created in NAU when restoring a previous version."
+  },
+  {
+    "id": 78,
+    "topic": "File Types",
+    "q": "RNAU stands for…",
+    "options": [
+      "Reversal Not Authorized",
+      "Record New Auth",
+      "Refund Auto",
+      "Random Number"
+    ],
+    "correct": 0,
+    "tip": "RNAU = Reversal Not Auth, used when a reversal is pending approval."
+  },
+  {
+    "id": 79,
+    "topic": "File Types",
+    "q": "What does Copy-on-Write mean in HIS context?",
+    "options": [
+      "Old LIV record moves to HIS before the new one becomes active",
+      "HIS is duplicated to LIV",
+      "Backup is taken",
+      "Logs are copied"
+    ],
+    "correct": 0,
+    "tip": "Copy-on-Write: upon authorization, the old LIV record is copied/moved to HIS before the new version takes its place."
+  },
+  {
+    "id": 80,
+    "topic": "File Types",
+    "q": "Which file would you query for an authorized customer's last 3 modifications?",
+    "options": [
+      "NAU",
+      "LIV",
+      "HIS",
+      "SIM"
+    ],
+    "correct": 2,
+    "tip": "HIS holds the historical versions ID;1, ID;2, ID;3."
+  },
+  {
+    "id": 81,
+    "topic": "File Types",
+    "q": "Which file would hold an aborted brand-new record?",
+    "options": [
+      "LIV",
+      "DEL",
+      "HIS",
+      "SIM"
+    ],
+    "correct": 1,
+    "tip": "A brand-new (SEQ.NO=1) record canceled from NAU lands in DEL for forensic purposes."
+  },
+  {
+    "id": 82,
+    "topic": "File Types",
+    "q": "What is the role of the NAU file in the 4-eyes principle?",
+    "options": [
+      "Holds the UNAU draft awaiting a second user's approval",
+      "Authorizes records automatically",
+      "Sends approvals via SMS",
+      "Stores manager passwords"
+    ],
+    "correct": 0,
+    "tip": "NAU holds the UNAU draft until a second user authorizes it, enforcing the 4-eyes principle."
+  },
+  {
+    "id": 83,
+    "topic": "File Types",
+    "q": "If a record exists in LIV and a draft is created in NAU, which is the latest state shown to the user via projections?",
+    "options": [
+      "LIV",
+      "NAU (Resolution Waterfall)",
+      "HIS",
+      "DEL"
+    ],
+    "correct": 1,
+    "tip": "Resolution Waterfall: NAU is checked first, then LIV, then HIS, then ARC."
+  },
+  {
+    "id": 84,
+    "topic": "File Types",
+    "q": "Cardinality constraint of NAU exists because…",
+    "options": [
+      "Disk space is small",
+      "It allows only one record per ID — preventing two states coexisting",
+      "Network rules",
+      "Customer count limit"
+    ],
+    "correct": 1,
+    "tip": "NAU is a singleton; HOLD and UNAU statuses cannot coexist for the same ID."
+  },
+  {
+    "id": 85,
+    "topic": "File Types",
+    "q": "Which space is variable in structure based on use case?",
+    "options": [
+      "LIV",
+      "NAU",
+      "HIS",
+      "SIM"
+    ],
+    "correct": 3,
+    "tip": "SIM structure varies based on the simulation use case."
+  },
+  {
+    "id": 86,
+    "topic": "File Types",
+    "q": "In HIS, ID;3 vs ID;1 — which is more recent?",
+    "options": [
+      "ID;1",
+      "ID;3",
+      "They are equal",
+      "Depends on time of day"
+    ],
+    "correct": 1,
+    "tip": "The highest suffix number represents the most recent historical state."
+  },
+  {
+    "id": 87,
+    "topic": "File Types",
+    "q": "Why does DEL exist?",
+    "options": [
+      "To save disk space",
+      "Forensic audit trail of canceled new records",
+      "To improve speed",
+      "To duplicate LIV"
+    ],
+    "correct": 1,
+    "tip": "DEL preserves a forensic audit trail of data that was input but ultimately rejected before becoming live."
+  },
+  {
+    "id": 88,
+    "topic": "File Types",
+    "q": "True or False: A record can be in LIV and NAU at the same time (with different statuses).",
+    "options": [
+      "True — LIV is authorized live, NAU holds the pending draft",
+      "False — only one file at a time",
+      "True but only in SIM",
+      "False — they merge automatically"
+    ],
+    "correct": 0,
+    "tip": "A LIV record can have a concurrent NAU draft (e.g. UNAU). Resolution Waterfall surfaces the most relevant state."
+  },
+  {
+    "id": 89,
+    "topic": "File Types",
+    "q": "NAU's edit locking prevents…",
+    "options": [
+      "File system corruption",
+      "Concurrent modification conflicts on the same LIV record",
+      "Backup loss",
+      "Auth bypass"
+    ],
+    "correct": 1,
+    "tip": "NAU's singleton nature prevents two users from editing the same LIV record concurrently."
+  },
+  {
+    "id": 90,
+    "topic": "File Types",
+    "q": "Lifecycle spaces ensure…",
+    "options": [
+      "Faster network",
+      "Strict data integrity and lifecycle consistency",
+      "Less storage",
+      "Easier debugging"
+    ],
+    "correct": 1,
+    "tip": "Distinct lifecycle spaces with strict cardinality rules ensure data integrity and lifecycle consistency."
+  },
+  {
+    "id": 91,
+    "topic": "Operations",
+    "q": "Which operation retrieves and displays a specific record?",
+    "options": [
+      "INPUT",
+      "SEE",
+      "HOLD",
+      "AUTH"
+    ],
+    "correct": 1,
+    "tip": "SEE retrieves and displays a record using the Resolution Waterfall (NAU → LIV → HIS → ARC)."
+  },
+  {
+    "id": 92,
+    "topic": "Operations",
+    "q": "In what order does SEE perform the Resolution Waterfall?",
+    "options": [
+      "LIV → NAU → HIS → ARC",
+      "NAU → LIV → HIS → ARC",
+      "HIS → LIV → NAU → ARC",
+      "ARC → LIV → NAU → HIS"
+    ],
+    "correct": 1,
+    "tip": "Resolution Waterfall: NAU first, then LIV, then HIS, then ARC."
+  },
+  {
+    "id": 93,
+    "topic": "Operations",
+    "q": "What does SEE return if no record exists in any space?",
+    "options": [
+      "A NULL record",
+      "A 'Record not found' error",
+      "A blank record",
+      "A draft"
+    ],
+    "correct": 1,
+    "tip": "If no record exists in any space (NAU, LIV, HIS, ARC), SEE returns 'Record not found'."
+  },
+  {
+    "id": 94,
+    "topic": "Operations",
+    "q": "What does INPUT do for FIN/CUS classification?",
+    "options": [
+      "Writes directly to LIV",
+      "Runs validations and creates a record in NAU with status UNAU",
+      "Deletes the record",
+      "Skips validation"
+    ],
+    "correct": 1,
+    "tip": "INPUT on FIN/CUS validates immediately and creates the record in NAU as UNAU, awaiting authorization."
+  },
+  {
+    "id": 95,
+    "topic": "Operations",
+    "q": "What does INPUT do for INT classification with 0-Auth configured?",
+    "options": [
+      "Stops",
+      "Skips NAU and writes directly to LIV",
+      "Sends to HIS",
+      "Reverses"
+    ],
+    "correct": 1,
+    "tip": "For INT tables with 0-Auth, INPUT bypasses NAU and writes directly to LIV after validation."
+  },
+  {
+    "id": 96,
+    "topic": "Operations",
+    "q": "HOLD operation creates a record in…",
+    "options": [
+      "LIV directly",
+      "NAU with status HOLD",
+      "HIS",
+      "DEL"
+    ],
+    "correct": 1,
+    "tip": "HOLD saves an unvalidated draft into NAU with status HOLD."
+  },
+  {
+    "id": 97,
+    "topic": "Operations",
+    "q": "Does HOLD require validation?",
+    "options": [
+      "Yes",
+      "No — it saves drafts without validation",
+      "Yes, for all classifications",
+      "Only for INT"
+    ],
+    "correct": 1,
+    "tip": "HOLD saves a draft without validation — the user can return later to complete it."
+  },
+  {
+    "id": 98,
+    "topic": "Operations",
+    "q": "Why does the system block HOLD if a UNAU record already exists for the same ID?",
+    "options": [
+      "Disk full",
+      "NAU only allows one record per ID — writing a draft would overwrite the pending committed record",
+      "Manager rule",
+      "User permissions"
+    ],
+    "correct": 1,
+    "tip": "NAU's singleton nature means HOLD would overwrite the pending UNAU record — so it is blocked."
+  },
+  {
+    "id": 99,
+    "topic": "Operations",
+    "q": "VALIDATE operation does what?",
+    "options": [
+      "Saves to LIV",
+      "Evaluates business logic without saving to the database",
+      "Deletes the record",
+      "Sends to HIS"
+    ],
+    "correct": 1,
+    "tip": "VALIDATE evaluates rules and returns Success or Error without persisting any data."
+  },
+  {
+    "id": 100,
+    "topic": "Operations",
+    "q": "VALIDATE is commonly used by…",
+    "options": [
+      "Backend cron jobs",
+      "Front-end clients to verify before submission",
+      "Auditors",
+      "Customer service phone IVR"
+    ],
+    "correct": 1,
+    "tip": "Front-end clients use VALIDATE to verify data before final submission."
+  },
+  {
+    "id": 101,
+    "topic": "Operations",
+    "q": "AUTH executes which principle?",
+    "options": [
+      "First-in-first-out",
+      "Four-Eyes Principle",
+      "Random sampling",
+      "Hot-swap"
+    ],
+    "correct": 1,
+    "tip": "AUTH executes the Four-Eyes principle by requiring a second user to approve pending changes."
+  },
+  {
+    "id": 102,
+    "topic": "Operations",
+    "q": "During AUTH on a UNAU record, what happens?",
+    "options": [
+      "UNAU moves to LIV and prior LIV is archived to HIS",
+      "UNAU moves to DEL",
+      "Nothing",
+      "HIS is purged"
+    ],
+    "correct": 0,
+    "tip": "AUTH moves UNAU (or HNAU) into LIV and archives the replaced LIV record to HIS."
+  },
+  {
+    "id": 103,
+    "topic": "Operations",
+    "q": "AUTH also handles which special status reversal?",
+    "options": [
+      "RNAU → REVE in HIS",
+      "UNAU → DEL",
+      "HOLD → LIV",
+      "SIM → LIV"
+    ],
+    "correct": 0,
+    "tip": "AUTH moves RNAU records to REVE status and into HIS to complete a reversal."
+  },
+  {
+    "id": 104,
+    "topic": "Operations",
+    "q": "REVERSE on FIN/CUS does what?",
+    "options": [
+      "Moves LIV to NAU with status RNAU",
+      "Deletes the record",
+      "Reads only",
+      "Sends email"
+    ],
+    "correct": 0,
+    "tip": "REVERSE on FIN/CUS moves the LIV record to NAU as RNAU, requiring a second user to authorize the cancellation."
+  },
+  {
+    "id": 105,
+    "topic": "Operations",
+    "q": "REVERSE on INT does what?",
+    "options": [
+      "Routes to NAU",
+      "Directly moves LIV to HIS with status REVE",
+      "Goes to DEL",
+      "Locks the system"
+    ],
+    "correct": 1,
+    "tip": "REVERSE on INT directly moves the LIV record to HIS with REVE status — no secondary approval required."
+  },
+  {
+    "id": 106,
+    "topic": "Operations",
+    "q": "DELETE on a brand-new record (SEQ.NO=1) does what?",
+    "options": [
+      "Moves from NAU to DEL",
+      "Moves to HIS",
+      "Skips and ignores",
+      "Locks system"
+    ],
+    "correct": 0,
+    "tip": "For SEQ.NO=1, DELETE moves the draft from NAU to DEL, preserving forensic audit."
+  },
+  {
+    "id": 107,
+    "topic": "Operations",
+    "q": "DELETE on an amendment (SEQ.NO>1) does what?",
+    "options": [
+      "Moves to DEL",
+      "Physically deletes from NAU without writing to DEL",
+      "Moves to LIV",
+      "Moves to SIM"
+    ],
+    "correct": 1,
+    "tip": "For SEQ.NO>1, DELETE physically removes from NAU without writing to DEL since the base still exists in LIV/HIS."
+  },
+  {
+    "id": 108,
+    "topic": "Operations",
+    "q": "HISTORY.RESTORE on FIN/CUS creates a…",
+    "options": [
+      "HNAU copy in NAU buffer for review and authorization",
+      "Direct LIV overwrite",
+      "DEL entry",
+      "SIM entry"
+    ],
+    "correct": 0,
+    "tip": "On FIN/CUS, HISTORY.RESTORE creates HNAU in NAU so a second user can authorize the restore."
+  },
+  {
+    "id": 109,
+    "topic": "Operations",
+    "q": "HISTORY.RESTORE on INT does what?",
+    "options": [
+      "Creates HNAU",
+      "Directly overwrites the LIV record",
+      "Goes to SIM",
+      "Sends approval email"
+    ],
+    "correct": 1,
+    "tip": "On INT tables, HISTORY.RESTORE directly overwrites LIV with the historical version."
+  },
+  {
+    "id": 110,
+    "topic": "Operations",
+    "q": "0-Auth exception applies to which kind of table?",
+    "options": [
+      "Customer FIN",
+      "INT (Installation, e.g. CURRENCY)",
+      "All tables",
+      "HIS only"
+    ],
+    "correct": 1,
+    "tip": "0-Auth applies to INT global parameter tables like CURRENCY — bypassing NAU."
+  },
+  {
+    "id": 111,
+    "topic": "Operations",
+    "q": "With 0-Auth, when a user commits a change, what happens to the old LIV record?",
+    "options": [
+      "Deleted permanently",
+      "Written to HIS, new input written directly to LIV",
+      "Stays in LIV",
+      "Goes to DEL"
+    ],
+    "correct": 1,
+    "tip": "Under 0-Auth: old LIV → HIS, new input → LIV directly. No NAU involvement."
+  },
+  {
+    "id": 112,
+    "topic": "Operations",
+    "q": "Direct database modifications are…",
+    "options": [
+      "Allowed for admins",
+      "Prohibited — all interactions must use standard operations",
+      "Only allowed on weekends",
+      "Only via SQL"
+    ],
+    "correct": 1,
+    "tip": "Direct database modifications are prohibited. All interactions go through standardized operations."
+  },
+  {
+    "id": 113,
+    "topic": "Operations",
+    "q": "Which operations are part of the standard list?",
+    "options": [
+      "SEE, INPUT, HOLD, VALIDATE, AUTH, REVERSE, DELETE, HISTORY.RESTORE",
+      "CREATE, READ, UPDATE, DELETE",
+      "GET, POST, PUT, PATCH",
+      "ADD, SUB, MULT, DIV"
+    ],
+    "correct": 0,
+    "tip": "Standard ops are SEE, INPUT, HOLD, VALIDATE, AUTH, REVERSE, DELETE, HISTORY.RESTORE."
+  },
+  {
+    "id": 114,
+    "topic": "Operations",
+    "q": "Why does FIN/CUS INPUT route through NAU instead of LIV?",
+    "options": [
+      "For speed",
+      "To enforce the Four-Eyes Principle / authorization",
+      "To save disk",
+      "For backup"
+    ],
+    "correct": 1,
+    "tip": "FIN/CUS INPUT goes to NAU because authorization is required before financial impact."
+  },
+  {
+    "id": 115,
+    "topic": "Operations",
+    "q": "INT tables that do not use 0-Auth would behave like…",
+    "options": [
+      "FIN/CUS — going through NAU",
+      "Always SIM",
+      "Always DEL",
+      "Always HIS"
+    ],
+    "correct": 0,
+    "tip": "Without 0-Auth, INT INPUT also routes through NAU like FIN/CUS for authorization."
+  },
+  {
+    "id": 116,
+    "topic": "Operations",
+    "q": "What does INAU mean in the context of projections?",
+    "options": [
+      "Initial Audit",
+      "An unauthorized record indicator",
+      "Internal Auth",
+      "Inverted Auth"
+    ],
+    "correct": 1,
+    "tip": "INAU is the unauthorized-record flag indicating an active draft awaiting approval."
+  },
+  {
+    "id": 117,
+    "topic": "Operations",
+    "q": "REVE status indicates…",
+    "options": [
+      "A reversed record",
+      "A revised record",
+      "A revenue entry",
+      "A review marker"
+    ],
+    "correct": 0,
+    "tip": "REVE indicates the record was reversed and archived in HIS."
+  },
+  {
+    "id": 118,
+    "topic": "Operations",
+    "q": "After AUTH on a UNAU, the new RECORD.STATUS becomes…",
+    "options": [
+      "LIVE",
+      "HOLD",
+      "DEL",
+      "SIM"
+    ],
+    "correct": 0,
+    "tip": "After AUTH, the record's status becomes LIVE in the LIV file."
+  },
+  {
+    "id": 119,
+    "topic": "Operations",
+    "q": "A user is editing CUSTOMER record CUS123. Someone else has UNAU in NAU. The system returns…",
+    "options": [
+      "A merge dialog",
+      "'Record Locked' error",
+      "An auto-approval",
+      "A silent success"
+    ],
+    "correct": 1,
+    "tip": "The system prevents concurrent edits with a 'Record Locked' error."
+  },
+  {
+    "id": 120,
+    "topic": "Operations",
+    "q": "Which operation buffers data for the 4-eyes flow?",
+    "options": [
+      "INPUT into NAU",
+      "DELETE",
+      "VALIDATE",
+      "SEE"
+    ],
+    "correct": 0,
+    "tip": "INPUT on FIN/CUS buffers data into NAU for the 4-eyes flow."
+  },
+  {
+    "id": 121,
+    "topic": "Operations",
+    "q": "Why does VALIDATE not write to the DB?",
+    "options": [
+      "To prevent writes during inspection — it is a check-only operation",
+      "Disk constraints",
+      "Authentication issue",
+      "Latency"
+    ],
+    "correct": 0,
+    "tip": "VALIDATE is a check-only operation that only returns Success/Error to the client."
+  },
+  {
+    "id": 122,
+    "topic": "Operations",
+    "q": "AUTH on HNAU triggers…",
+    "options": [
+      "Restore overwrite into LIV with HIS archival",
+      "Deletion",
+      "SIM creation",
+      "Re-input"
+    ],
+    "correct": 0,
+    "tip": "AUTH on HNAU moves the restored version to LIV and archives the prior LIV state to HIS."
+  },
+  {
+    "id": 123,
+    "topic": "Operations",
+    "q": "Which standard operation requires no second user under 0-Auth?",
+    "options": [
+      "INPUT",
+      "REVERSE",
+      "HISTORY.RESTORE",
+      "All of the above on INT 0-Auth"
+    ],
+    "correct": 3,
+    "tip": "Under 0-Auth (INT), INPUT, REVERSE, and HISTORY.RESTORE all bypass the second-user requirement."
+  },
+  {
+    "id": 124,
+    "topic": "Operations",
+    "q": "In the standard ops, REVERSE differs from DELETE because…",
+    "options": [
+      "REVERSE cancels a LIVE transaction; DELETE removes an unauthorized draft",
+      "They are identical",
+      "DELETE works on LIV, REVERSE on NAU",
+      "Neither does anything"
+    ],
+    "correct": 0,
+    "tip": "REVERSE cancels a LIVE transaction; DELETE removes a draft from NAU."
+  },
+  {
+    "id": 125,
+    "topic": "Operations",
+    "q": "After DELETE on a SEQ.NO=1 record, the record physically ends up in…",
+    "options": [
+      "DEL",
+      "HIS",
+      "LIV",
+      "SIM"
+    ],
+    "correct": 0,
+    "tip": "SEQ.NO=1 deletes land in DEL for forensic auditing."
+  },
+  {
+    "id": 126,
+    "topic": "Operations",
+    "q": "After DELETE on a SEQ.NO>1 record, the data ends up…",
+    "options": [
+      "Removed from NAU; base remains in LIV/HIS",
+      "Moved to DEL",
+      "Moved to HIS",
+      "Moved to SIM"
+    ],
+    "correct": 0,
+    "tip": "SEQ.NO>1 deletes are simply removed from NAU — base record persists in LIV/HIS."
+  },
+  {
+    "id": 127,
+    "topic": "Operations",
+    "q": "INPUT on INT (non-0-Auth) writes to…",
+    "options": [
+      "LIV directly",
+      "NAU with UNAU",
+      "DEL",
+      "SIM"
+    ],
+    "correct": 1,
+    "tip": "Non-0-Auth INT INPUT still routes through NAU as UNAU."
+  },
+  {
+    "id": 128,
+    "topic": "Operations",
+    "q": "What is the practical purpose of HOLD?",
+    "options": [
+      "To save unvalidated work-in-progress drafts",
+      "To finalize transactions",
+      "To delete data",
+      "To archive records"
+    ],
+    "correct": 0,
+    "tip": "HOLD lets users save partial work without validation and resume later."
+  },
+  {
+    "id": 129,
+    "topic": "Operations",
+    "q": "What does AUTH ensure regarding the prior LIV record?",
+    "options": [
+      "It is duplicated",
+      "It is archived to HIS",
+      "It is deleted",
+      "It is hidden"
+    ],
+    "correct": 1,
+    "tip": "AUTH archives the replaced LIV record into HIS to maintain audit trail."
+  },
+  {
+    "id": 130,
+    "topic": "Operations",
+    "q": "Can DELETE remove a LIVE record directly?",
+    "options": [
+      "No — DELETE works on NAU drafts only; LIV must be REVERSEd",
+      "Yes — anyone with admin rights",
+      "Yes — but only at month-end",
+      "Yes — automatically"
+    ],
+    "correct": 0,
+    "tip": "DELETE removes drafts from NAU. To cancel a LIVE transaction, use REVERSE."
+  },
+  {
+    "id": 131,
+    "topic": "Operations",
+    "q": "Resolution Waterfall benefits which standard operation primarily?",
+    "options": [
+      "SEE",
+      "HOLD",
+      "DELETE",
+      "REVERSE"
+    ],
+    "correct": 0,
+    "tip": "SEE uses Resolution Waterfall (NAU→LIV→HIS→ARC) to fetch the most relevant state."
+  },
+  {
+    "id": 132,
+    "topic": "Operations",
+    "q": "After REVERSE on FIN/CUS, the LIV record is now in…",
+    "options": [
+      "NAU as RNAU",
+      "HIS as REVE",
+      "LIV unchanged",
+      "DEL"
+    ],
+    "correct": 0,
+    "tip": "REVERSE on FIN/CUS moves LIV to NAU as RNAU for second-user authorization."
+  },
+  {
+    "id": 133,
+    "topic": "Operations",
+    "q": "After AUTH on an RNAU, the record ends up in…",
+    "options": [
+      "HIS as REVE",
+      "LIV as LIVE",
+      "NAU",
+      "DEL"
+    ],
+    "correct": 0,
+    "tip": "AUTH on RNAU finalizes the reversal — moves the record to HIS as REVE."
+  },
+  {
+    "id": 134,
+    "topic": "Operations",
+    "q": "What does ARC represent in the Resolution Waterfall?",
+    "options": [
+      "Archive — the deepest layer of historical storage",
+      "Architecture",
+      "Arc lighting",
+      "Archive of customer photos"
+    ],
+    "correct": 0,
+    "tip": "ARC = Archive, the deepest layer searched after NAU, LIV, HIS."
+  },
+  {
+    "id": 135,
+    "topic": "Operations",
+    "q": "True or False: All INT tables automatically use 0-Auth.",
+    "options": [
+      "True",
+      "False — only tables specifically configured for 0-Auth",
+      "True only on weekends",
+      "Depends on user"
+    ],
+    "correct": 1,
+    "tip": "0-Auth must be specifically configured; not all INT tables are 0-Auth by default."
+  },
+  {
+    "id": 136,
+    "topic": "Operations",
+    "q": "INPUT validation runs at which moment for FIN/CUS?",
+    "options": [
+      "Never",
+      "Immediately on input, before saving to NAU",
+      "Only at AUTH",
+      "Only during reporting"
+    ],
+    "correct": 1,
+    "tip": "INPUT runs validation immediately and only writes to NAU if rules pass."
+  },
+  {
+    "id": 137,
+    "topic": "Operations",
+    "q": "In HOLD, validation runs?",
+    "options": [
+      "Always",
+      "Never — it intentionally skips validation",
+      "Sometimes",
+      "Only on weekends"
+    ],
+    "correct": 1,
+    "tip": "HOLD is designed to save unvalidated drafts; it skips validation by design."
+  },
+  {
+    "id": 138,
+    "topic": "Operations",
+    "q": "What is the practical purpose of HISTORY.RESTORE?",
+    "options": [
+      "Backup a record",
+      "Reinstate a past version of a record from HIS",
+      "Delete history",
+      "Print history"
+    ],
+    "correct": 1,
+    "tip": "HISTORY.RESTORE reinstates a past version from HIS as the current record."
+  },
+  {
+    "id": 139,
+    "topic": "Operations",
+    "q": "Which operation can both authorize forward edits and finalize reversals?",
+    "options": [
+      "AUTH",
+      "HOLD",
+      "SEE",
+      "INPUT"
+    ],
+    "correct": 0,
+    "tip": "AUTH handles UNAU/HNAU authorization AND finalizing RNAU reversals."
+  },
+  {
+    "id": 140,
+    "topic": "Operations",
+    "q": "The Resolution Waterfall returns 'Record not found' when…",
+    "options": [
+      "NAU is empty",
+      "Record exists nowhere across NAU, LIV, HIS, ARC",
+      "Only HIS is empty",
+      "User has no permission"
+    ],
+    "correct": 1,
+    "tip": "Only when the record exists in none of NAU, LIV, HIS, or ARC does SEE return 'Record not found'."
+  },
+  {
+    "id": 141,
+    "topic": "DDD",
+    "q": "What is the DDD (Dynamic Data Dictionary)?",
+    "options": [
+      "A static schema definition",
+      "A metadata-driven abstraction layer decoupling physical storage from logical view",
+      "An API gateway",
+      "A monitoring tool"
+    ],
+    "correct": 1,
+    "tip": "DDD is a metadata-driven abstraction layer that decouples a Table's Physical Storage Schema from its Logical Business View."
+  },
+  {
+    "id": 142,
+    "topic": "DDD",
+    "q": "DDD eliminates the need for what?",
+    "options": [
+      "Hard-coded DDL or kernel recompilation",
+      "User permissions",
+      "Backups",
+      "Auditing"
+    ],
+    "correct": 0,
+    "tip": "DDD enables dynamic definition of field structures and validations at runtime — no DDL or kernel recompilation needed."
+  },
+  {
+    "id": 143,
+    "topic": "DDD",
+    "q": "DDD definitions cannot function unless the target table is…",
+    "options": [
+      "Backed up",
+      "Officially registered in the FILE registry",
+      "Run on Linux",
+      "Encrypted"
+    ],
+    "correct": 1,
+    "tip": "DDD has a strict dependency on the Table Registry — definitions require an active FILE registry record."
+  },
+  {
+    "id": 144,
+    "topic": "DDD",
+    "q": "Which DDD records are commonly referenced?",
+    "options": [
+      "TABLE.DEF and FIELD.DEF",
+      "ROW.DEF and COL.DEF",
+      "SCHEMA.DEF and INDEX.DEF",
+      "USER.DEF and ROLE.DEF"
+    ],
+    "correct": 0,
+    "tip": "DDD definitions live in TABLE.DEF and FIELD.DEF."
+  },
+  {
+    "id": 145,
+    "topic": "DDD",
+    "q": "DDD relies on which classification to decide global vs company-specific?",
+    "options": [
+      "FILE classification (INT/FIN/CUS)",
+      "Branch",
+      "Currency",
+      "Sector"
+    ],
+    "correct": 0,
+    "tip": "FILE classification determines if field definitions apply globally (INT) or are company-restricted (FIN/CUS)."
+  },
+  {
+    "id": 146,
+    "topic": "DDD",
+    "q": "DDD maps logical field names to…",
+    "options": [
+      "IP addresses",
+      "Physical data array positions (Field 1, Multi-value 1)",
+      "User IDs",
+      "Currency codes"
+    ],
+    "correct": 1,
+    "tip": "DDD maps logical names (e.g. CUSTOMER.NAME) to physical positions (Field 1, Multi-value 1)."
+  },
+  {
+    "id": 147,
+    "topic": "DDD",
+    "q": "System Type 'D' (Data) means…",
+    "options": [
+      "Deleted",
+      "Physical data stored directly in the database",
+      "Dynamic",
+      "Derived only"
+    ],
+    "correct": 1,
+    "tip": "D = Data: physical data stored directly in the database."
+  },
+  {
+    "id": 148,
+    "topic": "DDD",
+    "q": "System Type 'I' (I-Descriptor) means…",
+    "options": [
+      "Index",
+      "Logical descriptor calculated at runtime, never written to DB",
+      "Internal",
+      "Integer"
+    ],
+    "correct": 1,
+    "tip": "I-Descriptor/Virtual: values calculated in memory at runtime (e.g. concatenating first+last name), never persisted."
+  },
+  {
+    "id": 149,
+    "topic": "DDD",
+    "q": "System Type 'J' (Join) means…",
+    "options": [
+      "Java",
+      "Dynamic link fetching data from related tables (foreign key)",
+      "Job",
+      "JSON"
+    ],
+    "correct": 1,
+    "tip": "J = Join: dynamic links that automatically fetch data from related tables via a foreign key."
+  },
+  {
+    "id": 150,
+    "topic": "DDD",
+    "q": "Concatenating First+Last Name on the fly is an example of…",
+    "options": [
+      "D field",
+      "I-Descriptor (I field)",
+      "J field",
+      "K field"
+    ],
+    "correct": 1,
+    "tip": "Calculated-in-memory derived fields are I-Descriptors (Type I)."
+  },
+  {
+    "id": 151,
+    "topic": "DDD",
+    "q": "Displaying a customer's name on an account record by foreign key uses…",
+    "options": [
+      "D",
+      "I",
+      "J",
+      "K"
+    ],
+    "correct": 2,
+    "tip": "Dynamic relational fetch via foreign key is a J (Join) field."
+  },
+  {
+    "id": 152,
+    "topic": "DDD",
+    "q": "Non-1NF support means…",
+    "options": [
+      "Tables cannot have arrays",
+      "A single record can natively store multi-dimensional arrays and repeating blocks",
+      "Two normal forms",
+      "No normalization at all"
+    ],
+    "correct": 1,
+    "tip": "Non-First Normal Form: a single record can natively store multi-dimensional arrays and repeating blocks — no child tables needed."
+  },
+  {
+    "id": 153,
+    "topic": "DDD",
+    "q": "Field Associations (Blocks) use which markers?",
+    "options": [
+      "{ } [ ]",
+      "< (Start), - (Member), > (End)",
+      "(* +)",
+      "! @ #"
+    ],
+    "correct": 1,
+    "tip": "Blocks use < for Start, - for Member, and > for End markers."
+  },
+  {
+    "id": 154,
+    "topic": "DDD",
+    "q": "If a new index is added inside an Association, what happens?",
+    "options": [
+      "Random shuffle",
+      "System automatically expands or shifts associated fields to maintain index alignment",
+      "Nothing",
+      "User must do it manually"
+    ],
+    "correct": 1,
+    "tip": "Adding/removing an index automatically shifts associated fields, preserving alignment."
+  },
+  {
+    "id": 155,
+    "topic": "DDD",
+    "q": "The Hot-Swappable Validation Engine means…",
+    "options": [
+      "The validations only run at restart",
+      "Validation rules can change without code recompilation/restart",
+      "Validations are hot-loaded from disk",
+      "Validations are physical hardware"
+    ],
+    "correct": 1,
+    "tip": "Hot-swappable: an admin changes a field rule (e.g. Alphanumeric → Numeric) via config; no recompilation needed."
+  },
+  {
+    "id": 156,
+    "topic": "DDD",
+    "q": "Field.type links fields to…",
+    "options": [
+      "UI colors",
+      "Pre-compiled validation routines (validateDate, validateAmount)",
+      "Currency codes",
+      "Network ports"
+    ],
+    "correct": 1,
+    "tip": "Field.type ties fields directly to pre-compiled validation routines like validateDate or validateAmount."
+  },
+  {
+    "id": 157,
+    "topic": "DDD",
+    "q": "To avoid creating thousands of tiny reference tables, DDD integrates with…",
+    "options": [
+      "Virtual Tables",
+      "HIS",
+      "SIM",
+      "DEL"
+    ],
+    "correct": 0,
+    "tip": "Virtual Tables centralize static reference lists like Risk Levels in a single VIRTUAL.TABLES table with compound keys."
+  },
+  {
+    "id": 158,
+    "topic": "DDD",
+    "q": "Static reference lists are stored in…",
+    "options": [
+      "VIRTUAL.TABLES with compound keys (e.g. STATUS|ACTIVE)",
+      "Each in their own table",
+      "HIS",
+      "ARC"
+    ],
+    "correct": 0,
+    "tip": "Stored as a unified physical table VIRTUAL.TABLES, distinguished by compound keys."
+  },
+  {
+    "id": 159,
+    "topic": "DDD",
+    "q": "When a dictionary field links to virtual tables, the system…",
+    "options": [
+      "Crashes",
+      "Auto-generates UI dropdowns and validates inputs against records",
+      "Creates new physical tables",
+      "Locks the table"
+    ],
+    "correct": 1,
+    "tip": "The system generates correctly populated dropdowns and validates inputs against virtual-table records."
+  },
+  {
+    "id": 160,
+    "topic": "DDD",
+    "q": "How does DDD support custom local fields added by a bank?",
+    "options": [
+      "By prompting for SQL",
+      "System automatically injects user-defined fields into TABLE.DEF",
+      "Custom fields are blocked",
+      "Only Anthropic adds them"
+    ],
+    "correct": 1,
+    "tip": "When a bank adds custom local fields, they are automatically injected into TABLE.DEF and become available."
+  },
+  {
+    "id": 161,
+    "topic": "DDD",
+    "q": "True or False: DDD requires changing physical storage when adding new fields.",
+    "options": [
+      "True",
+      "False — abstraction allows new fields without altering physical structure",
+      "True for I fields",
+      "True for J fields"
+    ],
+    "correct": 1,
+    "tip": "DDD abstraction lets the system add fields without altering the underlying physical structure."
+  },
+  {
+    "id": 162,
+    "topic": "DDD",
+    "q": "DDD's primary benefit is…",
+    "options": [
+      "Hard-coding faster",
+      "Decoupling logical schema from physical storage",
+      "Eliminating audit",
+      "Reducing user count"
+    ],
+    "correct": 1,
+    "tip": "DDD's primary benefit is decoupling logical business view from physical storage."
+  },
+  {
+    "id": 163,
+    "topic": "DDD",
+    "q": "Which is NOT a System Type in DDD?",
+    "options": [
+      "D",
+      "I",
+      "J",
+      "Z"
+    ],
+    "correct": 3,
+    "tip": "Standard System Types are D, I, J. Z is not defined."
+  },
+  {
+    "id": 164,
+    "topic": "DDD",
+    "q": "An admin changes a field from Alphanumeric to Numeric. The change applies…",
+    "options": [
+      "After kernel recompile",
+      "Immediately after dictionary update (hot-swap)",
+      "Next year",
+      "Never"
+    ],
+    "correct": 1,
+    "tip": "Hot-swappable engine applies validation changes immediately without restart or recompile."
+  },
+  {
+    "id": 165,
+    "topic": "DDD",
+    "q": "What is the role of < and > markers in DDD?",
+    "options": [
+      "XML tags",
+      "Defining Start and End of a Field Association block",
+      "Math operators",
+      "User mentions"
+    ],
+    "correct": 1,
+    "tip": "< Start, - Member, > End mark Field Association blocks to group multi-value fields."
+  },
+  {
+    "id": 166,
+    "topic": "DDD",
+    "q": "Why does DDD allow non-1NF?",
+    "options": [
+      "To break SQL",
+      "To natively store multi-dim arrays/repeating blocks without child tables",
+      "To save passwords",
+      "To improve UI"
+    ],
+    "correct": 1,
+    "tip": "Non-1NF allows repeating blocks (e.g. Repayment Schedule) inside a single record."
+  },
+  {
+    "id": 167,
+    "topic": "DDD",
+    "q": "Multi-valued INPUTTER is enabled by which DDD feature?",
+    "options": [
+      "Non-1NF support",
+      "DEL file",
+      "SIM file",
+      "Virtual Tables"
+    ],
+    "correct": 0,
+    "tip": "Non-1NF allows multi-valued arrays like INPUTTER and AUTHORISER inside the audit fields block."
+  },
+  {
+    "id": 168,
+    "topic": "DDD",
+    "q": "Which fields are never persisted to the physical database?",
+    "options": [
+      "D fields",
+      "I-Descriptor (I) fields — runtime virtual",
+      "J fields",
+      "All of them"
+    ],
+    "correct": 1,
+    "tip": "I-Descriptor fields are calculated in memory at runtime and never written to the physical database."
+  },
+  {
+    "id": 169,
+    "topic": "DDD",
+    "q": "Joined fields (J) avoid which traditional approach?",
+    "options": [
+      "Physical foreign keys",
+      "Audit fields",
+      "Virtual tables",
+      "HIS"
+    ],
+    "correct": 0,
+    "tip": "J fields dynamically fetch related data without relying on physical database foreign keys."
+  },
+  {
+    "id": 170,
+    "topic": "DDD",
+    "q": "Which artifact registers a Table's fields and rules?",
+    "options": [
+      "TABLE.DEF / FIELD.DEF",
+      "USER.DEF",
+      "PROJECT.DEF",
+      "CUSTOMER.DEF"
+    ],
+    "correct": 0,
+    "tip": "TABLE.DEF and FIELD.DEF in DDD register field structure and validation rules."
+  },
+  {
+    "id": 171,
+    "topic": "DDD",
+    "q": "A repeating Repayment Schedule is best modeled via…",
+    "options": [
+      "A separate child table",
+      "Non-1NF associated multi-value fields in DDD",
+      "JSON in a TEXT column",
+      "File system folder"
+    ],
+    "correct": 1,
+    "tip": "DDD's Non-1NF Field Associations model repeating blocks natively without child tables."
+  },
+  {
+    "id": 172,
+    "topic": "DDD",
+    "q": "DDD validation rules are enforced at which layer?",
+    "options": [
+      "Physical DB only",
+      "Table definition (application) layer",
+      "UI only",
+      "Network only"
+    ],
+    "correct": 1,
+    "tip": "DDD enforces data integrity at the table definition layer rather than at the physical DB layer."
+  },
+  {
+    "id": 173,
+    "topic": "DDD",
+    "q": "VIRTUAL.TABLES uses what to distinguish entries?",
+    "options": [
+      "Random IDs",
+      "Compound keys (e.g. STATUS|ACTIVE)",
+      "Timestamps only",
+      "Owner names"
+    ],
+    "correct": 1,
+    "tip": "VIRTUAL.TABLES distinguishes records by compound keys like STATUS|ACTIVE."
+  },
+  {
+    "id": 174,
+    "topic": "DDD",
+    "q": "Custom local fields show up in the application…",
+    "options": [
+      "Only after redeployment",
+      "Instantly via DDD injection",
+      "Never",
+      "Only on weekends"
+    ],
+    "correct": 1,
+    "tip": "Custom local fields are injected into TABLE.DEF and become available instantly."
+  },
+  {
+    "id": 175,
+    "topic": "DDD",
+    "q": "Which is true about DDD's relationship with FILE classification?",
+    "options": [
+      "DDD ignores FILE classification",
+      "DDD relies on it to determine global vs company scope",
+      "DDD overwrites classification",
+      "Classification doesn't exist"
+    ],
+    "correct": 1,
+    "tip": "DDD relies on FILE classification (INT/FIN/CUS) for global vs company-restricted field scope."
+  },
+  {
+    "id": 176,
+    "topic": "Projections",
+    "q": "What is a Projection?",
+    "options": [
+      "A holographic display",
+      "A configuration for a Table defining display, entry, validation, processing",
+      "A SQL view",
+      "A backup config"
+    ],
+    "correct": 1,
+    "tip": "Projection configures how data is displayed, entered, validated, and processed for a Table."
+  },
+  {
+    "id": 177,
+    "topic": "Projections",
+    "q": "Projections decouple…",
+    "options": [
+      "UI/transaction behavior from physical database schema",
+      "UI from internet",
+      "Auth from users",
+      "Branches from HQ"
+    ],
+    "correct": 0,
+    "tip": "Projections decouple UI and transaction behavior from the physical database schema."
+  },
+  {
+    "id": 178,
+    "topic": "Projections",
+    "q": "What operations always go through Projections?",
+    "options": [
+      "Backup",
+      "Input, Authorize, Reverse, See",
+      "Only Print",
+      "Email"
+    ],
+    "correct": 1,
+    "tip": "All user operations (Input, Authorize, Reverse, See) must pass through Projections — they are the mandatory gateway."
+  },
+  {
+    "id": 179,
+    "topic": "Projections",
+    "q": "What does Server-Driven UI (SDUI) mean?",
+    "options": [
+      "Frontend forms are hard-coded",
+      "Backend returns composite JSON schema for layout, fields, validations",
+      "UI is server hardware",
+      "No UI at all"
+    ],
+    "correct": 1,
+    "tip": "SDUI: backend dynamically returns JSON schema describing layout/fields, so admins can alter UI without redeploying the client."
+  },
+  {
+    "id": 180,
+    "topic": "Projections",
+    "q": "Resolution Waterfall in Projections checks files in which order?",
+    "options": [
+      "LIV → NAU → HIS → ARC",
+      "NAU → LIV → HIS → ARC",
+      "HIS first",
+      "ARC first"
+    ],
+    "correct": 1,
+    "tip": "NAU → LIV → HIS → ARC ensures the most relevant active draft is surfaced."
+  },
+  {
+    "id": 181,
+    "topic": "Projections",
+    "q": "What does the Diff Engine do?",
+    "options": [
+      "Compresses files",
+      "Highlights visual differences between draft vs live or two HIS versions",
+      "Translates languages",
+      "Audits SQL"
+    ],
+    "correct": 1,
+    "tip": "The Diff Engine highlights field-level changes for authorization and auditing."
+  },
+  {
+    "id": 182,
+    "topic": "Projections",
+    "q": "A simplified CUSTOMER~SIMPLE projection shows…",
+    "options": [
+      "All 200+ fields",
+      "Only 5 fields for a teller",
+      "No fields",
+      "Random fields"
+    ],
+    "correct": 1,
+    "tip": "Targeted Subset Views: role-based projections show only the fields relevant for that role."
+  },
+  {
+    "id": 183,
+    "topic": "Projections",
+    "q": "If a projection ID matches the table name exactly (e.g. ACCOUNT), it…",
+    "options": [
+      "Acts as the Master View rendering all default fields",
+      "Fails to load",
+      "Is hidden",
+      "Acts as simulation"
+    ],
+    "correct": 0,
+    "tip": "A projection whose ID equals the table name is the Master View, showing all default fields."
+  },
+  {
+    "id": 184,
+    "topic": "Projections",
+    "q": "NOINPUT field property means…",
+    "options": [
+      "Hidden",
+      "Read-only",
+      "Required",
+      "Encrypted"
+    ],
+    "correct": 1,
+    "tip": "NOINPUT renders the field as read-only in that projection."
+  },
+  {
+    "id": 185,
+    "topic": "Projections",
+    "q": "NOCHANGE means…",
+    "options": [
+      "Required",
+      "Immutable after creation",
+      "Hidden",
+      "Optional"
+    ],
+    "correct": 1,
+    "tip": "NOCHANGE means the field is immutable after creation — cannot be modified later."
+  },
+  {
+    "id": 186,
+    "topic": "Projections",
+    "q": "HIDDEN means…",
+    "options": [
+      "Used for background logic but removed from the UI",
+      "Encrypted",
+      "Skipped from DB",
+      "Visible only to managers"
+    ],
+    "correct": 0,
+    "tip": "HIDDEN fields exist in the data flow for background logic but are not shown in the UI."
+  },
+  {
+    "id": 187,
+    "topic": "Projections",
+    "q": "Field Property Overrides can do which of the following?",
+    "options": [
+      "Make an optional field MANDATORY in a specific projection",
+      "Delete the field",
+      "Create the field globally",
+      "Lock the database"
+    ],
+    "correct": 0,
+    "tip": "Overrides can make optional fields MANDATORY, or mark them NOINPUT/NOCHANGE/HIDDEN per projection."
+  },
+  {
+    "id": 188,
+    "topic": "Projections",
+    "q": "Composite Layouts in projections support…",
+    "options": [
+      "Only single-column forms",
+      "Collapsible Sections/Clusters and Associated Projections (Tabs)",
+      "Only text",
+      "No grouping"
+    ],
+    "correct": 1,
+    "tip": "Projections support collapsible Sections/Clusters and Associated Projections that split complex products into Tabs."
+  },
+  {
+    "id": 189,
+    "topic": "Projections",
+    "q": "What is the purpose of Associated Projections?",
+    "options": [
+      "Backup",
+      "Split massive products (e.g. mortgages) into navigable logical Tabs",
+      "Hide fields",
+      "Send emails"
+    ],
+    "correct": 1,
+    "tip": "Associated Projections split complex products into logical Tabs like General, Interest, Collateral."
+  },
+  {
+    "id": 190,
+    "topic": "Projections",
+    "q": "Suppress See Mode does what?",
+    "options": [
+      "Hides non-participating attributes from the payload",
+      "Hides the whole projection",
+      "Suppresses validation",
+      "Disables See"
+    ],
+    "correct": 0,
+    "tip": "Suppress See Mode removes non-editable/non-participating attributes from the payload to reduce UI clutter."
+  },
+  {
+    "id": 191,
+    "topic": "Projections",
+    "q": "Automated Defaulting can use which sources?",
+    "options": [
+      "Fixed values, linked records, system vars (TODAY, USER, COMPANY)",
+      "Random",
+      "Customer email",
+      "User location"
+    ],
+    "correct": 0,
+    "tip": "Defaulting can prefill from fixed values, foreign records, or system variables like TODAY, USER, COMPANY."
+  },
+  {
+    "id": 192,
+    "topic": "Projections",
+    "q": "What are Hot Fields?",
+    "options": [
+      "Pre-rendered fields",
+      "ON.CHANGE fields that trigger validation/defaulting on tab-out",
+      "Hardware sensors",
+      "Audit fields"
+    ],
+    "correct": 1,
+    "tip": "Hot Fields fire ON.CHANGE — instantly triggering validation or defaulting the moment a user tabs out."
+  },
+  {
+    "id": 193,
+    "topic": "Projections",
+    "q": "Pre/Post hooks in projections are written in…",
+    "options": [
+      "Assembly",
+      "Java/Groovy scripts",
+      "SQL only",
+      "HTML only"
+    ],
+    "correct": 1,
+    "tip": "Pre/Post hooks support Java/Groovy for cross-field validations and external API calls."
+  },
+  {
+    "id": 194,
+    "topic": "Projections",
+    "q": "The AUTH.REQUIRED flag does what?",
+    "options": [
+      "Hides authorization",
+      "If YES, saves data as unauthorized draft (INAU), enforcing 4-eyes",
+      "Skips audit",
+      "Locks the system"
+    ],
+    "correct": 1,
+    "tip": "AUTH.REQUIRED=YES forces 4-eyes principle — draft saved as INAU pending second user."
+  },
+  {
+    "id": 195,
+    "topic": "Projections",
+    "q": "What does INAU mean?",
+    "options": [
+      "Initial Audit",
+      "Unauthorized record indicator (Input Not Auth)",
+      "Inverted",
+      "Internal"
+    ],
+    "correct": 1,
+    "tip": "INAU marks the record as unauthorized — waiting for second-user approval."
+  },
+  {
+    "id": 196,
+    "topic": "Projections",
+    "q": "Projections forbid direct API writes — why?",
+    "options": [
+      "Performance",
+      "To enforce business rules and the 4-eyes principle",
+      "Storage",
+      "User comfort"
+    ],
+    "correct": 1,
+    "tip": "All mutations must pass through a Projection to enforce business rules and 4-eyes."
+  },
+  {
+    "id": 197,
+    "topic": "Projections",
+    "q": "What is the practical example of CUSTOMER,CORP projection?",
+    "options": [
+      "A version of the CUSTOMER projection for corporate clients",
+      "A new table",
+      "An external API",
+      "A holiday calendar"
+    ],
+    "correct": 0,
+    "tip": "CUSTOMER,CORP is a Projection (Version) of the CUSTOMER Table tailored for corporate clients."
+  },
+  {
+    "id": 198,
+    "topic": "Projections",
+    "q": "Projections operate as a…",
+    "options": [
+      "Reporting tool",
+      "Presentation & Logic Configuration Engine",
+      "File server",
+      "HR module"
+    ],
+    "correct": 1,
+    "tip": "Projections act as a Presentation & Logic Configuration Engine."
+  },
+  {
+    "id": 199,
+    "topic": "Projections",
+    "q": "What does Server-Driven UI prevent the need for?",
+    "options": [
+      "Hard-coded frontend forms / client redeployment",
+      "Backups",
+      "Validations",
+      "Auth"
+    ],
+    "correct": 0,
+    "tip": "With SDUI, admins can alter representation without redeploying the client — no hard-coded forms."
+  },
+  {
+    "id": 200,
+    "topic": "Projections",
+    "q": "What does the Resolution Waterfall in Projections guarantee?",
+    "options": [
+      "The most relevant active draft is shown",
+      "Random data",
+      "Always LIV",
+      "Only HIS"
+    ],
+    "correct": 0,
+    "tip": "Resolution Waterfall shows the most relevant state of the record (drafts surface first)."
+  },
+  {
+    "id": 201,
+    "topic": "Projections",
+    "q": "True or False: Projections can override DDD field rules.",
+    "options": [
+      "True — e.g. making optional fields MANDATORY in a specific projection",
+      "False — DDD is immutable",
+      "Only for INT",
+      "Only for FIN"
+    ],
+    "correct": 0,
+    "tip": "Projections can override Data Dictionary rules: MANDATORY, NOINPUT, NOCHANGE, HIDDEN."
+  },
+  {
+    "id": 202,
+    "topic": "Projections",
+    "q": "Projections render forms via…",
+    "options": [
+      "Hard-coded HTML",
+      "Dynamic JSON schemas returned by the backend",
+      "PDF only",
+      "Excel only"
+    ],
+    "correct": 1,
+    "tip": "Projections deliver dynamic JSON schemas (SDUI) for rendering forms."
+  },
+  {
+    "id": 203,
+    "topic": "Projections",
+    "q": "How are loan-origination flows organized in projections?",
+    "options": [
+      "One huge form",
+      "Associated Projections as Tabs (General, Interest, Collateral)",
+      "Multiple windows",
+      "Random sequence"
+    ],
+    "correct": 1,
+    "tip": "Complex flows like loans are split into tabs via Associated Projections."
+  },
+  {
+    "id": 204,
+    "topic": "Projections",
+    "q": "Visual Diff between draft and baseline is used during…",
+    "options": [
+      "Authorization and auditing",
+      "Login",
+      "Logout",
+      "Backups"
+    ],
+    "correct": 0,
+    "tip": "The Diff Engine highlights field-level differences during authorization and auditing."
+  },
+  {
+    "id": 205,
+    "topic": "Projections",
+    "q": "WYSIWYG drag-and-drop designer is used in…",
+    "options": [
+      "Projections for composing layouts",
+      "Audit logs",
+      "Backup tools",
+      "Network setup"
+    ],
+    "correct": 0,
+    "tip": "Projections use a WYSIWYG drag-and-drop designer for layout composition."
+  },
+  {
+    "id": 206,
+    "topic": "Projections",
+    "q": "What does Defaulting from TODAY do?",
+    "options": [
+      "Sets a date field to the current bank date",
+      "Sets the user",
+      "Sets currency",
+      "Sets balance"
+    ],
+    "correct": 0,
+    "tip": "Defaulting uses system variables like TODAY to pre-fill date fields."
+  },
+  {
+    "id": 207,
+    "topic": "Projections",
+    "q": "Hot Fields trigger logic at which moment?",
+    "options": [
+      "On page load",
+      "ON.CHANGE / onBlur — when a user tabs out",
+      "Only on submit",
+      "Never"
+    ],
+    "correct": 1,
+    "tip": "Hot Fields trigger ON.CHANGE — typically the onBlur event."
+  },
+  {
+    "id": 208,
+    "topic": "Projections",
+    "q": "Pre-hooks run…",
+    "options": [
+      "Before the operation commits",
+      "After the operation commits",
+      "Always at midnight",
+      "Only on errors"
+    ],
+    "correct": 0,
+    "tip": "Pre-hooks fire before the operation is committed — useful for cross-field validation."
+  },
+  {
+    "id": 209,
+    "topic": "Projections",
+    "q": "Post-hooks run…",
+    "options": [
+      "Before commit",
+      "After successful commit (notifications, events, cascades)",
+      "On click",
+      "On login"
+    ],
+    "correct": 1,
+    "tip": "Post-hooks run after successful commit — for notifications, events, and cascading updates."
+  },
+  {
+    "id": 210,
+    "topic": "Projections",
+    "q": "Setting AUTH.REQUIRED=NO would…",
+    "options": [
+      "Bypass the 4-eyes principle (where allowed)",
+      "Crash the system",
+      "Lock the projection",
+      "Hide the form"
+    ],
+    "correct": 0,
+    "tip": "AUTH.REQUIRED=NO skips the 4-eyes / unauthorized-draft step (where permitted)."
+  },
+  {
+    "id": 211,
+    "topic": "Projections",
+    "q": "What can a CUSTOMER~SIMPLE projection be used for?",
+    "options": [
+      "A teller-focused subset view of CUSTOMER",
+      "Backups",
+      "A new table",
+      "A SQL query"
+    ],
+    "correct": 0,
+    "tip": "CUSTOMER~SIMPLE is a role-based subset view — e.g. just 5 fields a teller needs."
+  },
+  {
+    "id": 212,
+    "topic": "Projections",
+    "q": "Targeted Subset Views avoid which problem?",
+    "options": [
+      "Showing 200+ fields to a user who only needs 5",
+      "File system corruption",
+      "Auth bypass",
+      "Network latency"
+    ],
+    "correct": 0,
+    "tip": "They prevent overwhelming users with hundreds of irrelevant fields."
+  },
+  {
+    "id": 213,
+    "topic": "Projections",
+    "q": "What is the difference between MANDATORY and NOINPUT overrides?",
+    "options": [
+      "MANDATORY forces input; NOINPUT makes read-only",
+      "They are the same",
+      "NOINPUT forces input",
+      "MANDATORY hides the field"
+    ],
+    "correct": 0,
+    "tip": "MANDATORY requires the user to fill it; NOINPUT prevents user input (read-only)."
+  },
+  {
+    "id": 214,
+    "topic": "Projections",
+    "q": "How do projections enforce authorization workflows?",
+    "options": [
+      "Via the AUTH.REQUIRED flag",
+      "Via PROGRAM registry",
+      "Via HIS file",
+      "Via SIM"
+    ],
+    "correct": 0,
+    "tip": "AUTH.REQUIRED flag inside the projection dictates governance — 4-eyes when YES."
+  },
+  {
+    "id": 215,
+    "topic": "Projections",
+    "q": "Why do projections support pre/post hooks?",
+    "options": [
+      "For cross-field validation, external API calls, post-commit notifications",
+      "UI styling",
+      "Database backup",
+      "Holiday planning"
+    ],
+    "correct": 0,
+    "tip": "Hooks enable cross-field validation, external API calls, and post-commit actions."
+  },
+  {
+    "id": 216,
+    "topic": "Projections",
+    "q": "True or False: A projection writes directly to the database bypassing the framework.",
+    "options": [
+      "True",
+      "False — all writes go through the projection framework with rules enforced",
+      "Sometimes",
+      "Only at night"
+    ],
+    "correct": 1,
+    "tip": "Projections are the mandatory gateway; direct writes are forbidden."
+  },
+  {
+    "id": 217,
+    "topic": "Projections",
+    "q": "What kind of differences does the Diff Engine compare?",
+    "options": [
+      "Draft vs live, or two historical versions",
+      "Two databases",
+      "Two networks",
+      "Two users"
+    ],
+    "correct": 0,
+    "tip": "It compares draft vs live, or specific historical versions."
+  },
+  {
+    "id": 218,
+    "topic": "Projections",
+    "q": "Why is SDUI advantageous for admins?",
+    "options": [
+      "They can change UI by editing config — no client redeploy",
+      "They can edit hardware",
+      "They reduce CPU",
+      "They eliminate users"
+    ],
+    "correct": 0,
+    "tip": "SDUI lets admins alter data representation without redeploying the client application."
+  },
+  {
+    "id": 219,
+    "topic": "Projections",
+    "q": "Field-level dropdowns from virtual tables are surfaced via…",
+    "options": [
+      "Projections + DDD virtual-table linkage",
+      "Hardcoded HTML",
+      "User typing only",
+      "Backend logs"
+    ],
+    "correct": 0,
+    "tip": "DDD-linked virtual-table fields are auto-rendered as dropdowns in the projection UI."
+  },
+  {
+    "id": 220,
+    "topic": "Projections",
+    "q": "A teller's onboarding form is best modeled with which projection style?",
+    "options": [
+      "A targeted subset projection (e.g. CUSTOMER~SIMPLE)",
+      "Full Master View",
+      "SIM file",
+      "DEL file"
+    ],
+    "correct": 0,
+    "tip": "Use a targeted subset projection so the teller sees only the fields they need."
+  },
+  {
+    "id": 221,
+    "topic": "Plugins",
+    "q": "What is a Plugin in CBS?",
+    "options": [
+      "A USB device",
+      "A programmable logic unit invoked by Screen for validations/calculations/business rules/integrations",
+      "A UI theme",
+      "A reporting tool"
+    ],
+    "correct": 1,
+    "tip": "Plugin = programmable logic unit (jBase or Java) invoked by Screen to perform complex validations, calculations, business rules, or external integrations."
+  },
+  {
+    "id": 222,
+    "topic": "Plugins",
+    "q": "Plugin code is typically written in…",
+    "options": [
+      "COBOL only",
+      "jBase or Java",
+      "Python only",
+      "HTML"
+    ],
+    "correct": 1,
+    "tip": "Plugins are written in jBase or Java."
+  },
+  {
+    "id": 223,
+    "topic": "Plugins",
+    "q": "Plugins are invoked at which moments?",
+    "options": [
+      "At defined points in the record lifecycle",
+      "Only at startup",
+      "Only on hardware events",
+      "Random"
+    ],
+    "correct": 0,
+    "tip": "Plugins execute at defined points in the record lifecycle (open, input, authorize…)."
+  },
+  {
+    "id": 224,
+    "topic": "Plugins",
+    "q": "Why use plugins instead of modifying core vendor code?",
+    "options": [
+      "Plugins allow extensibility without altering the core or DB schema",
+      "Vendor charges more",
+      "Plugins are mandatory",
+      "Vendor code is missing"
+    ],
+    "correct": 0,
+    "tip": "Plugins introduce custom logic without modifying core vendor code or the physical DB schema."
+  },
+  {
+    "id": 225,
+    "topic": "Plugins",
+    "q": "What kinds of tasks do plugins perform?",
+    "options": [
+      "Complex validations, financial calcs, localized rules, synchronous external integrations",
+      "Only logging",
+      "Only printing",
+      "Backup"
+    ],
+    "correct": 0,
+    "tip": "Plugins handle validations, calcs, business rules, and synchronous integrations with external systems."
+  },
+  {
+    "id": 226,
+    "topic": "Plugins",
+    "q": "Plugins integrate with projections via…",
+    "options": [
+      "Pre/Post programs (hooks)",
+      "Email triggers",
+      "Random functions",
+      "SQL stored procedures"
+    ],
+    "correct": 0,
+    "tip": "Plugins attach to projections as Pre/Post programs (hooks)."
+  },
+  {
+    "id": 227,
+    "topic": "Plugins",
+    "q": "Pre-hooks fire…",
+    "options": [
+      "Before a transaction operation is committed",
+      "After commit",
+      "Never",
+      "At system boot"
+    ],
+    "correct": 0,
+    "tip": "Pre-hooks execute before INPUT (or other ops) commits — useful for validations & external API calls (e.g. Credit Check)."
+  },
+  {
+    "id": 228,
+    "topic": "Plugins",
+    "q": "Post-hooks fire…",
+    "options": [
+      "After an operation completes successfully",
+      "Before commit",
+      "Only on error",
+      "Only on login"
+    ],
+    "correct": 0,
+    "tip": "Post-hooks handle notifications, events, and cascading updates after a successful operation."
+  },
+  {
+    "id": 229,
+    "topic": "Plugins",
+    "q": "Where are plugins registered?",
+    "options": [
+      "PROGRAM registry",
+      "FILE registry",
+      "USER table",
+      "HIS file"
+    ],
+    "correct": 0,
+    "tip": "Plugins are registered in the PROGRAM registry, which controls executable artifacts."
+  },
+  {
+    "id": 230,
+    "topic": "Plugins",
+    "q": "A 'Hot Field' triggers plugin logic at which event?",
+    "options": [
+      "onBlur (when the user removes focus)",
+      "On page load",
+      "Only on submit",
+      "On logout"
+    ],
+    "correct": 0,
+    "tip": "Hot Fields trigger associated plugin logic on the onBlur event — immediately validating or auto-populating."
+  },
+  {
+    "id": 231,
+    "topic": "Plugins",
+    "q": "Validation endpoints are defined in which registry?",
+    "options": [
+      "VALIDATION.PRGM",
+      "HIS",
+      "DEL",
+      "SIM"
+    ],
+    "correct": 0,
+    "tip": "API validation endpoints are defined in the VALIDATION.PRGM registry."
+  },
+  {
+    "id": 232,
+    "topic": "Plugins",
+    "q": "All write operations must pass through…",
+    "options": [
+      "A registered PROJECTION.DEF",
+      "SQL CLI",
+      "Email",
+      "HIS directly"
+    ],
+    "correct": 0,
+    "tip": "Strict Gateway Enforcement: all writes go through a registered PROJECTION.DEF — invoking attached plugins."
+  },
+  {
+    "id": 233,
+    "topic": "Plugins",
+    "q": "Why is the Gateway Enforcement strict?",
+    "options": [
+      "To guarantee plugin and field rules enforce before reaching the DB",
+      "To slow performance",
+      "To prevent backups",
+      "To avoid logs"
+    ],
+    "correct": 0,
+    "tip": "Guarantees rules (MANDATORY, NOINPUT) and plugin validations are enforced before any write."
+  },
+  {
+    "id": 234,
+    "topic": "Plugins",
+    "q": "Projections are described as the orchestrator; plugins are the…",
+    "options": [
+      "Executor",
+      "Reader",
+      "Auditor",
+      "Backup"
+    ],
+    "correct": 0,
+    "tip": "Projection = orchestrator; Plugin = extensible executor for validation/integration/processing."
+  },
+  {
+    "id": 235,
+    "topic": "Plugins",
+    "q": "A Credit Check during INPUT is typically done by…",
+    "options": [
+      "A pre-hook plugin synchronously calling an external API",
+      "Manual phone call",
+      "HIS lookup",
+      "SIM query"
+    ],
+    "correct": 0,
+    "tip": "Pre-hook plugins commonly call external APIs (e.g. Credit Check) before commit."
+  },
+  {
+    "id": 236,
+    "topic": "Plugins",
+    "q": "A post-hook plugin might…",
+    "options": [
+      "Send notifications, publish events, cascade updates",
+      "Run validation",
+      "Block input",
+      "Delete HIS"
+    ],
+    "correct": 0,
+    "tip": "Post-hooks handle downstream tasks like notifications, events, and cascades."
+  },
+  {
+    "id": 237,
+    "topic": "Plugins",
+    "q": "Hot Fields validating an ID against a Government Registry uses…",
+    "options": [
+      "Plugin logic triggered on onBlur",
+      "Email",
+      "HIS",
+      "SIM"
+    ],
+    "correct": 0,
+    "tip": "Hot Field plugin can verify an ID against an external Government Registry instantly."
+  },
+  {
+    "id": 238,
+    "topic": "Plugins",
+    "q": "True or False: Plugins can replace core vendor code.",
+    "options": [
+      "True",
+      "False — they extend without modifying core vendor code",
+      "Only on weekends",
+      "Only with admin override"
+    ],
+    "correct": 1,
+    "tip": "Plugins extend functionality without modifying the core vendor code."
+  },
+  {
+    "id": 239,
+    "topic": "Plugins",
+    "q": "The Gateway and Executor model refers to…",
+    "options": [
+      "Projections (gateway) + Plugins (executor)",
+      "Tables + Audit",
+      "HIS + DEL",
+      "Customers + Users"
+    ],
+    "correct": 0,
+    "tip": "Projections gateway when/where logic runs; plugins execute the logic."
+  },
+  {
+    "id": 240,
+    "topic": "Plugins",
+    "q": "At which projection lifecycle moments can plugins be invoked?",
+    "options": [
+      "Form open, data entry/submission, authorization",
+      "Only at login",
+      "Only at logout",
+      "Random"
+    ],
+    "correct": 0,
+    "tip": "Plugins are triggered at lifecycle stages: form open, input/submission, and authorization."
+  },
+  {
+    "id": 241,
+    "topic": "Plugins",
+    "q": "Pre-hooks are useful for…",
+    "options": [
+      "Cross-field validation and synchronous external API calls",
+      "Sending newsletters",
+      "Backups",
+      "Print queue"
+    ],
+    "correct": 0,
+    "tip": "Pre-hooks excel at cross-field validation and synchronous external integrations like Credit Check."
+  },
+  {
+    "id": 242,
+    "topic": "Plugins",
+    "q": "Auto-populate logic on field blur is achieved via…",
+    "options": [
+      "Hot Field plugin",
+      "SIM table",
+      "Cron job",
+      "HIS lookup"
+    ],
+    "correct": 0,
+    "tip": "Hot Field plugins auto-populate or validate related fields on the onBlur event."
+  },
+  {
+    "id": 243,
+    "topic": "Plugins",
+    "q": "Plugins enforce which kind of business rules?",
+    "options": [
+      "Localized and specific custom rules",
+      "Hardware rules",
+      "DNS rules",
+      "UI color rules"
+    ],
+    "correct": 0,
+    "tip": "Plugins enforce localized and specific custom business rules beyond standard config."
+  },
+  {
+    "id": 244,
+    "topic": "Plugins",
+    "q": "Integration with third-party systems is handled via…",
+    "options": [
+      "Plugins (synchronous integrations)",
+      "HIS file",
+      "DEL file",
+      "Audit fields"
+    ],
+    "correct": 0,
+    "tip": "Plugins handle synchronous integrations with external third-party systems."
+  },
+  {
+    "id": 245,
+    "topic": "Plugins",
+    "q": "Why are plugins called 'hot-swappable' in some contexts?",
+    "options": [
+      "They can be updated without recompiling the kernel or restarting the system",
+      "They overheat",
+      "They run on hot CPUs",
+      "They auto-delete"
+    ],
+    "correct": 0,
+    "tip": "Plugins (like validation rules) can be updated without kernel recompilation or restart — analogous to hot-swappable validation engine."
+  },
+  {
+    "id": 246,
+    "topic": "Enquiries",
+    "q": "What is an Enquiry?",
+    "options": [
+      "A read-only view or report over one or more Tables",
+      "A write transaction",
+      "A backup",
+      "A plugin"
+    ],
+    "correct": 0,
+    "tip": "Enquiry is a read-only view/report defining which tables, filters, sort, display fields."
+  },
+  {
+    "id": 247,
+    "topic": "Enquiries",
+    "q": "Enquiry framework is described as a…",
+    "options": [
+      "Metadata-Driven Data Virtualization Layer",
+      "Hardcoded API",
+      "Email engine",
+      "SIM tool"
+    ],
+    "correct": 0,
+    "tip": "Enquiries operate as a Metadata-Driven Data Virtualization Layer decoupling raw DB storage from the UI."
+  },
+  {
+    "id": 248,
+    "topic": "Enquiries",
+    "q": "Fixed Selection in Enquiries is…",
+    "options": [
+      "A hardcoded background filter (e.g. SECTOR EQ 1001)",
+      "User-editable",
+      "Random",
+      "Always disabled"
+    ],
+    "correct": 0,
+    "tip": "Fixed Selection is a hardcoded background filter automatically applied to limit the dataset."
+  },
+  {
+    "id": 249,
+    "topic": "Enquiries",
+    "q": "Dynamic Selection in Enquiries is…",
+    "options": [
+      "Runtime filter exposed to the user",
+      "Hardcoded",
+      "SIM-only",
+      "HIS-only"
+    ],
+    "correct": 0,
+    "tip": "Dynamic Selection lets users customize filters at runtime (e.g. AMOUNT GT 5000)."
+  },
+  {
+    "id": 250,
+    "topic": "Enquiries",
+    "q": "Which operator means 'Like'?",
+    "options": [
+      "LK",
+      "EQ",
+      "NE",
+      "RG"
+    ],
+    "correct": 0,
+    "tip": "LK = Like, used for pattern matching."
+  },
+  {
+    "id": 251,
+    "topic": "Enquiries",
+    "q": "Which operator means 'Range'?",
+    "options": [
+      "RG",
+      "EQ",
+      "NE",
+      "GT"
+    ],
+    "correct": 0,
+    "tip": "RG = Range filter."
+  },
+  {
+    "id": 252,
+    "topic": "Enquiries",
+    "q": "Mandatory Selection rules enforce filtering on…",
+    "options": [
+      "Indexed fields only — to prevent full-table scans",
+      "Random fields",
+      "Non-indexed fields",
+      "All fields"
+    ],
+    "correct": 0,
+    "tip": "Mandatory Selection on Indexed Fields prevents performance-killing full-table scans."
+  },
+  {
+    "id": 253,
+    "topic": "Enquiries",
+    "q": "Transformation Pipeline can do which operations?",
+    "options": [
+      "Arithmetic (ADD/SUB/MULT), concatenation, code-to-text translation",
+      "Backup",
+      "Compression",
+      "Encryption"
+    ],
+    "correct": 0,
+    "tip": "The pipeline performs arithmetic, concatenation, and code-to-text translation using the DICTIONARY service."
+  },
+  {
+    "id": 254,
+    "topic": "Enquiries",
+    "q": "Soft Links (Virtual Joins) allow…",
+    "options": [
+      "Dynamic relational fetches without physical foreign keys",
+      "SIM-only joins",
+      "HIS-only joins",
+      "Auth-only joins"
+    ],
+    "correct": 0,
+    "tip": "Soft Links fetch related data across tables without physical FKs (e.g. customer name from ACCOUNT.CUSTOMER)."
+  },
+  {
+    "id": 255,
+    "topic": "Enquiries",
+    "q": "Virtual Data Merging means…",
+    "options": [
+      "Auto-combining LIV, NAU, HIS into a single virtual view",
+      "Merging two databases",
+      "Combining tables physically",
+      "Encrypting files"
+    ],
+    "correct": 0,
+    "tip": "Enquiries auto-merge LIV/NAU/HIS so users see the most relevant data and unauthorized rows are flagged."
+  },
+  {
+    "id": 256,
+    "topic": "Enquiries",
+    "q": "In Enquiries, an unauthorized pending change is flagged as…",
+    "options": [
+      "INAU (Unauthorised)",
+      "DEAD",
+      "SIM",
+      "REVE"
+    ],
+    "correct": 0,
+    "tip": "Enquiry flags pending NAU rows as INAU (Unauthorised)."
+  },
+  {
+    "id": 257,
+    "topic": "Enquiries",
+    "q": "Context-Sensitive Enquiries…",
+    "options": [
+      "Launch side-panels based on the user's current focus",
+      "Send emails",
+      "Backup tables",
+      "Lock records"
+    ],
+    "correct": 0,
+    "tip": "They broadcast user focus, opening side panels (e.g. account balance when focused on Debit Account)."
+  },
+  {
+    "id": 258,
+    "topic": "Enquiries",
+    "q": "Hypermedia Drill-Downs allow…",
+    "options": [
+      "Clicking a row to open deeper enquiry, URL, or pre-filled projection",
+      "Crashing the system",
+      "Random navigation",
+      "Audio playback"
+    ],
+    "correct": 0,
+    "tip": "Drill-downs open detailed enquiries, external URLs, or pre-filled projection forms."
+  },
+  {
+    "id": 259,
+    "topic": "Enquiries",
+    "q": "Actionable Enquiries (Fast Path) means…",
+    "options": [
+      "Row Actions like APPROVE/DELETE directly from list view",
+      "Static rows",
+      "Read-only forever",
+      "Backups only"
+    ],
+    "correct": 0,
+    "tip": "Fast Path adds Row Action buttons (APPROVE, DELETE) directly to data grids."
+  },
+  {
+    "id": 260,
+    "topic": "Enquiries",
+    "q": "Enquiry Designer is…",
+    "options": [
+      "A WYSIWYG React/Web tool to build enquiries by drag-and-drop",
+      "A SQL editor",
+      "An OS utility",
+      "An email client"
+    ],
+    "correct": 0,
+    "tip": "Enquiry Designer is the WYSIWYG tool to build views via drag-and-drop + visual Expression Builder."
+  },
+  {
+    "id": 261,
+    "topic": "Enquiries",
+    "q": "What does the Expression Builder enable?",
+    "options": [
+      "Conditional formatting logic (e.g. IF AMOUNT>1000 THEN 'RED' ELSE 'GREEN')",
+      "Hardware config",
+      "User passwords",
+      "UI font sizing"
+    ],
+    "correct": 0,
+    "tip": "Expression Builder writes conditional formatting and calculated logic visually."
+  },
+  {
+    "id": 262,
+    "topic": "Enquiries",
+    "q": "What does Live Preview do in Enquiry Designer?",
+    "options": [
+      "Executes unsaved config against live data, returns first page",
+      "Saves to LIV",
+      "Compiles to binary",
+      "Sends email"
+    ],
+    "correct": 0,
+    "tip": "Live Preview runs the unsaved config and returns sample results without compiling."
+  },
+  {
+    "id": 263,
+    "topic": "Enquiries",
+    "q": "Why are Enquiries metadata-driven?",
+    "options": [
+      "So consultants can build views by configuration — no new API endpoints",
+      "To slow performance",
+      "To require hardware change",
+      "To hide UI"
+    ],
+    "correct": 0,
+    "tip": "Metadata-driven means functional consultants configure views without coding new API endpoints."
+  },
+  {
+    "id": 264,
+    "topic": "Enquiries",
+    "q": "Enquiries replace what traditional artifact?",
+    "options": [
+      "Hardcoded API endpoints",
+      "User permissions",
+      "Audit fields",
+      "HIS file"
+    ],
+    "correct": 0,
+    "tip": "They replace hardcoded API endpoints with SQL-like configurable logic."
+  },
+  {
+    "id": 265,
+    "topic": "Enquiries",
+    "q": "Relational Operators supported include…",
+    "options": [
+      "EQ, NE, GT, LT, LK, RG",
+      "SUM, AVG",
+      "JOIN, UNION",
+      "BACK, FORTH"
+    ],
+    "correct": 0,
+    "tip": "EQ, NE, GT, LT, LK, RG are the standard operators."
+  },
+  {
+    "id": 266,
+    "topic": "Enquiries",
+    "q": "Performance protection in Enquiry uses…",
+    "options": [
+      "Mandatory Selection on indexed fields + caching pagination",
+      "Random sampling",
+      "Buying more RAM",
+      "Hardcoded limits"
+    ],
+    "correct": 0,
+    "tip": "Mandatory Selection on indexed fields + caching keep enquiries fast."
+  },
+  {
+    "id": 267,
+    "topic": "Enquiries",
+    "q": "DICTIONARY service is used to…",
+    "options": [
+      "Translate system codes to human-readable text",
+      "Encrypt fields",
+      "Spell-check",
+      "Generate emails"
+    ],
+    "correct": 0,
+    "tip": "The DICTIONARY service translates codes into human-readable text for display."
+  },
+  {
+    "id": 268,
+    "topic": "Enquiries",
+    "q": "Charts (Bar, Pie, Line) in enquiries are…",
+    "options": [
+      "SVG-based outputs",
+      "PDF only",
+      "CSV only",
+      "Audio"
+    ],
+    "correct": 0,
+    "tip": "Enquiries can render SVG-based Bar, Pie, and Line charts."
+  },
+  {
+    "id": 269,
+    "topic": "Enquiries",
+    "q": "Hierarchical data like General Ledgers can be displayed as…",
+    "options": [
+      "Interactive Tree Views",
+      "Pie chart only",
+      "Plain text",
+      "Audio playback"
+    ],
+    "correct": 0,
+    "tip": "Tree Views are used for hierarchical data like General Ledgers."
+  },
+  {
+    "id": 270,
+    "topic": "Enquiries",
+    "q": "What does ACCOUNT.CUSTOMER look-up via Soft Links produce?",
+    "options": [
+      "The Customer's NAME displayed in the account grid",
+      "An error",
+      "A backup file",
+      "A login screen"
+    ],
+    "correct": 0,
+    "tip": "Soft Links resolve ACCOUNT.CUSTOMER and display the Customer NAME directly in the grid."
+  },
+  {
+    "id": 271,
+    "topic": "Enquiries",
+    "q": "Why is Virtual Data Merging important?",
+    "options": [
+      "Because data is fragmented across LIV/NAU/HIS — simple SQL would miss context",
+      "To slow queries",
+      "To require manual joins",
+      "To create new tables"
+    ],
+    "correct": 0,
+    "tip": "Without virtual merging, a SQL query would miss UNAU drafts and history context."
+  },
+  {
+    "id": 272,
+    "topic": "Enquiries",
+    "q": "True or False: Enquiries can mutate the database.",
+    "options": [
+      "True",
+      "False — they are read-only (but can launch projections for writes via Fast Path)",
+      "True with admin override",
+      "Only for SIM"
+    ],
+    "correct": 1,
+    "tip": "Enquiries are read-only. To mutate, Fast Path launches a Projection."
+  },
+  {
+    "id": 273,
+    "topic": "Enquiries",
+    "q": "Fast Path opens a target Projection with…",
+    "options": [
+      "The specific record @ID prefilled",
+      "Random IDs",
+      "No data",
+      "SIM data only"
+    ],
+    "correct": 0,
+    "tip": "Fast Path passes the @ID into the target Projection (e.g. CUSTOMER|INPUT)."
+  },
+  {
+    "id": 274,
+    "topic": "Enquiries",
+    "q": "Live Preview helps admins…",
+    "options": [
+      "Validate logic instantly without compiling",
+      "Send invoices",
+      "Translate languages",
+      "Print reports"
+    ],
+    "correct": 0,
+    "tip": "Live Preview executes against live data to verify logic without compiling — saving deploy cycles."
+  },
+  {
+    "id": 275,
+    "topic": "Enquiries",
+    "q": "What is the practical example of context broadcast?",
+    "options": [
+      "Teller focuses Debit Account field → side-panel shows account balance",
+      "Email sent automatically",
+      "HIS purged",
+      "SIM cleared"
+    ],
+    "correct": 0,
+    "tip": "Context broadcast triggers side-panel showing relevant data (account balance for Debit Account focus)."
+  },
+  {
+    "id": 276,
+    "topic": "Compare",
+    "q": "What is the primary purpose of Projections?",
+    "options": [
+      "Data mutation and transaction governance (Write/Edit/Authorize)",
+      "Read-only reporting",
+      "File backup",
+      "Hardware control"
+    ],
+    "correct": 0,
+    "tip": "Projections are designed for data mutation and transaction governance."
+  },
+  {
+    "id": 277,
+    "topic": "Compare",
+    "q": "What is the primary purpose of Enquiries?",
+    "options": [
+      "Data virtualization, reporting, and interactive retrieval",
+      "Writing transactions",
+      "Backing up",
+      "Encryption"
+    ],
+    "correct": 0,
+    "tip": "Enquiries are for data virtualization, reporting, and retrieval (Read/Search)."
+  },
+  {
+    "id": 278,
+    "topic": "Compare",
+    "q": "A Projection is bound to…",
+    "options": [
+      "Exactly one physical target table",
+      "Multiple tables",
+      "No table",
+      "Random tables"
+    ],
+    "correct": 0,
+    "tip": "A Projection is strictly bound to one physical target table (e.g. ACCOUNT or CUSTOMER)."
+  },
+  {
+    "id": 279,
+    "topic": "Compare",
+    "q": "An Enquiry can traverse…",
+    "options": [
+      "Multiple tables via Virtual Joins (Soft Links)",
+      "Only one table",
+      "Only the SIM",
+      "Only HIS"
+    ],
+    "correct": 0,
+    "tip": "Enquiries can traverse multiple tables via Virtual Joins / Soft Links."
+  },
+  {
+    "id": 280,
+    "topic": "Compare",
+    "q": "Projection's Resolution Waterfall versus Enquiry's Virtual Data Merging — what differs?",
+    "options": [
+      "Projection fetches single record by waterfall; Enquiry merges datasets across files",
+      "They are identical",
+      "Both write data",
+      "Both only read NAU"
+    ],
+    "correct": 0,
+    "tip": "Projection: single-record waterfall NAU→LIV→HIS→ARC. Enquiry: merges LIV/NAU/HIS into a virtual view."
+  },
+  {
+    "id": 281,
+    "topic": "Compare",
+    "q": "Diff Engine is part of which framework?",
+    "options": [
+      "Projections",
+      "Enquiries",
+      "HIS",
+      "SIM"
+    ],
+    "correct": 0,
+    "tip": "Diff Engine belongs to Projections — to highlight authoring/auditing changes."
+  },
+  {
+    "id": 282,
+    "topic": "Compare",
+    "q": "Transformation Pipeline (arithmetic, concat, code-to-text) is part of…",
+    "options": [
+      "Enquiries",
+      "Projections",
+      "HIS",
+      "DEL"
+    ],
+    "correct": 0,
+    "tip": "Transformation Pipeline lives in Enquiries to render data for display."
+  },
+  {
+    "id": 283,
+    "topic": "Compare",
+    "q": "Which framework focuses on data-entry forms?",
+    "options": [
+      "Projections",
+      "Enquiries",
+      "HIS",
+      "SIM"
+    ],
+    "correct": 0,
+    "tip": "Projections focus on data-entry forms with grouped sections and tabs."
+  },
+  {
+    "id": 284,
+    "topic": "Compare",
+    "q": "Which framework renders grids, tree views, and charts?",
+    "options": [
+      "Enquiries",
+      "Projections",
+      "HIS",
+      "DEL"
+    ],
+    "correct": 0,
+    "tip": "Enquiries render data presentations: grids, tree views, SVG charts."
+  },
+  {
+    "id": 285,
+    "topic": "Compare",
+    "q": "Field Property Overrides (MANDATORY/NOINPUT) belong to…",
+    "options": [
+      "Projections",
+      "Enquiries",
+      "SIM",
+      "Plugins only"
+    ],
+    "correct": 0,
+    "tip": "Field Property Overrides are configured in Projections."
+  },
+  {
+    "id": 286,
+    "topic": "Compare",
+    "q": "Fixed and Dynamic Selections belong to…",
+    "options": [
+      "Enquiries",
+      "Projections",
+      "HIS",
+      "DEL"
+    ],
+    "correct": 0,
+    "tip": "Fixed and Dynamic Selections are Enquiry filtering mechanisms."
+  },
+  {
+    "id": 287,
+    "topic": "Compare",
+    "q": "Synergy: Enquiry launches Projection via…",
+    "options": [
+      "Fast Path passing @ID into target Projection",
+      "Email link",
+      "SMS",
+      "Telegraph"
+    ],
+    "correct": 0,
+    "tip": "Fast Path drills from Enquiry into a pre-filled Projection (e.g. CUSTOMER|INPUT)."
+  },
+  {
+    "id": 288,
+    "topic": "Compare",
+    "q": "Both frameworks share which characteristic?",
+    "options": [
+      "Server-Driven UI and metadata configuration",
+      "Hard-coded forms",
+      "Identical workflows",
+      "Read-only only"
+    ],
+    "correct": 0,
+    "tip": "Both use SDUI and metadata configuration — but serve different purposes."
+  },
+  {
+    "id": 289,
+    "topic": "Compare",
+    "q": "Which framework enforces the 4-eyes principle?",
+    "options": [
+      "Projections (via AUTH.REQUIRED)",
+      "Enquiries",
+      "HIS",
+      "SIM"
+    ],
+    "correct": 0,
+    "tip": "Projections enforce 4-eyes via AUTH.REQUIRED — Enquiries are read-only."
+  },
+  {
+    "id": 290,
+    "topic": "Compare",
+    "q": "Real-time arithmetic in display belongs to…",
+    "options": [
+      "Enquiry Transformation Pipeline",
+      "Projection Diff Engine",
+      "HIS file",
+      "DEL file"
+    ],
+    "correct": 0,
+    "tip": "Enquiry's Transformation Pipeline does real-time arithmetic, concatenation, and translation."
+  },
+  {
+    "id": 291,
+    "topic": "Product Factory",
+    "q": "What is the Product Factory?",
+    "options": [
+      "Component-based architecture for assembling reusable banking products and contracts",
+      "A hardware module",
+      "A reporting tool",
+      "A backup script"
+    ],
+    "correct": 0,
+    "tip": "Product Factory assembles reusable business components into saleable financial products and per-customer arrangements."
+  },
+  {
+    "id": 292,
+    "topic": "Product Factory",
+    "q": "Product Builder is used for…",
+    "options": [
+      "Accounts, loans, deposits",
+      "Phones",
+      "Cars",
+      "Furniture"
+    ],
+    "correct": 0,
+    "tip": "Product Builder is used for accounts, loans, and deposits."
+  },
+  {
+    "id": 293,
+    "topic": "Product Factory",
+    "q": "What is the highest tier of the inheritance framework?",
+    "options": [
+      "PRODUCT.CLASS",
+      "PRODUCT.TYPE",
+      "PRODUCT",
+      "PARENT.PRODUCT"
+    ],
+    "correct": 0,
+    "tip": "PRODUCT.CLASS (e.g. ACCOUNT, LENDING) defines permissible base components."
+  },
+  {
+    "id": 294,
+    "topic": "Product Factory",
+    "q": "PRODUCT.TYPE is the…",
+    "options": [
+      "Middle tier (e.g. PERSONAL.LOAN)",
+      "Highest tier",
+      "Lowest tier",
+      "Audit tier"
+    ],
+    "correct": 0,
+    "tip": "PRODUCT.TYPE groups similar products and defines shared Product Attributes."
+  },
+  {
+    "id": 295,
+    "topic": "Product Factory",
+    "q": "PRODUCT (the saleable tier) supports…",
+    "options": [
+      "PARENT.PRODUCT inheritance with delta overrides",
+      "Only static config",
+      "No inheritance",
+      "Random copy"
+    ],
+    "correct": 0,
+    "tip": "Products can define a PARENT.PRODUCT to inherit attributes and only specify deltas."
+  },
+  {
+    "id": 296,
+    "topic": "Product Factory",
+    "q": "Modular Product Attributes (e.g. Principal Interest, Charges) are…",
+    "options": [
+      "Standardized reusable building blocks",
+      "Hardcoded",
+      "Single-use only",
+      "UI only"
+    ],
+    "correct": 0,
+    "tip": "Products are assembled from standardized reusable Product Attributes — enhancements propagate."
+  },
+  {
+    "id": 297,
+    "topic": "Product Factory",
+    "q": "Where are draft product modifications staged?",
+    "options": [
+      "PRODUCT.BUILDER (sandbox); PRODUCT.CATALOG stays intact",
+      "SIM",
+      "HIS",
+      "DEL"
+    ],
+    "correct": 0,
+    "tip": "Changes are staged in PRODUCT.BUILDER for zero-downtime maintenance; live PRODUCT.CATALOG keeps serving."
+  },
+  {
+    "id": 298,
+    "topic": "Product Factory",
+    "q": "The 3-Stage Lifecycle Engine stages are…",
+    "options": [
+      "Define → Validate → Enable",
+      "Plan → Build → Test",
+      "Draft → Review → Print",
+      "Save → Load → Delete"
+    ],
+    "correct": 0,
+    "tip": "Stages: Define Capability → Validate Capability → Enable Capability."
+  },
+  {
+    "id": 299,
+    "topic": "Product Factory",
+    "q": "What does COMBINE.ACTIONS=YES do?",
+    "options": [
+      "Instantly catalogs the product after successful validation, skipping the secondary prompt",
+      "Deletes the product",
+      "Locks the product",
+      "Sends email"
+    ],
+    "correct": 0,
+    "tip": "COMBINE.ACTIONS=YES auto-executes the cataloging step immediately after validation."
+  },
+  {
+    "id": 300,
+    "topic": "Product Factory",
+    "q": "How are products version-controlled?",
+    "options": [
+      "Composite key of PRODUCT.ID + EFFECTIVE.DATE",
+      "Random UUID",
+      "Filename",
+      "User ID"
+    ],
+    "correct": 0,
+    "tip": "Products and conditions are versioned by PRODUCT.ID + EFFECTIVE.DATE — supports future-dated changes."
+  }
+]

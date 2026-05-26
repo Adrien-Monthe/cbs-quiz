@@ -1,0 +1,11 @@
+# Local Python score data — keep private to your machine
+scores.json
+
+# Editor / OS junk
+.DS_Store
+Thumbs.db
+*.swp
+__pycache__/
+*.pyc
+.vscode/
+.idea/

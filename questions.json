@@ -10,7 +10,7 @@
       "A backup file of customer records"
     ],
     "correct": 1,
-    "tip": "A Table represents a logical business entity. Its execution, data structures, and physical storage are governed by a centralized and immutable Table Registry."
+    "tip": "A Table in CBS is the fundamental logical entity that holds banking records — think of it like a schema/container for one type of object (CUSTOMER, ACCOUNT, etc.). Its execution, data structures, and physical storage are all controlled by a central system index called the Table Registry, which acts as the authoritative service directory."
   },
   {
     "id": 2,
@@ -23,7 +23,7 @@
       "The Database Admin manually"
     ],
     "correct": 1,
-    "tip": "The centralized and immutable Table Registry acts as the system's service directory and ensures only authorized applications can operate."
+    "tip": "The Table Registry is the central, immutable index that governs every Table in CBS: it controls which programs can run, where data is stored, how it's classified, and how multi-company segregation is enforced. Without the Registry, a Table cannot operate — the system rejects any unregistered program or data definition."
   },
   {
     "id": 3,
@@ -36,7 +36,7 @@
       "A reporting engine"
     ],
     "correct": 1,
-    "tip": "The Table Registry acts as the system's service directory, enforcing authorization and strict multi-company data segregation rules."
+    "tip": "The Table Registry acts as the system's service directory. It enforces TWO key controls: (1) authorization — only programs registered in the Registry may execute; (2) multi-company segregation — data scoping rules ensure one company's transactional data cannot leak into another's reports or balances."
   },
   {
     "id": 4,
@@ -49,7 +49,7 @@
       "Network packets"
     ],
     "correct": 1,
-    "tip": "A Table represents a logical business entity containing a structured set of records related to a specific type of banking object."
+    "tip": "A Table represents one type of banking object — like CUSTOMER (party data), ACCOUNT (balances), or FUNDS.TRANSFER (payments). Each Table holds many Records (instances) and defines the data model, business rules, access controls, and integration points for that object type."
   },
   {
     "id": 5,
@@ -62,7 +62,7 @@
       "Physical disk firmware"
     ],
     "correct": 3,
-    "tip": "Tables define data models, business processing rules, access controls, and integration points — not hardware-level firmware."
+    "tip": "Tables define the LOGICAL banking object — its data model, business processing rules, access controls, and integration points. They don't manage hardware-level concerns like disk firmware or networking; those belong to the underlying database and OS layers."
   },
   {
     "id": 6,
@@ -75,7 +75,7 @@
       "By the user who created them"
     ],
     "correct": 1,
-    "tip": "Tables are categorized by their functionality and by how they handle financial data."
+    "tip": "Tables are categorized by their functional role (Customer/Entity, Account/Balance, Transactional, Loans/Deposits, System Config) AND by their financial classification (INT for installation-wide parameters, FIN for transactional financial data, CUS for customer data). Both axes together determine how a Table is used."
   },
   {
     "id": 7,
@@ -88,7 +88,7 @@
       "DATES"
     ],
     "correct": 1,
-    "tip": "The CUSTOMER table stores Master Data for individuals or corporates, assigning a unique Customer ID used to link future accounts and loans."
+    "tip": "The CUSTOMER Table holds the master data record for each individual or corporate client — fields like SHORT.NAME (display name), SECTOR (business segment), TARGET (customer target group), NATIONALITY. Each new client gets a unique Customer ID that ties together all their accounts, loans, and contracts."
   },
   {
     "id": 8,
@@ -101,7 +101,7 @@
       "DATE, HOLIDAY"
     ],
     "correct": 0,
-    "tip": "Key fields include SHORT.NAME, SECTOR, TARGET, and NATIONALITY."
+    "tip": "Key Fields on the CUSTOMER Table include SHORT.NAME (display name), SECTOR (e.g. retail vs corporate), TARGET (sub-segment for marketing/reporting), and NATIONALITY. These attributes drive how the customer is treated downstream — different sectors may get different products, pricing, or compliance treatment."
   },
   {
     "id": 9,
@@ -114,7 +114,7 @@
       "Currency exchange"
     ],
     "correct": 1,
-    "tip": "The USER table manages internal staff: tellers, branch managers, login credentials, department access rights."
+    "tip": "The USER Table represents internal bank STAFF (not customers) — tellers, managers, back-office staff. It holds login credentials, role assignments, allowed departments, and access rights. Don't confuse it with CUSTOMER (which holds clients of the bank). Audit fields INPUTTER/AUTHORISER reference USER IDs."
   },
   {
     "id": 10,
@@ -127,7 +127,7 @@
       "SIM"
     ],
     "correct": 1,
-    "tip": "CUSTOMER-related entities are typically classified as CUS (Customer level) or INT (Installation level)."
+    "tip": "Classification controls data scope. CUS (Customer) — tables holding client-related data, which may be shared or segregated by configuration; INT (Installation) — tables shared across all companies, like LANGUAGE; FIN (Financial) — strictly segregated transactional data per company."
   },
   {
     "id": 11,
@@ -140,7 +140,7 @@
       "DATES"
     ],
     "correct": 0,
-    "tip": "The ACCOUNT table maintains current, savings, or internal GL balances with fields like WORKING.BALANCE and CURRENCY."
+    "tip": "The ACCOUNT Table holds the current state of each banking account — balances, currency, the linked CUSTOMER, the CATEGORY (product type). It's the 'money living somewhere' Table: when a deposit happens, the WORKING.BALANCE field on the relevant ACCOUNT Record is updated."
   },
   {
     "id": 12,
@@ -153,7 +153,7 @@
       "CATEGORY"
     ],
     "correct": 1,
-    "tip": "When a customer deposits cash, the system updates the WORKING.BALANCE on the ACCOUNT table."
+    "tip": "When a customer deposits cash, the system updates the WORKING.BALANCE Field on their ACCOUNT Record — this is the current real-time balance available for transactions. The deposit transaction itself is captured in FUNDS.TRANSFER or TELLER; the ACCOUNT's running balance reflects the cumulative effect."
   },
   {
     "id": 13,
@@ -166,7 +166,7 @@
       "Tellers"
     ],
     "correct": 1,
-    "tip": "CATEGORY defines and groups products. E.g. accounts 1000-1999 may be Current and 6000-6999 Savings."
+    "tip": "The CATEGORY Table is the configuration table that defines and groups products. For example, you might configure ranges: accounts numbered 1000-1999 are 'Current Accounts', 6000-6999 are 'Savings Accounts'. CATEGORY drives reporting, accounting, and product behavior — without it, the bank wouldn't know what kind of account each ACCOUNT Record represents."
   },
   {
     "id": 14,
@@ -179,7 +179,7 @@
       "Suspense accounts"
     ],
     "correct": 1,
-    "tip": "In the example, the 1000-1999 range was used for Current Accounts and 6000-6999 for Savings Accounts."
+    "tip": "Account numbering ranges in the CATEGORY Table classify accounts by product. The textbook example: 1000-1999 = Current Accounts, 6000-6999 = Savings Accounts. CATEGORY is what lets reports group accounts by product family without each account having to store its product type as a string."
   },
   {
     "id": 15,
@@ -192,7 +192,7 @@
       "Define currency decimals"
     ],
     "correct": 1,
-    "tip": "FUNDS.TRANSFER drives the movement of funds via Internal, SWIFT, or Local payments."
+    "tip": "FUNDS.TRANSFER is the transactional Table for moving money. It supports Internal transfers (between own accounts), SWIFT (international), and Local (domestic clearing). Each transfer Record specifies a Debit Account (where the money comes FROM), a Credit Account (where it goes TO), the amount, and the transaction type."
   },
   {
     "id": 16,
@@ -205,7 +205,7 @@
       "SHORT.NAME"
     ],
     "correct": 0,
-    "tip": "FUNDS.TRANSFER key fields include DEBIT.ACCT.NO, CREDIT.ACCT.NO, DEBIT.AMOUNT, and TRANSACTION.TYPE."
+    "tip": "Key Fields on FUNDS.TRANSFER: DEBIT.ACCT.NO (source account), CREDIT.ACCT.NO (destination), DEBIT.AMOUNT (the value being moved), TRANSACTION.TYPE (Internal/SWIFT/Local). Together they capture the essential mechanics of any payment."
   },
   {
     "id": 17,
@@ -218,7 +218,7 @@
       "Currency definitions"
     ],
     "correct": 1,
-    "tip": "TELLER handles over-the-counter cash operations like USD 500 withdrawals at the branch."
+    "tip": "The TELLER Table records over-the-counter cash operations — cash withdrawals, deposits, currency exchanges done at a branch counter. When a customer walks in to withdraw USD 500, the teller uses this Table to record the cash-out and update vault balances. Distinct from FUNDS.TRANSFER, which is for account-to-account movements."
   },
   {
     "id": 18,
@@ -231,7 +231,7 @@
       "Holiday calendars"
     ],
     "correct": 0,
-    "tip": "AA.ARRANGEMENT manages the lifecycle of a specific loan or deposit contract (e.g. a 20-year mortgage)."
+    "tip": "AA.ARRANGEMENT (Arrangement Architecture Arrangement) is the Table that manages the LIFECYCLE of a specific loan or deposit contract. It ties together the interest rates, repayment schedule, fees, and penalty rules into one coherent Arrangement — the bank's record of 'this is John's specific 20-year mortgage'. It's the CBS equivalent of a Temenos ARRANGEMENT."
   },
   {
     "id": 19,
@@ -244,7 +244,7 @@
       "CATEGORY"
     ],
     "correct": 2,
-    "tip": "AA.ARRANGEMENT tracks contracts, linking interest rates, repayment schedules and penalties into one Arrangement."
+    "tip": "A 20-year mortgage is tracked as a single Arrangement Record in AA.ARRANGEMENT. The Arrangement ties together interest rates, the repayment schedule, late-payment penalties, collateral references — the full lifecycle of that specific contract. The Product (template) and Customer are referenced; the Arrangement is the specific instance."
   },
   {
     "id": 20,
@@ -257,7 +257,7 @@
       "TIME"
     ],
     "correct": 1,
-    "tip": "The DATES table controls the Bank Date and works with HOLIDAY to decide working days."
+    "tip": "The DATES Table controls the system's Bank Date — the date the system considers 'today' for processing. It can differ from the calendar date (e.g. during long batch cycles). It works with the HOLIDAY Table to skip weekends/holidays when advancing the date during End-of-Day (EOD) processing."
   },
   {
     "id": 21,
@@ -270,7 +270,7 @@
       "The CATEGORY table"
     ],
     "correct": 0,
-    "tip": "DATES references HOLIDAY to determine if today is a working day before accruing interest or processing payments."
+    "tip": "DATES looks up HOLIDAY when deciding whether to roll forward. If today's calendar date is a Saturday or a bank holiday, DATES won't advance the Bank Date through it — interest doesn't accrue, scheduled payments are postponed, etc. This is why batch interest calculations correctly handle non-working days without bespoke code."
   },
   {
     "id": 22,
@@ -283,7 +283,7 @@
       "TELLER"
     ],
     "correct": 1,
-    "tip": "CURRENCY defines ISO codes and exchange rate decimals (e.g. JPY allows no decimals, USD allows 2)."
+    "tip": "The CURRENCY Table defines ISO codes (USD, EUR, JPY...), the number of allowed decimal places per currency (USD = 2, JPY = 0), and exchange rate metadata. Any amount Field validated against CURRENCY automatically respects the right decimal rule, preventing things like 0.01 JPY transactions."
   },
   {
     "id": 23,
@@ -296,7 +296,7 @@
       "HOLIDAY flag"
     ],
     "correct": 2,
-    "tip": "CURRENCY defines exchange rate decimals — JPY has zero allowed, USD has two."
+    "tip": "CURRENCY defines the decimal places allowed per ISO currency. JPY = 0 (yen has no sub-units), USD = 2 (cents). When a Field is linked to CURRENCY, the system reads this metadata to validate inputs — entering 100.50 JPY would fail; 100.50 USD is fine. This is hot-swap config, not code."
   },
   {
     "id": 24,
@@ -309,7 +309,7 @@
       "BRANCH"
     ],
     "correct": 2,
-    "tip": "USER table defines internal staff access rights, departments, and login credentials."
+    "tip": "Internal staff management is the USER Table's job. It defines a teller's or manager's identity, allowed departments, access rights, and password. CUSTOMER is for clients of the bank; USER is for employees of the bank. The two are referenced separately by audit fields (USER) and contracts (CUSTOMER)."
   },
   {
     "id": 25,
@@ -322,7 +322,7 @@
       "Lock the branch"
     ],
     "correct": 0,
-    "tip": "The unique Customer ID created during onboarding links all future accounts and loans to that customer."
+    "tip": "The unique Customer ID is the primary key of the CUSTOMER Table. Once assigned during onboarding, it's the anchor for every downstream relationship: ACCOUNT Records reference it; AA.ARRANGEMENT (loans/deposits) reference it; FUNDS.TRANSFER Records may reference it. Without that ID, there's nothing to link the customer's activities together."
   },
   {
     "id": 26,
@@ -335,7 +335,7 @@
       "A user profile"
     ],
     "correct": 1,
-    "tip": "Every Table's foundation is mandatory registration in the system's index, which controls execution and storage."
+    "tip": "Every Table must be registered in the system's central index BEFORE it can be used. This mandatory registration is what enables central control over execution and storage — without a Registry entry, the Table can't operate at all. The Registry has two parts: PROGRAM (executables) and FILE (physical storage)."
   },
   {
     "id": 27,
@@ -348,7 +348,7 @@
       "SECURITY"
     ],
     "correct": 1,
-    "tip": "The PROGRAM Registry governs executable artifacts. The system blocks execution of any program lacking an active record there."
+    "tip": "The PROGRAM Registry is the index of executable artifacts — every program/script that can run in the system must have an active record here. This is a security control: the system strictly blocks the execution of any program lacking a Registry record, preventing unauthorized or rogue code from running."
   },
   {
     "id": 28,
@@ -361,7 +361,7 @@
       "It runs only on weekends"
     ],
     "correct": 1,
-    "tip": "The system strictly blocks the execution of any program that does not have an active record in the PROGRAM registry."
+    "tip": "Strict gateway enforcement: if a program isn't in the PROGRAM Registry, it does NOT run. The system refuses to execute it. This is a hard control to prevent unauthorized code execution — it's why all custom Plugins (Java/jBase) must be registered before they can be invoked from Projections."
   },
   {
     "id": 29,
@@ -374,7 +374,7 @@
       "CUSTOMER"
     ],
     "correct": 0,
-    "tip": "The FILE Registry determines the Table's physical database location, operational behavior, and data classification."
+    "tip": "The FILE Registry holds the metadata for every Table's physical storage — what kind of files it has (LIV, NAU, HIS, etc.), where they live, how they behave operationally, and how the data is classified (INT/FIN/CUS). Without a FILE Registry entry, the Table is non-existent to the system."
   },
   {
     "id": 30,
@@ -387,7 +387,7 @@
       "Phone numbers"
     ],
     "correct": 0,
-    "tip": "FILE registry defines physical location, operational behavior, and data classification (INT, FIN, CUS)."
+    "tip": "Besides physical location, the FILE Registry defines the Table's operational behavior (e.g. is it transactional, batch-friendly, etc.) and its classification — INT (Installation, globally shared), FIN (Financial, segregated per company), or CUS (Customer data). These three facts together govern how the Table is treated everywhere."
   },
   {
     "id": 31,
@@ -400,7 +400,7 @@
       "Backup frequency"
     ],
     "correct": 1,
-    "tip": "CLASSIFICATION enforces strict multi-company data segregation."
+    "tip": "CLASSIFICATION is a Table-level attribute set in the FILE Registry. Its purpose is to enforce strict multi-company data segregation — ensuring that, for example, Company A's accounts are completely isolated from Company B's, while shared parameters (like CURRENCY) remain available to both. Without CLASSIFICATION, data segregation would be ad-hoc and error-prone."
   },
   {
     "id": 32,
@@ -413,7 +413,7 @@
       "Initial setup"
     ],
     "correct": 1,
-    "tip": "INT (Installation) stores global parameters like COUNTRY or LANGUAGE that are universally shared across all companies."
+    "tip": "INT = Installation classification. INT Tables hold global parameters shared across ALL companies in the installation — e.g. COUNTRY codes, LANGUAGE codes, CURRENCY definitions. One copy of the data; every company sees it. Compare with FIN (Financial — strictly per-company) and CUS (Customer — configurable)."
   },
   {
     "id": 33,
@@ -426,7 +426,7 @@
       "Fixed assets only"
     ],
     "correct": 1,
-    "tip": "FIN (Financial) houses transactional data (ACCOUNT, FUNDS.TRANSFER) that must be strictly segregated by company."
+    "tip": "FIN = Financial classification. FIN Tables hold transactional data that MUST be segregated per company/book — e.g. ACCOUNT balances, FUNDS.TRANSFER records. This is a non-negotiable regulatory and accounting requirement: one company cannot see another's books."
   },
   {
     "id": 34,
@@ -439,7 +439,7 @@
       "Customs declarations"
     ],
     "correct": 1,
-    "tip": "CUS (Customer) manages client data that may be shared or segregated based on configuration rules."
+    "tip": "CUS = Customer classification. CUS Tables hold client data which may be either shared across companies or segregated per company, depending on the bank's configuration. This flexibility lets banking groups share a single customer view across subsidiaries when desired, or keep customers segregated by company when regulation requires."
   },
   {
     "id": 35,
@@ -452,7 +452,7 @@
       "SIM"
     ],
     "correct": 0,
-    "tip": "Global parameters like COUNTRY or LANGUAGE are INT (Installation) — universally shared."
+    "tip": "COUNTRY and LANGUAGE Tables hold globally-shared parameters — every company in the installation uses the same country codes and language codes. They're classified as INT (Installation), the classification reserved for installation-wide parameters that don't vary by company."
   },
   {
     "id": 36,
@@ -465,7 +465,7 @@
       "DEL"
     ],
     "correct": 1,
-    "tip": "Transactional data like ACCOUNT and FUNDS.TRANSFER is FIN (Financial) — strictly segregated by company."
+    "tip": "ACCOUNT (balances) and FUNDS.TRANSFER (payments) are transactional financial data. They're classified as FIN (Financial), meaning they're strictly segregated by the lead company or book. Each company keeps its own copies; nothing leaks across — required for separate accounting and regulatory reporting."
   },
   {
     "id": 37,
@@ -478,7 +478,7 @@
       "A vendor ID"
     ],
     "correct": 0,
-    "tip": "Every Table must be linked to a valid MODULE code (AC, ST, etc.), which determines its directory path in the database."
+    "tip": "Every Table is linked to a MODULE code (e.g. AC for Accounts, ST for Static data) which determines the Table's directory path inside the database. So the Table's physical location isn't arbitrary — it's resolved from the MODULE code via the FILE Registry. This systematic naming keeps the database organized."
   },
   {
     "id": 38,
@@ -491,7 +491,7 @@
       "By currency"
     ],
     "correct": 1,
-    "tip": "The physical structure is divided into distinct lifecycle spaces with strict cardinality rules to ensure data integrity."
+    "tip": "The Table's physical structure is partitioned into distinct lifecycle SPACES (a.k.a. file types): LIV (Live), NAU (Unauthorized drafts), HIS (History), DEL (Deleted drafts), and SIM (Simulation). Each space holds the same record ID in a different state — this is what enables strict data integrity and audit trails."
   },
   {
     "id": 39,
@@ -504,7 +504,7 @@
       "User session"
     ],
     "correct": 1,
-    "tip": "LIV is a singleton — strictly 1 record per ID — representing the currently active authorized state."
+    "tip": "LIV = Live. It holds the currently active, authorized version of every Record. LIV is a SINGLETON file: only ONE record per ID. So for CUSTOMER 123456, LIV holds exactly one current state — the authorized truth. The other lifecycle spaces (NAU, HIS) hold other states for the same ID."
   },
   {
     "id": 40,
@@ -517,7 +517,7 @@
       "A backup file"
     ],
     "correct": 1,
-    "tip": "NAU is a singleton (1 record per ID) that buffers uncommitted drafts (HOLD) and pending records (UNAU)."
+    "tip": "NAU = Unauthorized. It's the buffer file that holds in-flight changes: HOLD drafts (incomplete, unvalidated) and UNAU records (completed edits awaiting second-user approval). NAU is also a SINGLETON: only one record per ID. This is the key concurrency-control mechanism — if a NAU record exists for an ID, no one else can edit it."
   },
   {
     "id": 41,
@@ -530,7 +530,7 @@
       "Encrypted records only"
     ],
     "correct": 1,
-    "tip": "HIS supports many records per ID, distinguished by sequential suffixes like ;1, ;2, ;3 — the highest is the most recent historical state."
+    "tip": "HIS = History. Unlike LIV and NAU which are singletons, HIS supports MULTIPLE records per ID — each historical version gets a sequential suffix (ID;1, ID;2, ID;3, ...). HIS is the immutable archive: when a record is amended and the amendment is authorized, the OLD live version is copy-on-write archived into HIS."
   },
   {
     "id": 42,
@@ -543,7 +543,7 @@
       "Currency tables"
     ],
     "correct": 1,
-    "tip": "DEL is a singleton file that stores deleted unauthorized copies, preserving a forensic audit trail."
+    "tip": "DEL is the singleton file for deleted unauthorized records. Specifically: if a brand-new draft Record (SEQ.NO=1) is deleted from NAU before being authorized, it's moved to DEL to preserve a forensic audit trail. This way, even data that was input and then canceled is preserved for compliance."
   },
   {
     "id": 43,
@@ -556,7 +556,7 @@
       "Network simulation"
     ],
     "correct": 0,
-    "tip": "SIM holds simulation or what-if data, completely isolated from active or financial records."
+    "tip": "SIM = Simulation. It holds 'what-if' data — completely isolated from active financial records. SIM is where stress tests, scenario analyses, and proposal calculations live. Records in SIM cannot generate accounting entries or affect any other lifecycle file — perfect for risk analyses without contaminating real books."
   },
   {
     "id": 44,
@@ -569,7 +569,7 @@
       "Random padding"
     ],
     "correct": 1,
-    "tip": "The system automatically appends mandatory audit fields (RECORD.STATUS, INPUTTER, AUTHORISER, DATE.TIME, COMPANY) at the end of every Table."
+    "tip": "Every Table's data structure ends with a block of system-maintained AUDIT FIELDS (read-only). These include: RECORD.STATUS (e.g. UNAU, HOLD, LIVE, REVE), INPUTTER (multi-valued user IDs who created/edited each version), AUTHORISER (multi-valued user IDs who approved each version), DATE.TIME (timestamps), and COMPANY (where each action happened)."
   },
   {
     "id": 45,
@@ -582,7 +582,7 @@
       "The signature"
     ],
     "correct": 0,
-    "tip": "RECORD.STATUS reflects the operational state: UNAU, HOLD, LIVE, REVE etc."
+    "tip": "RECORD.STATUS is the audit Field that records the operational state of each Record. Values include: HOLD (unvalidated draft), UNAU (pending authorization), LIVE (currently active), REVE (reversed/canceled). The status drives which lifecycle file the Record lives in: HOLD/UNAU live in NAU; LIVE lives in LIV; REVE lives in HIS."
   },
   {
     "id": 46,
@@ -595,7 +595,7 @@
       "Booleans"
     ],
     "correct": 1,
-    "tip": "INPUTTER & AUTHORISER are multi-valued arrays capturing the User ID and Department of staff who created/modified and approved the record."
+    "tip": "INPUTTER and AUTHORISER are MULTI-VALUED audit Fields — arrays, not scalars. Each entry captures one cycle (who created the v1, who approved v1, who edited v2, who approved v2, etc.). They capture the user ID + department of every staff who created/modified vs approved the Record. Critical for fraud investigations."
   },
   {
     "id": 47,
@@ -608,7 +608,7 @@
       "Random sampling time"
     ],
     "correct": 1,
-    "tip": "DATE.TIME tracks the exact timestamps for every input and authorization."
+    "tip": "DATE.TIME is the audit Field that captures the exact timestamps of every input and authorization event on a Record. It's multi-valued alongside INPUTTER/AUTHORISER. Combined with COMPANY (also multi-valued), it tells you not just 'who and what' but 'where and when' every change happened."
   },
   {
     "id": 48,
@@ -621,7 +621,7 @@
       "An email"
     ],
     "correct": 1,
-    "tip": "COMPANY field stores the specific companies in which input/authorization actions occurred."
+    "tip": "COMPANY is an audit Field capturing which specific company/legal entity each action took place in. Important in multi-company installations — the same USER might work across Company A and Company B; the audit trail must show which company's books were touched. Multi-valued alongside INPUTTER/DATE.TIME."
   },
   {
     "id": 49,
@@ -634,7 +634,7 @@
       "Stored only in HIS"
     ],
     "correct": 1,
-    "tip": "Audit fields are system-maintained and read-only — they preserve a forensic trail and cannot be tampered with."
+    "tip": "Audit Fields (RECORD.STATUS, INPUTTER, AUTHORISER, DATE.TIME, COMPANY) are SYSTEM-MAINTAINED and READ-ONLY. Users cannot write to them directly. The system automatically updates them during INPUT, AUTH, REVERSE, and DELETE operations to preserve an unfalsifiable forensic trail. Tampering with them would defeat the audit framework."
   },
   {
     "id": 50,
@@ -647,7 +647,7 @@
       "Phone country code"
     ],
     "correct": 1,
-    "tip": "MODULE codes (AC, ST, etc.) determine the exact directory path where the Table is stored physically."
+    "tip": "MODULE codes (e.g. AC = Accounts, ST = Static) define WHERE in the database directory tree a Table's physical files live. So a Table linked to MODULE AC is stored in the AC directory path; ST goes elsewhere. This systematic placement keeps the database organized and enables efficient backup/recovery."
   },
   {
     "id": 51,
@@ -660,7 +660,7 @@
       "DEL"
     ],
     "correct": 0,
-    "tip": "LIV (Live) is the primary source of truth for the system's operational calculations."
+    "tip": "LIV (Live) holds the current, fully authorized state of a Record. It's the primary source of truth for all the system's operational calculations — interest accrual, balance lookups, reporting, ledger postings. When a record is in LIV, it's 'live' in the bank's books."
   },
   {
     "id": 52,
@@ -673,7 +673,7 @@
       "Zero"
     ],
     "correct": 0,
-    "tip": "LIV is a singleton — strictly 1 record per ID."
+    "tip": "LIV is a SINGLETON file — strictly ONE record per ID. This means there's only one 'live' version of CUSTOMER 123456 at any time. If you need to see older versions, they're in HIS. If a draft is pending, it's in NAU. LIV holds only the current authorized state."
   },
   {
     "id": 53,
@@ -686,7 +686,7 @@
       "Branch addresses"
     ],
     "correct": 1,
-    "tip": "NAU holds uncommitted data: drafts in HOLD status and edits awaiting approval in UNAU status."
+    "tip": "The NAU (Unauthorized) file is a BUFFER. It holds work-in-progress: HOLD records (incomplete drafts the user saved to resume later, unvalidated) and UNAU records (completed edits awaiting second-user approval per the 4-Eyes Principle). NAU records are not yet in the books — they can't post to the GL."
   },
   {
     "id": 54,
@@ -699,7 +699,7 @@
       "Only with manager override"
     ],
     "correct": 1,
-    "tip": "Financial Isolation: Records residing in NAU cannot generate accounting entries or update the General Ledger."
+    "tip": "Records in NAU are 'Financially Isolated' — they cannot generate accounting entries or affect the General Ledger. This is by design: NAU holds DRAFTS and PENDING records, not authorized truth. Only when a NAU record is AUTH'd does it move to LIV and become eligible to post to the ledger."
   },
   {
     "id": 55,
@@ -712,7 +712,7 @@
       "Only at year-end"
     ],
     "correct": 1,
-    "tip": "NAU allows only one record per ID, so a record cannot be in UNAU and HOLD at the same time."
+    "tip": "NAU is a SINGLETON file: only ONE record per ID at a time. Because of this cardinality constraint, a single record can't be in both UNAU (awaiting authorization) AND HOLD (unvalidated draft) simultaneously — the file would have nowhere to put two records under the same ID."
   },
   {
     "id": 56,
@@ -725,7 +725,7 @@
       "Doubles the data"
     ],
     "correct": 1,
-    "tip": "Edit Locking via NAU prevents concurrent modification — the system returns a Record Locked error."
+    "tip": "Edit locking via NAU prevents concurrent modification. If Alice has a draft of CUSTOMER 123456 sitting in NAU, and Bob tries to edit the same record, NAU has no room for a second draft (it's a singleton). The system returns 'Record Locked' so Alice's pending work isn't overwritten — built-in concurrency control."
   },
   {
     "id": 57,
@@ -738,7 +738,7 @@
       "Pure cache"
     ],
     "correct": 1,
-    "tip": "HIS supports multiple records per ID and acts as an immutable, read-only archive."
+    "tip": "HIS (History) is the immutable archive of past versions. Unlike LIV and NAU which are singletons, HIS supports MANY records per ID — each historical version is suffixed (ID;1, ID;2, ID;3). When a Record is amended and authorized, the old version is copy-on-write moved into HIS. The chain in HIS is permanent and read-only."
   },
   {
     "id": 58,
@@ -751,7 +751,7 @@
       "Disk full"
     ],
     "correct": 1,
-    "tip": "Copy-on-Write: upon authorization of an amendment, the pre-amendment LIV record is moved to HIS before the new version becomes active."
+    "tip": "Copy-on-Write: when an amendment to a Record is AUTH'd (authorized), the system FIRST moves the old LIV version to HIS (giving it the next suffix, e.g. ID;n), THEN promotes the new authorized version into LIV. This way HIS accumulates every prior version automatically — no manual archiving needed."
   },
   {
     "id": 59,
@@ -764,7 +764,7 @@
       "By timestamp only"
     ],
     "correct": 1,
-    "tip": "Historical records use sequential suffixes (ID;1, ID;2…), with the highest representing the most recent historical state."
+    "tip": "Historical versions in HIS are distinguished by sequential suffixes: ID;1 (oldest archived), ID;2, ID;3, ... The HIGHEST suffix represents the most-recently archived version (the last LIV state before the current one). This lets auditors retrieve specific historical states by ID;n."
   },
   {
     "id": 60,
@@ -777,7 +777,7 @@
       "Deleting history"
     ],
     "correct": 0,
-    "tip": "HISTORY_RESTORE retrieves a specific version from HIS and reinstates it as the active record."
+    "tip": "HISTORY_RESTORE is the operation that retrieves a specific past version from HIS and reinstates it as the current Record. For FIN/CUS Tables, restoration goes through a HNAU (History Restore Not Authorized) review-and-approve cycle in NAU; for INT Tables it can overwrite LIV directly. Useful for reversing an erroneous later amendment."
   },
   {
     "id": 61,
@@ -790,7 +790,7 @@
       "An encryption key store"
     ],
     "correct": 1,
-    "tip": "DEL is a singleton file holding deleted unauthorized copies."
+    "tip": "DEL holds DELETED UNAUTHORIZED records. Specifically: if a brand-new Record (SEQ.NO=1) was input but then deleted from NAU before ever being authorized, DEL preserves it for forensic audit. DEL is a SINGLETON (one record per ID) and exists purely to retain evidence of canceled drafts."
   },
   {
     "id": 62,
@@ -803,7 +803,7 @@
       "It becomes HIS;1"
     ],
     "correct": 1,
-    "tip": "Forensic Delete: a brand-new record (SEQ.NO=1) deleted from NAU is moved to DEL to preserve a forensic trail."
+    "tip": "Forensic Delete: when a brand-new (SEQ.NO=1) Record is deleted from the NAU buffer before authorization, the data goes to DEL rather than disappearing. This preserves a forensic audit trail of EVERYTHING that was ever input — even data the user canceled. Required for compliance investigations."
   },
   {
     "id": 63,
@@ -816,7 +816,7 @@
       "Locked permanently"
     ],
     "correct": 1,
-    "tip": "For amendments (SEQ.NO>1), the draft is physically removed from NAU without writing to DEL because the base still exists in LIV and HIS."
+    "tip": "When you delete an AMENDMENT (SEQ.NO>1) draft from NAU, the data is just removed from NAU — nothing goes to DEL. Why? Because the underlying base Record still exists in LIV (and earlier versions in HIS), so there's no need to preserve the deleted amendment separately — the audit chain is already intact."
   },
   {
     "id": 64,
@@ -829,7 +829,7 @@
       "Server monitoring"
     ],
     "correct": 0,
-    "tip": "SIM holds simulation data and is completely isolated from active or financial records."
+    "tip": "SIM = Simulation file. It holds what-if data completely isolated from live and financial records. Stress tests, what-if loan calculations, scenario analyses all go in SIM. Anything written here is incapable of generating accounting entries or affecting any other lifecycle file."
   },
   {
     "id": 65,
@@ -842,7 +842,7 @@
       "Disk capacity"
     ],
     "correct": 1,
-    "tip": "SIM is completely isolated so what-if scenarios never impact real financial records."
+    "tip": "Isolation is the point of SIM. Without it, what-if calculations might accidentally affect real customer balances or GL postings. SIM provides a sandbox space inside the same system, governed by the same Tables and rules, but with zero risk of touching real financials."
   },
   {
     "id": 66,
@@ -855,7 +855,7 @@
       "SIM"
     ],
     "correct": 0,
-    "tip": "NAU enforces edit-locking by holding the uncommitted draft and blocking concurrent edits to the same LIV record."
+    "tip": "Edit-locking concurrency control happens through the NAU file. Because NAU is a singleton, only one user can have a draft on a given Record at a time. Any second user trying to edit the same Record gets 'Record Locked'. This protects pending work without needing distributed lock servers."
   },
   {
     "id": 67,
@@ -868,7 +868,7 @@
       "DEL"
     ],
     "correct": 2,
-    "tip": "HIS is the immutable, read-only archive storing previous versions."
+    "tip": "HIS is the IMMUTABLE, READ-ONLY archive. You can't edit HIS records — they're frozen snapshots. The only way to bring a HIS version back is HISTORY.RESTORE, which copies it into NAU for review/authorization (FIN/CUS) or directly into LIV (INT). This immutability is what makes HIS a trustworthy audit trail."
   },
   {
     "id": 68,
@@ -881,7 +881,7 @@
       "Zero"
     ],
     "correct": 0,
-    "tip": "LIV is strictly 1 record per ID (singleton)."
+    "tip": "LIV cardinality: strictly ONE record per ID (singleton). Whatever the current authorized state of CUSTOMER 123456 is, that's the single record in LIV. Earlier states live in HIS; pending drafts live in NAU. Singleton means LIV always represents 'the current truth'."
   },
   {
     "id": 69,
@@ -894,7 +894,7 @@
       "Limited to 10"
     ],
     "correct": 1,
-    "tip": "HIS supports multiple records per ID using sequential suffixes."
+    "tip": "HIS cardinality: MANY records per ID. Each prior version gets a sequential suffix (;1, ;2, ;3...). HIS supports unlimited historical versions, capturing the full audit timeline. The highest suffix = the most recently archived version. This is the only lifecycle file that allows multiple records per ID."
   },
   {
     "id": 70,
@@ -907,7 +907,7 @@
       "Unlimited"
     ],
     "correct": 0,
-    "tip": "NAU is a singleton — only 1 record per ID, enforcing the cardinality constraint."
+    "tip": "NAU cardinality: ONE record per ID (singleton). This singleton constraint is critical — it's what enforces edit locking (no two drafts for the same record) and prevents a record from being in HOLD and UNAU statuses simultaneously. Only ONE in-flight change per ID at a time."
   },
   {
     "id": 71,
@@ -920,7 +920,7 @@
       "Zero"
     ],
     "correct": 0,
-    "tip": "DEL is also a singleton file (1 record per ID)."
+    "tip": "DEL cardinality: ONE record per ID (singleton). DEL holds deleted brand-new drafts for forensic audit; one deleted draft per record ID. Once the audit period passes (per the bank's retention policy), DEL records may eventually be purged — but during their life, they're singletons."
   },
   {
     "id": 72,
@@ -933,7 +933,7 @@
       "Branch hours"
     ],
     "correct": 0,
-    "tip": "The FILE registry dictates the valid physical file types (spaces or buckets) for every registered Table."
+    "tip": "The FILE Registry is the authoritative configuration that specifies which physical file types (LIV, NAU, HIS, DEL, SIM) each Table uses. A Table's CLASSIFICATION drives the file types — e.g. an INT Table might not need NAU (because it uses 0-Auth direct writes). The Registry makes these choices explicit."
   },
   {
     "id": 73,
@@ -946,7 +946,7 @@
       "Round-robin"
     ],
     "correct": 1,
-    "tip": "Records of the same ID are partitioned across LIV, NAU, HIS, DEL, SIM based on the current state."
+    "tip": "The FILE Registry partitions a single record ID across distinct physical files based on its CURRENT STATE. For example, CUSTOMER 123456 might exist with state LIVE in LIV, with status UNAU as a draft in NAU, with three prior versions in HIS (;1, ;2, ;3). The Registry coordinates this partitioning."
   },
   {
     "id": 74,
@@ -959,7 +959,7 @@
       "Deleted"
     ],
     "correct": 1,
-    "tip": "HOLD is an unvalidated, incomplete draft saved in NAU."
+    "tip": "HOLD is a record status in NAU. It means: 'unvalidated draft saved by the user'. The user pressed HOLD instead of INPUT because they weren't ready to validate yet — maybe they need to verify something or step away. HOLD records survive crashes (they're persisted in NAU) and can be resumed later."
   },
   {
     "id": 75,
@@ -972,7 +972,7 @@
       "A deleted record"
     ],
     "correct": 1,
-    "tip": "UNAU is a completed edit pending second-user approval."
+    "tip": "UNAU is the record status in NAU for a 'completed edit awaiting authorization'. The user pressed INPUT (which ran validation), the data passed, but a second user still has to AUTH it before it can become LIVE. UNAU is the heart of the 4-Eyes Principle."
   },
   {
     "id": 76,
@@ -985,7 +985,7 @@
       "Recovered"
     ],
     "correct": 1,
-    "tip": "REVE indicates a reversed transaction archived in HIS."
+    "tip": "REVE is the status in HIS for a record that was REVERSED (canceled after being live). REVE marks the terminal state of a reversed transaction. The full REVERSE flow: LIV → moved to NAU as RNAU → AUTH'd → moved to HIS as REVE. The reversal is now permanent and audit-trail-complete."
   },
   {
     "id": 77,
@@ -998,7 +998,7 @@
       "Holiday Not Auth"
     ],
     "correct": 1,
-    "tip": "HNAU is a History Restore Not Authorized record created in NAU when restoring a previous version."
+    "tip": "HNAU stands for 'History Restore Not Authorized'. When you invoke HISTORY.RESTORE on a FIN/CUS Record, the system copies the chosen historical version into NAU with status HNAU — pending a second-user AUTH before it becomes the new LIV record. The H means 'this restoration originated from HIS'."
   },
   {
     "id": 78,
@@ -1011,7 +1011,7 @@
       "Random Number"
     ],
     "correct": 0,
-    "tip": "RNAU = Reversal Not Auth, used when a reversal is pending approval."
+    "tip": "RNAU stands for 'Reversal Not Authorized'. When you REVERSE a LIV Record, it's moved into NAU with status RNAU. A second user must AUTH the reversal, at which point it moves to HIS with status REVE. The R distinguishes a pending reversal from a normal pending edit (UNAU)."
   },
   {
     "id": 79,
@@ -1024,7 +1024,7 @@
       "Logs are copied"
     ],
     "correct": 0,
-    "tip": "Copy-on-Write: upon authorization, the old LIV record is copied/moved to HIS before the new version takes its place."
+    "tip": "Copy-on-Write describes the AUTH-time behavior: when an amendment is authorized, the system copies the OLD LIV record into HIS (giving it the next sequential suffix) BEFORE the new amended version replaces it in LIV. This way HIS always retains a complete history without users having to remember to archive."
   },
   {
     "id": 80,
@@ -1037,7 +1037,7 @@
       "SIM"
     ],
     "correct": 2,
-    "tip": "HIS holds the historical versions ID;1, ID;2, ID;3."
+    "tip": "If you want to see all of a customer's prior versions, look in HIS — it's the immutable archive of every authorized prior state. Versions are numbered ID;1, ID;2, ID;3 in chronological order of when they were superseded. Current LIV is separate; HIS holds everything that came before."
   },
   {
     "id": 81,
@@ -1050,7 +1050,7 @@
       "SIM"
     ],
     "correct": 1,
-    "tip": "A brand-new (SEQ.NO=1) record canceled from NAU lands in DEL for forensic purposes."
+    "tip": "A brand-new (SEQ.NO=1) draft that was canceled from NAU is in DEL. DEL exists specifically to capture this case — a Record that was input but never made it to LIV. Without DEL, this canceled data would simply vanish; with DEL, auditors can review every cancellation."
   },
   {
     "id": 82,
@@ -1063,7 +1063,7 @@
       "Stores manager passwords"
     ],
     "correct": 0,
-    "tip": "NAU holds the UNAU draft until a second user authorizes it, enforcing the 4-eyes principle."
+    "tip": "NAU's role in the 4-Eyes Principle: the Initiator's INPUT creates a draft in NAU as UNAU (Unauthorized). The Authoriser (a different user) sees the pending UNAU in NAU and AUTH-approves it, moving it to LIV. NAU is the holding area between input and approval — without it, there'd be no place to park 'pending' records."
   },
   {
     "id": 83,
@@ -1076,7 +1076,7 @@
       "DEL"
     ],
     "correct": 1,
-    "tip": "Resolution Waterfall: NAU is checked first, then LIV, then HIS, then ARC."
+    "tip": "When you ask 'what's the latest state of this record?', the Resolution Waterfall checks NAU FIRST (so pending drafts surface), then LIV (the current authorized state), then HIS (historical versions), then ARC (archive). This priority means users always see the most relevant in-flight state, not stale LIV when a draft exists."
   },
   {
     "id": 84,
@@ -1089,7 +1089,7 @@
       "Customer count limit"
     ],
     "correct": 1,
-    "tip": "NAU is a singleton; HOLD and UNAU statuses cannot coexist for the same ID."
+    "tip": "NAU's cardinality constraint (one record per ID) is intentional. It serves multiple purposes: prevents two simultaneous drafts, prevents HOLD+UNAU coexistence for the same record, and provides natural edit locking. The single-slot design is a deliberate concurrency-control mechanism."
   },
   {
     "id": 85,
@@ -1102,7 +1102,7 @@
       "SIM"
     ],
     "correct": 3,
-    "tip": "SIM structure varies based on the simulation use case."
+    "tip": "SIM is the lifecycle space whose structure isn't fixed per Table — it can vary based on the simulation use case. Stress tests might need a particular structure; what-if loan calcs might need a different one. SIM gives flexibility because it's isolated from real data — no need for the rigid cardinality of LIV/NAU."
   },
   {
     "id": 86,
@@ -1115,7 +1115,7 @@
       "Depends on time of day"
     ],
     "correct": 1,
-    "tip": "The highest suffix number represents the most recent historical state."
+    "tip": "In HIS, ID;3 is MORE RECENT than ID;1. The suffix numbering reflects archival ORDER: each time a LIV record is replaced (by an authorized amendment), the old LIV moves to HIS with the next available suffix. So higher suffix = more recently archived = more recent prior state."
   },
   {
     "id": 87,
@@ -1128,7 +1128,7 @@
       "To duplicate LIV"
     ],
     "correct": 1,
-    "tip": "DEL preserves a forensic audit trail of data that was input but ultimately rejected before becoming live."
+    "tip": "DEL exists for forensic audit. When a brand-new (SEQ.NO=1) draft Record is deleted before being authorized, DEL preserves it. This way, regulators can verify the FULL history of what was input — including data that was input then canceled. Without DEL, evidence of cancellations would be lost forever."
   },
   {
     "id": 88,
@@ -1141,7 +1141,7 @@
       "False — they merge automatically"
     ],
     "correct": 0,
-    "tip": "A LIV record can have a concurrent NAU draft (e.g. UNAU). Resolution Waterfall surfaces the most relevant state."
+    "tip": "Yes — a Record can be in LIV (as the current authorized state) and in NAU (as a pending edit or HOLD draft) at the same time. They're DIFFERENT lifecycle files holding the SAME ID but different states. The Resolution Waterfall in Projections surfaces the most relevant state (NAU first if it exists, else LIV)."
   },
   {
     "id": 89,
@@ -1154,7 +1154,7 @@
       "Auth bypass"
     ],
     "correct": 1,
-    "tip": "NAU's singleton nature prevents two users from editing the same LIV record concurrently."
+    "tip": "NAU's edit locking is what prevents two users from concurrently editing the same LIV record without conflict. Because NAU is a singleton, the first user's draft occupies the slot; the second user can't start a competing draft until the first is resolved (AUTH'd, DELETE'd, or aged out). No distributed lock manager needed."
   },
   {
     "id": 90,
@@ -1167,7 +1167,7 @@
       "Easier debugging"
     ],
     "correct": 1,
-    "tip": "Distinct lifecycle spaces with strict cardinality rules ensure data integrity and lifecycle consistency."
+    "tip": "Distinct lifecycle spaces (LIV, NAU, HIS, DEL, SIM) with strict cardinality rules (singletons for LIV/NAU/DEL; many-per-ID for HIS; flexible for SIM) ensure data integrity. Each space has a specific role; together they enforce immutability of history, isolation of drafts, edit locking, and forensic capture of cancellations."
   },
   {
     "id": 91,
@@ -1180,7 +1180,7 @@
       "AUTH"
     ],
     "correct": 1,
-    "tip": "SEE retrieves and displays a record using the Resolution Waterfall (NAU → LIV → HIS → ARC)."
+    "tip": "SEE is the read operation — it retrieves and displays a Record. It uses the Resolution Waterfall to find the most relevant version: NAU first (so pending drafts surface), then LIV (current authorized), then HIS (historical), then ARC (deep archive). If no version exists anywhere, it returns 'Record not found'."
   },
   {
     "id": 92,
@@ -1193,7 +1193,7 @@
       "ARC → LIV → NAU → HIS"
     ],
     "correct": 1,
-    "tip": "Resolution Waterfall: NAU first, then LIV, then HIS, then ARC."
+    "tip": "SEE's Resolution Waterfall order: NAU (Unauthorized — pending drafts) → LIV (Live — current authorized) → HIS (History — archived versions) → ARC (deep Archive). The reason NAU comes first: if the user has an in-flight draft, they should see THAT, not the stale LIV. This priority is built into the read path."
   },
   {
     "id": 93,
@@ -1206,7 +1206,7 @@
       "A draft"
     ],
     "correct": 1,
-    "tip": "If no record exists in any space (NAU, LIV, HIS, ARC), SEE returns 'Record not found'."
+    "tip": "'Record not found' is returned by SEE only when ALL four lifecycle layers (NAU, LIV, HIS, ARC) are empty for the given ID. The record genuinely doesn't exist anywhere. This is distinct from 'Record Locked' (which means a NAU draft exists owned by someone else)."
   },
   {
     "id": 94,
@@ -1219,7 +1219,7 @@
       "Skips validation"
     ],
     "correct": 1,
-    "tip": "INPUT on FIN/CUS validates immediately and creates the record in NAU as UNAU, awaiting authorization."
+    "tip": "INPUT on FIN/CUS Tables runs validation, then writes the Record to NAU with status UNAU (Unauthorized). The record is NOT yet live — it sits in NAU awaiting a second user's AUTH approval. This is the standard 4-Eyes flow for sensitive transactional data."
   },
   {
     "id": 95,
@@ -1232,7 +1232,7 @@
       "Reverses"
     ],
     "correct": 1,
-    "tip": "For INT tables with 0-Auth, INPUT bypasses NAU and writes directly to LIV after validation."
+    "tip": "INPUT on INT Tables behaves differently if the Table is configured for 0-Auth: validation still runs, but the record is written DIRECTLY to LIV (bypassing NAU). The old LIV record is moved to HIS at the same time. This is reserved for low-risk installation parameters (like CURRENCY) where 4-Eyes adds friction without security benefit."
   },
   {
     "id": 96,
@@ -1245,7 +1245,7 @@
       "DEL"
     ],
     "correct": 1,
-    "tip": "HOLD saves an unvalidated draft into NAU with status HOLD."
+    "tip": "HOLD saves an UNVALIDATED draft into NAU with status HOLD. Unlike INPUT, no validation runs — the user can save partial/incomplete work and resume later. The draft persists across sessions (it's in NAU on disk), so a crash won't lose it. HOLD = 'I'm not done, save and let me come back'."
   },
   {
     "id": 97,
@@ -1258,7 +1258,7 @@
       "Only for INT"
     ],
     "correct": 1,
-    "tip": "HOLD saves a draft without validation — the user can return later to complete it."
+    "tip": "HOLD intentionally SKIPS validation. The whole point of HOLD is to let users save in-progress work without needing all fields to be valid yet. INPUT runs validation; HOLD doesn't. When the user returns and presses INPUT, validation then runs against the completed data."
   },
   {
     "id": 98,
@@ -1271,7 +1271,7 @@
       "User permissions"
     ],
     "correct": 1,
-    "tip": "NAU's singleton nature means HOLD would overwrite the pending UNAU record — so it is blocked."
+    "tip": "If a record with UNAU status already exists in NAU (a completed edit awaiting authorization), HOLD on the same ID is BLOCKED. Why? Because NAU is a singleton (one record per ID). If HOLD wrote a draft on top of the UNAU, the pending committed work would be lost. The system protects it by refusing the HOLD."
   },
   {
     "id": 99,
@@ -1284,7 +1284,7 @@
       "Sends to HIS"
     ],
     "correct": 1,
-    "tip": "VALIDATE evaluates rules and returns Success or Error without persisting any data."
+    "tip": "VALIDATE runs the business rules against a payload but does NOT save anything. It returns Success or Error. The use case: front-end forms can VALIDATE-check the data as the user fills it in, giving instant feedback without persisting half-baked data to NAU."
   },
   {
     "id": 100,
@@ -1297,7 +1297,7 @@
       "Customer service phone IVR"
     ],
     "correct": 1,
-    "tip": "Front-end clients use VALIDATE to verify data before final submission."
+    "tip": "Front-end clients use VALIDATE to verify data before final submission. The user fills the form; the client calls VALIDATE; the server returns Success or Error; the user fixes any issues; finally the client calls INPUT to commit. VALIDATE is the 'dry run' that's perfect for instant UX feedback."
   },
   {
     "id": 101,
@@ -1310,7 +1310,7 @@
       "Hot-swap"
     ],
     "correct": 1,
-    "tip": "AUTH executes the Four-Eyes principle by requiring a second user to approve pending changes."
+    "tip": "AUTH (authorize) implements the 4-Eyes Principle: it requires a DIFFERENT user (the Authoriser) to approve a record that another user (the Initiator) created. AUTH moves a NAU record (UNAU, HNAU, or RNAU statuses) into LIV (or for reversals, into HIS as REVE)."
   },
   {
     "id": 102,
@@ -1323,7 +1323,7 @@
       "HIS is purged"
     ],
     "correct": 0,
-    "tip": "AUTH moves UNAU (or HNAU) into LIV and archives the replaced LIV record to HIS."
+    "tip": "When AUTH is called on a UNAU record in NAU: (1) the record moves from NAU to LIV with status LIVE; (2) the previous LIV record (if any) is copy-on-write archived into HIS with the next sequential suffix. So one AUTH triggers two file moves, maintaining the audit chain."
   },
   {
     "id": 103,
@@ -1336,7 +1336,7 @@
       "SIM → LIV"
     ],
     "correct": 0,
-    "tip": "AUTH moves RNAU records to REVE status and into HIS to complete a reversal."
+    "tip": "AUTH handles three cases: (1) UNAU → LIV (standard authorization), (2) HNAU → LIV (history restore authorization), and (3) RNAU → HIS as REVE (reversal authorization). In all three cases, AUTH is the gateway between 'pending' and 'committed'."
   },
   {
     "id": 104,
@@ -1349,7 +1349,7 @@
       "Sends email"
     ],
     "correct": 0,
-    "tip": "REVERSE on FIN/CUS moves the LIV record to NAU as RNAU, requiring a second user to authorize the cancellation."
+    "tip": "REVERSE on a FIN/CUS Table doesn't immediately undo the transaction — it creates an RNAU (Reversal Not Authorized) entry in NAU. A second user must AUTH the reversal. Only after AUTH does the reversal complete, moving the record to HIS with status REVE. This applies 4-Eyes to reversals just like to inputs."
   },
   {
     "id": 105,
@@ -1362,7 +1362,7 @@
       "Locks the system"
     ],
     "correct": 1,
-    "tip": "REVERSE on INT directly moves the LIV record to HIS with REVE status — no secondary approval required."
+    "tip": "REVERSE on an INT Table (especially 0-Auth ones) is simpler: it directly moves the LIV record to HIS with status REVE, no second user required. This applies to low-risk installation parameters where requiring two users to undo would add friction without security benefit."
   },
   {
     "id": 106,
@@ -1375,7 +1375,7 @@
       "Locks system"
     ],
     "correct": 0,
-    "tip": "For SEQ.NO=1, DELETE moves the draft from NAU to DEL, preserving forensic audit."
+    "tip": "DELETE on a brand-new (SEQ.NO=1) NAU draft: the record moves from NAU to DEL. This preserves a forensic audit trail of the canceled draft. So even though the user 'deleted' the record, evidence of its existence is retained for compliance review."
   },
   {
     "id": 107,
@@ -1388,7 +1388,7 @@
       "Moves to SIM"
     ],
     "correct": 1,
-    "tip": "For SEQ.NO>1, DELETE physically removes from NAU without writing to DEL since the base still exists in LIV/HIS."
+    "tip": "DELETE on an AMENDMENT (SEQ.NO>1) NAU draft: the record is simply removed from NAU — NOTHING is written to DEL. Why? Because the underlying base record still exists in LIV (and earlier versions in HIS), so the audit chain is already intact. Deleting an amendment is treated as a 'cancel amendment' action."
   },
   {
     "id": 108,
@@ -1401,7 +1401,7 @@
       "SIM entry"
     ],
     "correct": 0,
-    "tip": "On FIN/CUS, HISTORY.RESTORE creates HNAU in NAU so a second user can authorize the restore."
+    "tip": "HISTORY.RESTORE on FIN/CUS Tables creates a HNAU (History Restore Not Authorized) entry in NAU. A second user must then AUTH the restoration before the historical version becomes the new LIV record. This applies 4-Eyes to historical restores — you can't sneak a past state back into production without approval."
   },
   {
     "id": 109,
@@ -1414,7 +1414,7 @@
       "Sends approval email"
     ],
     "correct": 1,
-    "tip": "On INT tables, HISTORY.RESTORE directly overwrites LIV with the historical version."
+    "tip": "HISTORY.RESTORE on INT Tables (especially 0-Auth ones) can directly overwrite the LIV record with the chosen historical version. The current LIV moves to HIS for audit purposes. This is allowed because INT parameters are typically low-risk."
   },
   {
     "id": 110,
@@ -1427,7 +1427,7 @@
       "HIS only"
     ],
     "correct": 1,
-    "tip": "0-Auth applies to INT global parameter tables like CURRENCY — bypassing NAU."
+    "tip": "0-Auth is a Table-level configuration applied to specific INT (Installation) Tables like CURRENCY. It bypasses the NAU buffer entirely — INPUT writes directly to LIV (with the old LIV moving to HIS for audit). The 4-Eyes Principle is skipped for these low-risk global parameters."
   },
   {
     "id": 111,
@@ -1440,7 +1440,7 @@
       "Goes to DEL"
     ],
     "correct": 1,
-    "tip": "Under 0-Auth: old LIV → HIS, new input → LIV directly. No NAU involvement."
+    "tip": "Under 0-Auth, when a user commits a change: the old LIV record is written to HIS (preserving audit), and the new input is written DIRECTLY to LIV (becoming the active version). NAU is bypassed. This works because INT parameters change rarely and aren't sensitive financial data."
   },
   {
     "id": 112,
@@ -1453,7 +1453,7 @@
       "Only via SQL"
     ],
     "correct": 1,
-    "tip": "Direct database modifications are prohibited. All interactions go through standardized operations."
+    "tip": "Direct database modifications (SQL UPDATE on the underlying tables) are STRICTLY PROHIBITED in CBS. All interactions must go through the standard operations (SEE, INPUT, AUTH, etc.) which enforce validation, authorization, audit, and lifecycle rules. Bypassing them would defeat every control the system provides."
   },
   {
     "id": 113,
@@ -1466,7 +1466,7 @@
       "ADD, SUB, MULT, DIV"
     ],
     "correct": 0,
-    "tip": "Standard ops are SEE, INPUT, HOLD, VALIDATE, AUTH, REVERSE, DELETE, HISTORY.RESTORE."
+    "tip": "The eight standard operations are: SEE (read), INPUT (create/edit), HOLD (save draft), VALIDATE (dry-run rules), AUTH (approve), REVERSE (cancel a LIV record), DELETE (cancel a NAU draft), HISTORY.RESTORE (reinstate a past version). These are the ONLY ways to interact with Records — direct DB modification is forbidden."
   },
   {
     "id": 114,
@@ -1479,7 +1479,7 @@
       "For backup"
     ],
     "correct": 1,
-    "tip": "FIN/CUS INPUT goes to NAU because authorization is required before financial impact."
+    "tip": "FIN/CUS INPUT routes through NAU specifically to enforce the 4-Eyes Principle. The Initiator's input goes to NAU as UNAU; a different user must AUTH it before it affects LIV (and the GL). Without NAU as a buffer, there'd be no place to park 'pending' records awaiting approval."
   },
   {
     "id": 115,
@@ -1492,7 +1492,7 @@
       "Always HIS"
     ],
     "correct": 0,
-    "tip": "Without 0-Auth, INT INPUT also routes through NAU like FIN/CUS for authorization."
+    "tip": "Without 0-Auth configured, an INT Table's INPUT behaves like FIN/CUS — routing through NAU as UNAU, requiring a second user's AUTH. Tables with 0-Auth (like CURRENCY) are explicitly configured to skip NAU. 0-Auth is opt-in, not default."
   },
   {
     "id": 116,
@@ -1505,7 +1505,7 @@
       "Inverted Auth"
     ],
     "correct": 1,
-    "tip": "INAU is the unauthorized-record flag indicating an active draft awaiting approval."
+    "tip": "INAU is a flag/status used in Projections and Enquiries to indicate that an authorized LIV record has a PENDING unauthorized draft in NAU. So when Enquiries do Virtual Data Merging, they show the row with an INAU marker to alert users that an unauthorized change is in-flight. It's the visible signal of a pending edit."
   },
   {
     "id": 117,
@@ -1518,7 +1518,7 @@
       "A review marker"
     ],
     "correct": 0,
-    "tip": "REVE indicates the record was reversed and archived in HIS."
+    "tip": "REVE is the terminal status in HIS for a reversed transaction. When you REVERSE a LIV record and a second user AUTHs the reversal, the record moves from NAU (as RNAU) to HIS with status REVE. REVE means 'this transaction was reversed/canceled and is archived'."
   },
   {
     "id": 118,
@@ -1531,7 +1531,7 @@
       "SIM"
     ],
     "correct": 0,
-    "tip": "After AUTH, the record's status becomes LIVE in the LIV file."
+    "tip": "After AUTH on an UNAU record, the record's status becomes LIVE — it now sits in LIV as the active version. Concurrently, the previous LIV version is archived to HIS with the next suffix. The status transition (UNAU → LIVE) and the file move (NAU → LIV) happen atomically."
   },
   {
     "id": 119,
@@ -1544,7 +1544,7 @@
       "A silent success"
     ],
     "correct": 1,
-    "tip": "The system prevents concurrent edits with a 'Record Locked' error."
+    "tip": "When Alice has CUS123 in NAU as UNAU and Bob tries to edit, the system returns 'Record Locked'. This is because NAU is a SINGLETON (one record per ID) — Bob can't create a competing draft. The lock protects Alice's pending work from being overwritten. Concurrency control built into the file structure."
   },
   {
     "id": 120,
@@ -1557,7 +1557,7 @@
       "SEE"
     ],
     "correct": 0,
-    "tip": "INPUT on FIN/CUS buffers data into NAU for the 4-eyes flow."
+    "tip": "INPUT on FIN/CUS buffers data into NAU as UNAU specifically to enable the 4-Eyes flow. The Initiator's INPUT puts a record in NAU; a different user's AUTH moves it to LIV. NAU is the buffer that makes 4-Eyes possible — without it, INPUT would have to write directly to LIV or fail."
   },
   {
     "id": 121,
@@ -1570,7 +1570,7 @@
       "Latency"
     ],
     "correct": 0,
-    "tip": "VALIDATE is a check-only operation that only returns Success/Error to the client."
+    "tip": "VALIDATE doesn't write because it's a CHECK-ONLY operation. The use case: front-end forms call VALIDATE to verify data quality before submission, getting instant Success/Error without persisting half-baked records to NAU. If we wrote during VALIDATE, every form interaction would clutter NAU with discarded drafts."
   },
   {
     "id": 122,
@@ -1583,7 +1583,7 @@
       "Re-input"
     ],
     "correct": 0,
-    "tip": "AUTH on HNAU moves the restored version to LIV and archives the prior LIV state to HIS."
+    "tip": "AUTH on an HNAU (History Restore Not Authorized): the system moves the restored historical version from NAU to LIV with status LIVE, and the prior LIV is archived to HIS. Effectively: the restored past state becomes the new present, and the state that WAS present joins history."
   },
   {
     "id": 123,
@@ -1596,7 +1596,7 @@
       "All of the above on INT 0-Auth"
     ],
     "correct": 3,
-    "tip": "Under 0-Auth (INT), INPUT, REVERSE, and HISTORY.RESTORE all bypass the second-user requirement."
+    "tip": "Under 0-Auth (INT classification), INPUT, REVERSE, and HISTORY.RESTORE all bypass the requirement for a second user. The operation completes immediately, with old LIV → HIS and new state → LIV. This is reserved for low-risk installation parameters; FIN/CUS Tables never bypass 4-Eyes."
   },
   {
     "id": 124,
@@ -1609,7 +1609,7 @@
       "Neither does anything"
     ],
     "correct": 0,
-    "tip": "REVERSE cancels a LIVE transaction; DELETE removes a draft from NAU."
+    "tip": "REVERSE cancels a LIVE transaction (something already in LIV). DELETE cancels an unauthorized draft (something still in NAU). They operate on different lifecycle stages: REVERSE creates an RNAU in NAU pending AUTH; DELETE removes a NAU draft (forensically to DEL if SEQ.NO=1, otherwise just removed)."
   },
   {
     "id": 125,
@@ -1622,7 +1622,7 @@
       "SIM"
     ],
     "correct": 0,
-    "tip": "SEQ.NO=1 deletes land in DEL for forensic auditing."
+    "tip": "After DELETE on a SEQ.NO=1 (brand new) Record: the data moves from NAU to DEL. DEL is the singleton file specifically for canceled brand-new drafts — preserving forensic evidence that the record was input then canceled before going live."
   },
   {
     "id": 126,
@@ -1635,7 +1635,7 @@
       "Moved to SIM"
     ],
     "correct": 0,
-    "tip": "SEQ.NO>1 deletes are simply removed from NAU — base record persists in LIV/HIS."
+    "tip": "After DELETE on a SEQ.NO>1 (amendment) Record: the draft is simply removed from NAU. Nothing goes to DEL because the audit chain is already intact — the base record still lives in LIV and earlier versions in HIS. Treating amendment deletions as 'cancel amendment' keeps DEL focused only on irretrievable cases."
   },
   {
     "id": 127,
@@ -1648,7 +1648,7 @@
       "SIM"
     ],
     "correct": 1,
-    "tip": "Non-0-Auth INT INPUT still routes through NAU as UNAU."
+    "tip": "INPUT on an INT Table that is NOT configured for 0-Auth still routes through NAU as UNAU — exactly like FIN/CUS. The 0-Auth bypass is opt-in; without it, INT INPUT requires authorization just like everything else. 0-Auth is set per Table in the FILE Registry."
   },
   {
     "id": 128,
@@ -1661,7 +1661,7 @@
       "To archive records"
     ],
     "correct": 0,
-    "tip": "HOLD lets users save partial work without validation and resume later."
+    "tip": "HOLD's practical purpose: a teller starts entering a complex transaction (e.g. a 20-line trade), gets interrupted, needs to step away. She presses HOLD — the partial work is saved to NAU as HOLD, unvalidated, no second-user approval pending. Later she returns and continues. INPUT validates and moves it to UNAU; AUTH moves it live."
   },
   {
     "id": 129,
@@ -1674,7 +1674,7 @@
       "It is hidden"
     ],
     "correct": 1,
-    "tip": "AUTH archives the replaced LIV record into HIS to maintain audit trail."
+    "tip": "AUTH archives the prior LIV record to HIS as part of the atomic transition. The pre-amendment LIV (whatever was live before) gets the next sequential suffix in HIS (;n). This Copy-on-Write happens automatically — admins don't have to remember to archive. Without it, you'd lose history every time a record was amended."
   },
   {
     "id": 130,
@@ -1687,7 +1687,7 @@
       "Yes — automatically"
     ],
     "correct": 0,
-    "tip": "DELETE removes drafts from NAU. To cancel a LIVE transaction, use REVERSE."
+    "tip": "DELETE works ONLY on NAU drafts. It cannot remove a LIVE record — for that, you must use REVERSE. The reason: a live record may be referenced by the GL, by other transactions, by reports; you can't just nuke it. REVERSE creates a controlled, audited cancellation. DELETE is for canceling work that never made it to LIV."
   },
   {
     "id": 131,
@@ -1700,7 +1700,7 @@
       "REVERSE"
     ],
     "correct": 0,
-    "tip": "SEE uses Resolution Waterfall (NAU→LIV→HIS→ARC) to fetch the most relevant state."
+    "tip": "The Resolution Waterfall is most critical for SEE — the read operation. SEE checks NAU → LIV → HIS → ARC, returning the FIRST hit. This means SEE always surfaces the most relevant state (pending drafts beat live; live beats history; history beats archive)."
   },
   {
     "id": 132,
@@ -1713,7 +1713,7 @@
       "DEL"
     ],
     "correct": 0,
-    "tip": "REVERSE on FIN/CUS moves LIV to NAU as RNAU for second-user authorization."
+    "tip": "After REVERSE on a FIN/CUS record: the record is in NAU with status RNAU (Reversal Not Authorized). LIV is now empty for that ID (until the reversal is AUTH'd). A second user reviews and AUTHs the reversal, after which it moves to HIS with status REVE."
   },
   {
     "id": 133,
@@ -1726,7 +1726,7 @@
       "DEL"
     ],
     "correct": 0,
-    "tip": "AUTH on RNAU finalizes the reversal — moves the record to HIS as REVE."
+    "tip": "After AUTH on an RNAU record: the record moves from NAU to HIS with status REVE. The reversal is now final and archived. LIV has no current authorized version for that ID. If someone tries to SEE the record, they'll get HIS data (or a 'no current state' indication depending on the projection)."
   },
   {
     "id": 134,
@@ -1739,7 +1739,7 @@
       "Archive of customer photos"
     ],
     "correct": 0,
-    "tip": "ARC = Archive, the deepest layer searched after NAU, LIV, HIS."
+    "tip": "ARC is the deepest layer in the Resolution Waterfall — a long-term archive that sits below HIS. SEE checks NAU → LIV → HIS → ARC in that order. Most reads will resolve in NAU, LIV, or HIS; ARC is the safety net for very old records that have been migrated out of active HIS."
   },
   {
     "id": 135,
@@ -1752,7 +1752,7 @@
       "Depends on user"
     ],
     "correct": 1,
-    "tip": "0-Auth must be specifically configured; not all INT tables are 0-Auth by default."
+    "tip": "Not all INT Tables use 0-Auth — it's a specific opt-in configuration on the FILE Registry. Some INT Tables (e.g. CURRENCY) are configured for 0-Auth; others remain 4-Eyes like FIN/CUS. The configuration is per Table, based on the bank's risk assessment of that Table's content."
   },
   {
     "id": 136,
@@ -1765,7 +1765,7 @@
       "Only during reporting"
     ],
     "correct": 1,
-    "tip": "INPUT runs validation immediately and only writes to NAU if rules pass."
+    "tip": "On INPUT for FIN/CUS, validation runs IMMEDIATELY before the record is written to NAU. The rules are checked synchronously; if any fail, the record is NOT created and the user gets an error. Only if validation passes does the record land in NAU as UNAU. This ensures NAU never contains invalid data (unlike HOLD which intentionally skips validation)."
   },
   {
     "id": 137,
@@ -1778,7 +1778,7 @@
       "Only on weekends"
     ],
     "correct": 1,
-    "tip": "HOLD is designed to save unvalidated drafts; it skips validation by design."
+    "tip": "HOLD intentionally SKIPS validation because its purpose is to save IN-PROGRESS, possibly-incomplete drafts. Forcing validation on HOLD would defeat the purpose — the user couldn't save partial work to resume later. HOLD = save and resume; INPUT = validate and commit."
   },
   {
     "id": 138,
@@ -1791,7 +1791,7 @@
       "Print history"
     ],
     "correct": 1,
-    "tip": "HISTORY.RESTORE reinstates a past version from HIS as the current record."
+    "tip": "HISTORY.RESTORE retrieves a specific historical version (from HIS) and reinstates it as the current Record. For FIN/CUS Tables, this goes through HNAU (History Restore Not Authorized) in NAU pending second-user AUTH. For 0-Auth INT Tables, it can overwrite LIV directly. Useful for reverting an amendment."
   },
   {
     "id": 139,
@@ -1804,7 +1804,7 @@
       "INPUT"
     ],
     "correct": 0,
-    "tip": "AUTH handles UNAU/HNAU authorization AND finalizing RNAU reversals."
+    "tip": "AUTH handles both forward edits (UNAU → LIV, with old LIV → HIS) AND reversals (RNAU → HIS as REVE) AND history restores (HNAU → LIV, with old LIV → HIS). It's the single 'approve' operation that finalizes any pending NAU state, regardless of its specific status."
   },
   {
     "id": 140,
@@ -1817,7 +1817,7 @@
       "User has no permission"
     ],
     "correct": 1,
-    "tip": "Only when the record exists in none of NAU, LIV, HIS, or ARC does SEE return 'Record not found'."
+    "tip": "'Record not found' is returned by SEE only when the record exists in NONE of NAU, LIV, HIS, or ARC. The full Resolution Waterfall has been exhausted with no hit. This is genuinely 'the record doesn't exist anywhere' — distinct from 'Record Locked' (where it exists but is owned by another draft in NAU)."
   },
   {
     "id": 141,
@@ -1830,7 +1830,7 @@
       "A monitoring tool"
     ],
     "correct": 1,
-    "tip": "DDD is a metadata-driven abstraction layer that decouples a Table's Physical Storage Schema from its Logical Business View."
+    "tip": "The Dynamic Data Dictionary (DDD) is the metadata layer that defines the SHAPE of every Table — what Fields exist, what types they are, what validation rules apply. Crucially, it DECOUPLES the logical business view (e.g. 'CUSTOMER.NAME') from physical storage (e.g. 'field 1, position 5'). This means schema changes don't require database recompilation or kernel changes."
   },
   {
     "id": 142,
@@ -1843,7 +1843,7 @@
       "Auditing"
     ],
     "correct": 0,
-    "tip": "DDD enables dynamic definition of field structures and validations at runtime — no DDL or kernel recompilation needed."
+    "tip": "Without the DDD, every schema change would require Data Definition Language (DDL) changes to the physical database, plus potentially kernel recompilation — slow, risky, and disruptive. The DDD eliminates this by treating schema as METADATA: change the dictionary, and the new structure applies immediately without touching the database engine."
   },
   {
     "id": 143,
@@ -1856,7 +1856,7 @@
       "Encrypted"
     ],
     "correct": 1,
-    "tip": "DDD has a strict dependency on the Table Registry — definitions require an active FILE registry record."
+    "tip": "A DDD dictionary definition (in TABLE.DEF and FIELD.DEF records) cannot work unless its target Table is officially registered in the FILE Registry. The FILE Registry is the prerequisite — it tells the system the Table exists and is governed. Only then does the DDD layer on field definitions on top."
   },
   {
     "id": 144,
@@ -1869,7 +1869,7 @@
       "USER.DEF and ROLE.DEF"
     ],
     "correct": 0,
-    "tip": "DDD definitions live in TABLE.DEF and FIELD.DEF."
+    "tip": "The DDD lives in two key records: TABLE.DEF (one per Table — defines its overall structure, classification reference) and FIELD.DEF (one per field — defines its name, type, validation rule, attributes). These two records form the complete metadata model for a Table's data layout."
   },
   {
     "id": 145,
@@ -1882,7 +1882,7 @@
       "Sector"
     ],
     "correct": 0,
-    "tip": "FILE classification determines if field definitions apply globally (INT) or are company-restricted (FIN/CUS)."
+    "tip": "DDD's behavior depends on the Table's FILE classification (INT/FIN/CUS). For INT Tables (installation-wide), field definitions apply globally across every Company. For FIN/CUS (per-company segregated), field definitions can be company-specific. The classification, set in the FILE Registry, determines DDD's scope."
   },
   {
     "id": 146,
@@ -1895,7 +1895,7 @@
       "Currency codes"
     ],
     "correct": 1,
-    "tip": "DDD maps logical names (e.g. CUSTOMER.NAME) to physical positions (Field 1, Multi-value 1)."
+    "tip": "The DDD maps LOGICAL field names (e.g. CUSTOMER.NAME) to PHYSICAL data array positions (e.g. Field 1, Multi-value position 1). Code never references the physical position — it uses the logical name. The DDD does the translation. This is why renaming or reordering fields doesn't require code changes."
   },
   {
     "id": 147,
@@ -1908,7 +1908,7 @@
       "Derived only"
     ],
     "correct": 1,
-    "tip": "D = Data: physical data stored directly in the database."
+    "tip": "D (Data) is the simplest System Type — a field that holds actual data stored in the physical database. Most fields are Type D. Examples: CUSTOMER.SHORT.NAME, ACCOUNT.WORKING.BALANCE. Type D fields persist; their values are written to and read from disk."
   },
   {
     "id": 148,
@@ -1921,7 +1921,7 @@
       "Integer"
     ],
     "correct": 1,
-    "tip": "I-Descriptor/Virtual: values calculated in memory at runtime (e.g. concatenating first+last name), never persisted."
+    "tip": "I (I-Descriptor / Virtual) fields are COMPUTED IN MEMORY at runtime — never persisted to disk. They're derived from other fields. Example: FULL.NAME = FIRST.NAME + ' ' + LAST.NAME. When you read FULL.NAME, the DDD computes it on-the-fly. No risk of stale derived data; no storage cost."
   },
   {
     "id": 149,
@@ -1934,7 +1934,7 @@
       "JSON"
     ],
     "correct": 1,
-    "tip": "J = Join: dynamic links that automatically fetch data from related tables via a foreign key."
+    "tip": "J (Join) fields fetch their value DYNAMICALLY from a related Table via a foreign-key relationship at display time. Example: on an ACCOUNT screen, the customer's name is a J field — at display, the system reads ACCOUNT.CUSTOMER (a Type D field holding the customer ID), then joins to the CUSTOMER Table to pull the name. No physical FK required."
   },
   {
     "id": 150,
@@ -1947,7 +1947,7 @@
       "K field"
     ],
     "correct": 1,
-    "tip": "Calculated-in-memory derived fields are I-Descriptors (Type I)."
+    "tip": "FULL.NAME as 'FIRST + LAST' is the textbook I-Descriptor (Type I) example. The value is COMPUTED at runtime by concatenating two stored fields, then displayed. It's never persisted, so there's no risk of FIRST changing and FULL.NAME going stale. The Field declaration in DDD specifies the computation logic."
   },
   {
     "id": 151,
@@ -1960,7 +1960,7 @@
       "K"
     ],
     "correct": 2,
-    "tip": "Dynamic relational fetch via foreign key is a J (Join) field."
+    "tip": "Showing the customer's name on an ACCOUNT record uses a J (Join) field. The ACCOUNT Record stores ACCOUNT.CUSTOMER (the customer's ID) as Type D. The customer's NAME is a Type J on the ACCOUNT projection — at display, the system fetches it from the CUSTOMER Table via the ID. No physical foreign key needed at the DB level."
   },
   {
     "id": 152,
@@ -1973,7 +1973,7 @@
       "No normalization at all"
     ],
     "correct": 1,
-    "tip": "Non-First Normal Form: a single record can natively store multi-dimensional arrays and repeating blocks — no child tables needed."
+    "tip": "Non-1NF (Non-First Normal Form) means a single Record can natively store MULTI-DIMENSIONAL arrays and repeating blocks (like a loan's repayment schedule). Standard 1NF databases would require a separate child table for the repayments; CBS's DDD lets you store them all inside the parent record — no joins needed."
   },
   {
     "id": 153,
@@ -1999,7 +1999,7 @@
       "User must do it manually"
     ],
     "correct": 1,
-    "tip": "Adding/removing an index automatically shifts associated fields, preserving alignment."
+    "tip": "Field Associations ensure index alignment within multi-value blocks. If you add a new entry at index 3 of a Repayment Schedule, ALL associated fields (date, amount, balance, etc.) automatically shift to make room — keeping their indices aligned. Without this, the values for one entry could drift away from each other."
   },
   {
     "id": 155,
@@ -2012,7 +2012,7 @@
       "Validations are physical hardware"
     ],
     "correct": 1,
-    "tip": "Hot-swappable: an admin changes a field rule (e.g. Alphanumeric → Numeric) via config; no recompilation needed."
+    "tip": "Hot-Swappable Validation Engine: the DDD binds each field type to pre-compiled validation routines (validateDate, validateAmount, validateCurrency, etc.). Changing a field's TYPE in the dictionary (e.g. Alphanumeric → Numeric) immediately applies the new rule — no system restart, no kernel recompile. The next input is validated by the new rule."
   },
   {
     "id": 156,
@@ -2025,7 +2025,7 @@
       "Network ports"
     ],
     "correct": 1,
-    "tip": "Field.type ties fields directly to pre-compiled validation routines like validateDate or validateAmount."
+    "tip": "Field.type in the DDD is the attribute that links a field to its validation routine. So Field.type='Numeric' connects to validateAmount; Field.type='Date' connects to validateDate. These routines are pre-compiled and registered; changing a field's type just swaps which routine is invoked. Hot-swap means immediate effect."
   },
   {
     "id": 157,
@@ -2038,7 +2038,7 @@
       "DEL"
     ],
     "correct": 0,
-    "tip": "Virtual Tables centralize static reference lists like Risk Levels in a single VIRTUAL.TABLES table with compound keys."
+    "tip": "VIRTUAL.TABLES is the system's centralized reference-list storage. Instead of creating thousands of tiny static reference Tables (Risk Levels, Statuses, Categories), all such lists live in a single Table called VIRTUAL.TABLES — distinguished by compound keys (e.g. RISK.LEVEL|HIGH, STATUS|ACTIVE). DDD links fields to these entries for dropdowns."
   },
   {
     "id": 158,
@@ -2051,7 +2051,7 @@
       "ARC"
     ],
     "correct": 0,
-    "tip": "Stored as a unified physical table VIRTUAL.TABLES, distinguished by compound keys."
+    "tip": "Reference lists in VIRTUAL.TABLES use COMPOUND KEYS to distinguish entries — for example, RISK.LEVEL|HIGH, RISK.LEVEL|MEDIUM, RISK.LEVEL|LOW for one list; STATUS|ACTIVE, STATUS|INACTIVE for another. The first part of the key is the list name; the second is the entry. One physical Table, many logical lists."
   },
   {
     "id": 159,
@@ -2064,7 +2064,7 @@
       "Locks the table"
     ],
     "correct": 1,
-    "tip": "The system generates correctly populated dropdowns and validates inputs against virtual-table records."
+    "tip": "When a DDD field is linked to entries in VIRTUAL.TABLES, the system AUTO-GENERATES the UI dropdown (showing the entries as options) and validates input against the entries (rejecting values not in the list). No code needed — the dropdown and validation flow from the DDD-to-virtual-tables link."
   },
   {
     "id": 160,
@@ -2077,7 +2077,7 @@
       "Only Anthropic adds them"
     ],
     "correct": 1,
-    "tip": "When a bank adds custom local fields, they are automatically injected into TABLE.DEF and become available."
+    "tip": "Custom local fields added by the bank are automatically INJECTED into TABLE.DEF via the DDD's customization framework. The system extends the Table to include the new field, and it's available everywhere (projections, enquiries, validations) immediately — without altering vendor code or recompiling."
   },
   {
     "id": 161,
@@ -2090,7 +2090,7 @@
       "True for J fields"
     ],
     "correct": 1,
-    "tip": "DDD abstraction lets the system add fields without altering the underlying physical structure."
+    "tip": "DDD's abstraction means new fields are METADATA additions, not physical schema migrations. Existing physical Records on disk remain untouched; the new field is simply a new logical position with no value yet. No migration, no downtime. This is the killer feature that makes adding fields trivial."
   },
   {
     "id": 162,
@@ -2103,7 +2103,7 @@
       "Reducing user count"
     ],
     "correct": 1,
-    "tip": "DDD's primary benefit is decoupling logical business view from physical storage."
+    "tip": "DDD's primary benefit: decoupling the LOGICAL business view (fields like CUSTOMER.NAME, validation rules) from PHYSICAL storage (where data sits on disk). Schema evolves through metadata; the database doesn't need DDL changes. This is what makes CBS configurable without code releases."
   },
   {
     "id": 163,
@@ -2116,7 +2116,7 @@
       "Z"
     ],
     "correct": 3,
-    "tip": "Standard System Types are D, I, J. Z is not defined."
+    "tip": "The three System Types are D (Data — stored on disk), I (I-Descriptor — computed at runtime, never stored), and J (Join — fetched from related table at display time). Z is not a defined type. Together, D/I/J cover storage, computation, and relational fetch — the three ways data can 'be on a record'."
   },
   {
     "id": 164,
@@ -2129,7 +2129,7 @@
       "Never"
     ],
     "correct": 1,
-    "tip": "Hot-swappable engine applies validation changes immediately without restart or recompile."
+    "tip": "Validation rule changes (e.g. Alphanumeric → Numeric) apply IMMEDIATELY after the DDD update — no kernel recompile, no restart. This is the Hot-Swappable Validation Engine in action. The next user input is validated by the new rule; the old data on disk is unchanged but new inputs must comply."
   },
   {
     "id": 165,
@@ -2142,7 +2142,7 @@
       "User mentions"
     ],
     "correct": 1,
-    "tip": "< Start, - Member, > End mark Field Association blocks to group multi-value fields."
+    "tip": "Field Association markers in the DDD: < marks the START of an association block, - marks each MEMBER field within the block, > marks the END. Within a block, all multi-value fields are kept index-aligned. So adding an entry shifts all members consistently — preserving the relationship between, say, date[3], amount[3], balance[3]."
   },
   {
     "id": 166,
@@ -2155,7 +2155,7 @@
       "To improve UI"
     ],
     "correct": 1,
-    "tip": "Non-1NF allows repeating blocks (e.g. Repayment Schedule) inside a single record."
+    "tip": "Non-1NF support exists so a SINGLE Record can store repeating blocks (Repayment Schedule, multiple phone numbers, multiple counterparties) without requiring separate child Tables. This is a deliberate departure from 1NF that simplifies data modeling for banking domain objects — keeping related data co-located."
   },
   {
     "id": 167,
@@ -2168,7 +2168,7 @@
       "Virtual Tables"
     ],
     "correct": 0,
-    "tip": "Non-1NF allows multi-valued arrays like INPUTTER and AUTHORISER inside the audit fields block."
+    "tip": "Multi-valued INPUTTER (and AUTHORISER) in the audit block is enabled by DDD's Non-1NF support — a single Record stores an array of inputter user IDs (one per modification cycle) inside the audit Fields without needing a child table. Each edit cycle adds a new entry to the array."
   },
   {
     "id": 168,
@@ -2181,7 +2181,7 @@
       "All of them"
     ],
     "correct": 1,
-    "tip": "I-Descriptor fields are calculated in memory at runtime and never written to the physical database."
+    "tip": "I-Descriptor (Type I) fields are NEVER persisted to disk. They're computed in memory at runtime each time the record is read. This avoids stale derived data — if the underlying source fields change, the computed value automatically reflects the new inputs on the next read. Trade-off: tiny CPU cost per read."
   },
   {
     "id": 169,
@@ -2194,7 +2194,7 @@
       "HIS"
     ],
     "correct": 0,
-    "tip": "J fields dynamically fetch related data without relying on physical database foreign keys."
+    "tip": "J (Join) fields avoid PHYSICAL foreign keys at the database layer. Traditional RDBMS would require an actual FK constraint linking ACCOUNT.CUSTOMER to CUSTOMER. With J fields, the DDD declares the link as metadata and resolves it dynamically at display time. Cleaner schema; less DDL."
   },
   {
     "id": 170,
@@ -2207,7 +2207,7 @@
       "CUSTOMER.DEF"
     ],
     "correct": 0,
-    "tip": "TABLE.DEF and FIELD.DEF in DDD register field structure and validation rules."
+    "tip": "TABLE.DEF and FIELD.DEF are the DDD's two key records. TABLE.DEF describes a Table's overall structure (which fields it has, in what order, classification reference). FIELD.DEF describes EACH field's specifics (name, type, validation routine, mandatory/optional, multi-value rules). Together, they define everything about a Table's data layout."
   },
   {
     "id": 171,
@@ -2220,7 +2220,7 @@
       "File system folder"
     ],
     "correct": 1,
-    "tip": "DDD's Non-1NF Field Associations model repeating blocks natively without child tables."
+    "tip": "A Repayment Schedule (date, amount, balance, ... for each installment) is best modeled as Non-1NF associated multi-value fields in the DDD. All installments live inside the parent loan Record — no child table required. Field Associations keep date[i], amount[i], balance[i] index-aligned via < - > markers."
   },
   {
     "id": 172,
@@ -2233,7 +2233,7 @@
       "Network only"
     ],
     "correct": 1,
-    "tip": "DDD enforces data integrity at the table definition layer rather than at the physical DB layer."
+    "tip": "DDD enforces data integrity at the TABLE DEFINITION (application) layer — not at the physical DB layer. So even if you used a different underlying DB engine, the validation rules would still apply because they live in the DDD metadata. This makes the system more portable and the rules more explicit."
   },
   {
     "id": 173,
@@ -2246,7 +2246,7 @@
       "Owner names"
     ],
     "correct": 1,
-    "tip": "VIRTUAL.TABLES distinguishes records by compound keys like STATUS|ACTIVE."
+    "tip": "VIRTUAL.TABLES uses compound keys to distinguish many logical reference lists inside one physical Table. The key format is LIST_NAME|ENTRY (e.g. STATUS|ACTIVE). The first part identifies the list; the second is the specific entry. Lookup just queries by compound key."
   },
   {
     "id": 174,
@@ -2259,7 +2259,7 @@
       "Only on weekends"
     ],
     "correct": 1,
-    "tip": "Custom local fields are injected into TABLE.DEF and become available instantly."
+    "tip": "Custom local fields appear in the application IMMEDIATELY after DDD injection — no redeployment needed. The bank adds the field to TABLE.DEF; the next time any projection/enquiry/validation reads the dictionary, it picks up the new field. No code, no compile, no restart."
   },
   {
     "id": 175,
@@ -2272,7 +2272,7 @@
       "Classification doesn't exist"
     ],
     "correct": 1,
-    "tip": "DDD relies on FILE classification (INT/FIN/CUS) for global vs company-restricted field scope."
+    "tip": "DDD relies on FILE classification (INT/FIN/CUS) to decide field-definition scope. INT classification → field definitions apply globally (every Company sees the same fields). FIN/CUS classification → field definitions can vary per Company (each Company may have local customizations). This is how DDD respects multi-company segregation."
   },
   {
     "id": 176,
@@ -2285,7 +2285,7 @@
       "A backup config"
     ],
     "correct": 1,
-    "tip": "Projection configures how data is displayed, entered, validated, and processed for a Table."
+    "tip": "A Projection is the configurable LENS over a Table — it defines how data is displayed to users, what they can enter, what gets validated, and how the record is processed (including authorization rules). One Table can have many Projections (e.g. CUSTOMER, CUSTOMER,CORP, CUSTOMER~TELLER) — each tailored for a different role or workflow."
   },
   {
     "id": 177,
@@ -2298,7 +2298,7 @@
       "Branches from HQ"
     ],
     "correct": 0,
-    "tip": "Projections decouple UI and transaction behavior from the physical database schema."
+    "tip": "Projections decouple the USER INTERFACE and transaction behavior from the PHYSICAL DATABASE schema. Edit the Projection, and the UI/workflow changes — without touching the underlying Table structure. This is what makes the system Server-Driven UI (SDUI) capable."
   },
   {
     "id": 178,
@@ -2311,7 +2311,7 @@
       "Email"
     ],
     "correct": 1,
-    "tip": "All user operations (Input, Authorize, Reverse, See) must pass through Projections — they are the mandatory gateway."
+    "tip": "All user-facing operations (Input, Authorize, Reverse, See) must go through Projections — they are the mandatory gateway between users and the database. Direct DB writes are forbidden; every mutation passes through a registered PROJECTION.DEF, ensuring rules, audit, and authorization are enforced consistently."
   },
   {
     "id": 179,
@@ -2324,7 +2324,7 @@
       "No UI at all"
     ],
     "correct": 1,
-    "tip": "SDUI: backend dynamically returns JSON schema describing layout/fields, so admins can alter UI without redeploying the client."
+    "tip": "Server-Driven UI (SDUI) means the BACKEND returns the form layout/field definitions as JSON when a user requests a Projection. The frontend doesn't hardcode forms — it renders whatever the server sends. Edit the Projection in config; clients see the new layout on next request. No client redeployment."
   },
   {
     "id": 180,
@@ -2337,7 +2337,7 @@
       "ARC first"
     ],
     "correct": 1,
-    "tip": "NAU → LIV → HIS → ARC ensures the most relevant active draft is surfaced."
+    "tip": "Projections use the same Resolution Waterfall as SEE — they check NAU (Unauthorized) first (so pending drafts surface), then LIV (Live — current authorized), then HIS (History), then ARC (Archive). This ensures users always see the most relevant in-flight state when opening a record."
   },
   {
     "id": 181,
@@ -2350,7 +2350,7 @@
       "Audits SQL"
     ],
     "correct": 1,
-    "tip": "The Diff Engine highlights field-level changes for authorization and auditing."
+    "tip": "The Diff Engine in Projections highlights VISUAL DIFFERENCES between a draft and the live baseline — at AUTH time it shows the Authoriser exactly what changed. It can also compare two historical versions for audit purposes. This makes 4-Eyes review fast and accurate — the Authoriser doesn't have to compare 200 fields manually."
   },
   {
     "id": 182,
@@ -2363,7 +2363,7 @@
       "Random fields"
     ],
     "correct": 1,
-    "tip": "Targeted Subset Views: role-based projections show only the fields relevant for that role."
+    "tip": "A CUSTOMER~SIMPLE Projection might show only 5 fields a teller needs — Name, Account, Balance, Phone, Notes — instead of the 200+ fields on the full CUSTOMER Table. This 'Targeted Subset View' approach reduces clutter, accelerates training, and prevents tellers from accidentally editing fields they shouldn't."
   },
   {
     "id": 183,
@@ -2376,7 +2376,7 @@
       "Acts as simulation"
     ],
     "correct": 0,
-    "tip": "A projection whose ID equals the table name is the Master View, showing all default fields."
+    "tip": "If a Projection's ID exactly matches the Table name (e.g. ACCOUNT — no version suffix), it acts as the MASTER VIEW — rendering all default fields. Variants like ACCOUNT,CORP or ACCOUNT~TELLER are role-specific subsets. The Master View is the fallback when no role-specific Projection is invoked."
   },
   {
     "id": 184,
@@ -2389,7 +2389,7 @@
       "Encrypted"
     ],
     "correct": 1,
-    "tip": "NOINPUT renders the field as read-only in that projection."
+    "tip": "NOINPUT is a Field Property Override in a Projection: it makes the field READ-ONLY in this specific Projection. The user can SEE the field but can't edit it. The underlying DDD definition is unchanged — other Projections on the same Table can still write to it."
   },
   {
     "id": 185,
@@ -2402,7 +2402,7 @@
       "Optional"
     ],
     "correct": 1,
-    "tip": "NOCHANGE means the field is immutable after creation — cannot be modified later."
+    "tip": "NOCHANGE makes a field IMMUTABLE AFTER CREATION. You can set it ONCE when creating the record; after that, no one can change it through this Projection. Useful for fields like Customer ID, Account Opening Date, or any 'set at birth' attribute that shouldn't drift over time."
   },
   {
     "id": 186,
@@ -2415,7 +2415,7 @@
       "Visible only to managers"
     ],
     "correct": 0,
-    "tip": "HIDDEN fields exist in the data flow for background logic but are not shown in the UI."
+    "tip": "HIDDEN means the field is used in BACKGROUND LOGIC (defaulting, validation, plugins) but is REMOVED from the user-visible UI. The user doesn't see it; the system still uses it. Useful for technical fields like internal flags that drive behavior without needing user input."
   },
   {
     "id": 187,
@@ -2428,7 +2428,7 @@
       "Lock the database"
     ],
     "correct": 0,
-    "tip": "Overrides can make optional fields MANDATORY, or mark them NOINPUT/NOCHANGE/HIDDEN per projection."
+    "tip": "Field Property Overrides in a Projection let you constrain fields per role/scenario: make an optional DDD field MANDATORY in this Projection; make it NOINPUT (read-only); make it NOCHANGE (immutable after creation); make it HIDDEN (invisible). One Table, many Projections — each with its own constraints."
   },
   {
     "id": 188,
@@ -2441,7 +2441,7 @@
       "No grouping"
     ],
     "correct": 1,
-    "tip": "Projections support collapsible Sections/Clusters and Associated Projections that split complex products into Tabs."
+    "tip": "Composite Layouts in Projections support modern UX: collapsible SECTIONS/CLUSTERS (group related fields together with a header), Associated Projections that split big tasks into TABS (e.g. General / Interest / Collateral on a mortgage form), and tooltips. This avoids overwhelming users with hundreds of flat fields."
   },
   {
     "id": 189,
@@ -2454,7 +2454,7 @@
       "Send emails"
     ],
     "correct": 1,
-    "tip": "Associated Projections split complex products into logical Tabs like General, Interest, Collateral."
+    "tip": "Associated Projections split a massive product (like a mortgage with 200 fields) into navigable logical TABS — General, Interest, Collateral, Documents, etc. Each tab is its own Associated Projection. Users move through them in sequence or as needed. Much easier than one giant scrolling form."
   },
   {
     "id": 190,
@@ -2467,7 +2467,7 @@
       "Disables See"
     ],
     "correct": 0,
-    "tip": "Suppress See Mode removes non-editable/non-participating attributes from the payload to reduce UI clutter."
+    "tip": "Suppress See Mode is a Projection setting that mathematically HIDES all non-participating or non-editable attributes from the payload — keeping the UI focused. So if a Projection is configured to view only certain fields, the irrelevant ones are stripped from the response entirely. Reduces clutter and load size."
   },
   {
     "id": 191,
@@ -2480,7 +2480,7 @@
       "User location"
     ],
     "correct": 0,
-    "tip": "Defaulting can prefill from fixed values, foreign records, or system variables like TODAY, USER, COMPANY."
+    "tip": "Automated Defaulting in Projections pre-fills field values without user typing. Sources: FIXED values (e.g. country=PT), LINKED records (fetch a value from a related Table when an ID is entered), or SYSTEM VARIABLES like TODAY (current bank date), USER (current user ID), COMPANY (current company). Saves time and reduces errors."
   },
   {
     "id": 192,
@@ -2493,7 +2493,7 @@
       "Audit fields"
     ],
     "correct": 1,
-    "tip": "Hot Fields fire ON.CHANGE — instantly triggering validation or defaulting the moment a user tabs out."
+    "tip": "Hot Fields trigger logic when the user changes a field and tabs out (the onBlur event). The associated plugin runs immediately — for validation (e.g. check ID against a registry) or auto-population (e.g. pull the customer's name when their ID is entered). Instant feedback before form submission."
   },
   {
     "id": 193,
@@ -2506,7 +2506,7 @@
       "HTML only"
     ],
     "correct": 1,
-    "tip": "Pre/Post hooks support Java/Groovy for cross-field validations and external API calls."
+    "tip": "Pre/Post hooks in Projections execute custom JAVA or GROOVY scripts — fragments of code attached to specific lifecycle events. Pre-hooks run BEFORE the operation commits (validation, external API calls); post-hooks run AFTER successful commit (notifications, cascading updates). The scripts are registered as Plugins."
   },
   {
     "id": 194,
@@ -2519,7 +2519,7 @@
       "Locks the system"
     ],
     "correct": 1,
-    "tip": "AUTH.REQUIRED=YES forces 4-eyes principle — draft saved as INAU pending second user."
+    "tip": "AUTH.REQUIRED is a Projection flag. When YES, INPUT writes the record to NAU as UNAU (Unauthorized) — requiring a second user's AUTH approval before it becomes LIVE. This is what implements the 4-Eyes Principle at the Projection level. Setting NO bypasses 4-Eyes (use sparingly for low-risk operations)."
   },
   {
     "id": 195,
@@ -2532,7 +2532,7 @@
       "Internal"
     ],
     "correct": 1,
-    "tip": "INAU marks the record as unauthorized — waiting for second-user approval."
+    "tip": "INAU is the visible MARKER that a LIV record has a pending UNAU change in NAU — visible in Enquiries and on Projections. So users see 'this record is live, but a draft amendment is awaiting authorization'. The Resolution Waterfall and Virtual Data Merging surface this flag automatically."
   },
   {
     "id": 196,
@@ -2545,7 +2545,7 @@
       "User comfort"
     ],
     "correct": 1,
-    "tip": "All mutations must pass through a Projection to enforce business rules and 4-eyes."
+    "tip": "Projections FORBID direct API writes to the database. All writes pass through a registered PROJECTION.DEF, ensuring rules (validation, plugins, AUTH.REQUIRED, field overrides) are enforced. This is a foundational architectural rule — bypassing it would defeat every control the system provides."
   },
   {
     "id": 197,
@@ -2558,7 +2558,7 @@
       "A holiday calendar"
     ],
     "correct": 0,
-    "tip": "CUSTOMER,CORP is a Projection (Version) of the CUSTOMER Table tailored for corporate clients."
+    "tip": "CUSTOMER,CORP is a comma-suffix Projection (or 'version') of the CUSTOMER Table — typically a corporate-customer variant showing fields relevant to companies (TAX.ID, INCORPORATION.DATE, DIRECTORS, etc.) rather than individuals. Same underlying CUSTOMER Table; tailored Projection for corporate workflows."
   },
   {
     "id": 198,
@@ -2571,7 +2571,7 @@
       "HR module"
     ],
     "correct": 1,
-    "tip": "Projections act as a Presentation & Logic Configuration Engine."
+    "tip": "Projections act as the system's Presentation & Logic CONFIGURATION ENGINE — controlling presentation (UI layout, field properties), validation hooks (pre/post programs, hot fields), and governance (AUTH.REQUIRED, audit triggers). They translate the underlying Table definition into role-aware, workflow-aware user-facing experiences."
   },
   {
     "id": 199,
@@ -2584,7 +2584,7 @@
       "Auth"
     ],
     "correct": 0,
-    "tip": "With SDUI, admins can alter representation without redeploying the client — no hard-coded forms."
+    "tip": "Server-Driven UI (SDUI) eliminates the need for HARD-CODED FRONTEND FORMS or client redeployment when forms change. The server defines the form (in a Projection); the client renders whatever schema is returned. Edit the Projection; users see the new form immediately on next request."
   },
   {
     "id": 200,
@@ -2597,7 +2597,7 @@
       "Only HIS"
     ],
     "correct": 0,
-    "tip": "Resolution Waterfall shows the most relevant state of the record (drafts surface first)."
+    "tip": "The Resolution Waterfall in Projections guarantees users always see the MOST RELEVANT state: NAU drafts surface first (so users continue their in-flight work), then LIV (current authorized), then HIS (history), then ARC (archive). Without this priority, users might see stale LIV when they had a pending draft."
   },
   {
     "id": 201,
@@ -2610,7 +2610,7 @@
       "Only for FIN"
     ],
     "correct": 0,
-    "tip": "Projections can override Data Dictionary rules: MANDATORY, NOINPUT, NOCHANGE, HIDDEN."
+    "tip": "Projections CAN override DDD field rules — that's the whole point of Field Property Overrides. The DDD might say a field is optional; the Projection can make it MANDATORY for THIS specific role/scenario. Or NOINPUT (read-only here). Or HIDDEN. The DDD is the underlying truth; Projections are the per-context restrictions."
   },
   {
     "id": 202,
@@ -2623,7 +2623,7 @@
       "Excel only"
     ],
     "correct": 1,
-    "tip": "Projections deliver dynamic JSON schemas (SDUI) for rendering forms."
+    "tip": "Projections deliver dynamic JSON schemas describing the form — fields, labels, layout, validation rules. The frontend renders the schema. Admins editing the Projection (via config) instantly change what users see, without redeploying any client code. This is Server-Driven UI in action."
   },
   {
     "id": 203,
@@ -2636,7 +2636,7 @@
       "Random sequence"
     ],
     "correct": 1,
-    "tip": "Complex flows like loans are split into tabs via Associated Projections."
+    "tip": "A loan origination flow with 200+ fields shouldn't be one massive form. Use Associated Projections — split into Tabs like General / Interest / Repayment / Collateral / Documents. Each tab is its own Associated Projection. Users navigate intuitively; cognitive load is manageable."
   },
   {
     "id": 204,
@@ -2649,7 +2649,7 @@
       "Backups"
     ],
     "correct": 0,
-    "tip": "The Diff Engine highlights field-level differences during authorization and auditing."
+    "tip": "The Diff Engine (visual diffs between draft and baseline) is most useful during AUTH — the Authoriser sees exactly what fields the Initiator changed, accelerating review and accuracy. It's also used in audits — comparing two historical versions to understand evolution."
   },
   {
     "id": 205,
@@ -2662,7 +2662,7 @@
       "Network setup"
     ],
     "correct": 0,
-    "tip": "Projections use a WYSIWYG drag-and-drop designer for layout composition."
+    "tip": "WYSIWYG drag-and-drop designer is the tool admins use to compose Projection layouts — drag fields onto the canvas, group them into Sections, arrange Tabs (Associated Projections). No coding required. The output is a Projection configuration; the runtime applies SDUI."
   },
   {
     "id": 206,
@@ -2675,7 +2675,7 @@
       "Sets balance"
     ],
     "correct": 0,
-    "tip": "Defaulting uses system variables like TODAY to pre-fill date fields."
+    "tip": "Defaulting from TODAY in a Projection pre-fills a date field with the current Bank Date (from the DATES Table). So new transactions get today's date automatically. Other defaulting variables: USER (the logged-in user's ID), COMPANY (the current company code)."
   },
   {
     "id": 207,
@@ -2688,7 +2688,7 @@
       "Never"
     ],
     "correct": 1,
-    "tip": "Hot Fields trigger ON.CHANGE — typically the onBlur event."
+    "tip": "Hot Fields trigger on the onBlur event — the moment the user tabs/clicks out of the field. The associated plugin runs immediately, performing validation or auto-population. This is INSTANT feedback before the user submits the form."
   },
   {
     "id": 208,
@@ -2701,7 +2701,7 @@
       "Only on errors"
     ],
     "correct": 0,
-    "tip": "Pre-hooks fire before the operation is committed — useful for cross-field validation."
+    "tip": "Pre-hooks fire BEFORE the operation commits (INPUT, AUTH, etc.). They can perform cross-field validations or synchronously call external APIs (like Credit Check, KYC). If a pre-hook rejects the operation, nothing is written. They're the gate keepers — synchronous, blocking, run-before-commit."
   },
   {
     "id": 209,
@@ -2714,7 +2714,7 @@
       "On login"
     ],
     "correct": 1,
-    "tip": "Post-hooks run after successful commit — for notifications, events, and cascading updates."
+    "tip": "Post-hooks fire AFTER an operation completes successfully. They handle downstream side-effects — sending notifications, publishing events, cascading updates to other Tables. Post-hooks should be fire-and-forget where possible (don't block the user) and should only react to successful operations."
   },
   {
     "id": 210,
@@ -2727,7 +2727,7 @@
       "Hide the form"
     ],
     "correct": 0,
-    "tip": "AUTH.REQUIRED=NO skips the 4-eyes / unauthorized-draft step (where permitted)."
+    "tip": "AUTH.REQUIRED=NO bypasses the 4-Eyes Principle — INPUT writes directly to LIV without needing a second user's AUTH. Use sparingly, for low-risk operations only. The audit fields INPUTTER/AUTHORISER will still record the user; but the SAME user can both create and commit. Risky for sensitive transactions."
   },
   {
     "id": 211,
@@ -2740,7 +2740,7 @@
       "A SQL query"
     ],
     "correct": 0,
-    "tip": "CUSTOMER~SIMPLE is a role-based subset view — e.g. just 5 fields a teller needs."
+    "tip": "A teller-focused subset Projection (CUSTOMER~SIMPLE) shows only the fields tellers need — Name, Phone, Balance, Notes — instead of the full 200-field CUSTOMER Table. Faster to fill, less risk of incidental edits to unrelated fields, much better UX for high-volume desk work."
   },
   {
     "id": 212,
@@ -2753,7 +2753,7 @@
       "Network latency"
     ],
     "correct": 0,
-    "tip": "They prevent overwhelming users with hundreds of irrelevant fields."
+    "tip": "Targeted Subset Views prevent overwhelming users with HUNDREDS of irrelevant fields. A teller doesn't need to see Tax ID, Incorporation Date, or Director List. A subset Projection (5-10 fields) keeps focus, reduces errors, and makes training easier."
   },
   {
     "id": 213,
@@ -2766,7 +2766,7 @@
       "MANDATORY hides the field"
     ],
     "correct": 0,
-    "tip": "MANDATORY requires the user to fill it; NOINPUT prevents user input (read-only)."
+    "tip": "MANDATORY: the user MUST fill the field; otherwise the operation fails. NOINPUT: the user CANNOT edit the field — it's read-only. Both override the underlying DDD definition. They're opposites: MANDATORY forces input; NOINPUT prevents input."
   },
   {
     "id": 214,
@@ -2779,7 +2779,7 @@
       "Via SIM"
     ],
     "correct": 0,
-    "tip": "AUTH.REQUIRED flag inside the projection dictates governance — 4-eyes when YES."
+    "tip": "AUTH.REQUIRED is a Projection-level flag that controls whether the 4-Eyes Principle applies. AUTH.REQUIRED=YES forces records into NAU as UNAU pending second-user approval; =NO writes directly to LIV. The flag is set per Projection, allowing fine-grained control over which workflows require approval."
   },
   {
     "id": 215,
@@ -2792,7 +2792,7 @@
       "Holiday planning"
     ],
     "correct": 0,
-    "tip": "Hooks enable cross-field validation, external API calls, and post-commit actions."
+    "tip": "Pre/Post hooks let you inject custom business logic at lifecycle moments — cross-field validation that's too complex for DDD, synchronous external API calls (Credit Check, KYC), post-commit notifications (Kafka, email), cascading updates (when X happens, also update Y). Plugins are the engine; Projections are the gateway that invokes them."
   },
   {
     "id": 216,
@@ -2805,7 +2805,7 @@
       "Only at night"
     ],
     "correct": 1,
-    "tip": "Projections are the mandatory gateway; direct writes are forbidden."
+    "tip": "A Projection NEVER writes directly to the database — all writes pass through the Projection framework, which enforces validation, plugin hooks, AUTH.REQUIRED, audit field maintenance, and field property overrides. This rule is architectural: no shortcuts, no exceptions, no direct SQL."
   },
   {
     "id": 217,
@@ -2818,7 +2818,7 @@
       "Two users"
     ],
     "correct": 0,
-    "tip": "It compares draft vs live, or specific historical versions."
+    "tip": "The Diff Engine compares: (1) draft (NAU) vs live baseline (LIV) — most common, used during AUTH; or (2) two HISTORICAL versions (HIS;n vs HIS;m) — used during audits. Both produce a field-level visual diff showing what changed."
   },
   {
     "id": 218,
@@ -2831,7 +2831,7 @@
       "They eliminate users"
     ],
     "correct": 0,
-    "tip": "SDUI lets admins alter data representation without redeploying the client application."
+    "tip": "Server-Driven UI is hugely advantageous for admins: they can change the UI by editing CONFIG (Projection definitions in the system), and the next request from any client sees the new form. No client redeploy. No app store updates. No 'please restart your browser'. Pure config-driven UX."
   },
   {
     "id": 219,
@@ -2844,7 +2844,7 @@
       "Backend logs"
     ],
     "correct": 0,
-    "tip": "DDD-linked virtual-table fields are auto-rendered as dropdowns in the projection UI."
+    "tip": "Field-level dropdowns from VIRTUAL.TABLES happen via the Projection + DDD integration. DDD links a field to entries in VIRTUAL.TABLES (e.g. STATUS|ACTIVE, STATUS|INACTIVE); the Projection renders these as a dropdown auto-populated with those options. The system also validates input against the list. All from metadata."
   },
   {
     "id": 220,
@@ -2857,7 +2857,7 @@
       "DEL file"
     ],
     "correct": 0,
-    "tip": "Use a targeted subset projection so the teller sees only the fields they need."
+    "tip": "A teller's onboarding form is best a targeted subset Projection (e.g. CUSTOMER~SIMPLE) showing 5-10 essential fields. The full Master View would overwhelm with 200+ fields. A subset Projection keeps the workflow fast, error-free, and trainable in minutes rather than hours."
   },
   {
     "id": 221,
@@ -4678,5 +4678,1565 @@
     ],
     "correct": 1,
     "tip": "Product Attributes (Interest, Charges, Schedules, Limits, Events) are reusable building blocks. Because functionality is encapsulated in the attribute, enhancing 'Charges' propagates to every product that uses it — a single change, system-wide benefit."
+  },
+  {
+    "id": 361,
+    "topic": "Temenos Map",
+    "q": "In Temenos terminology, what is the analogue of a CBS 'Table'?",
+    "options": [
+      "Application",
+      "Version",
+      "Routine",
+      "Property"
+    ],
+    "correct": 0,
+    "tip": "A 'Table' in CBS is the logical business entity that holds records for one type of banking object (like CUSTOMER, ACCOUNT, or LIMIT) — it defines the data model, business rules, access controls, and lifecycle. In Temenos, the exact same concept is called an 'Application'. The vocabularies differ but the concept is identical. Knowing these mappings is essential when reading Temenos documentation or working in teams that use both systems."
+  },
+  {
+    "id": 362,
+    "topic": "Temenos Map",
+    "q": "In Temenos, what corresponds to a CBS 'Projection'?",
+    "options": [
+      "Application",
+      "Version",
+      "Routine",
+      "Property"
+    ],
+    "correct": 1,
+    "tip": "A 'Projection' in CBS is the configuration that controls how data is displayed, entered, validated, and processed for a Table — fields shown, mandatory rules, default values, pre/post programs, authorization requirements. Temenos calls this exact same construct a 'Version'. Both let admins define multiple per-role views over the same underlying Table without duplicating data."
+  },
+  {
+    "id": 363,
+    "topic": "Temenos Map",
+    "q": "A CBS 'Plugin' is called what in Temenos?",
+    "options": [
+      "Application",
+      "Version",
+      "Routine",
+      "Property"
+    ],
+    "correct": 2,
+    "tip": "A 'Plugin' in CBS is a programmable logic unit (written in jBase or Java) invoked at defined lifecycle hooks — for example, to validate input, call an external API, or run business calculations. Temenos calls this same construct a 'Routine'. Both attach to lifecycle moments like pre-input, post-authorize, or onBlur of a 'Hot Field'."
+  },
+  {
+    "id": 364,
+    "topic": "Temenos Map",
+    "q": "In Temenos, a 'Product Group' corresponds to what in CBS?",
+    "options": [
+      "Product Class",
+      "Product Type",
+      "Product Attribute",
+      "Contract"
+    ],
+    "correct": 1,
+    "tip": "CBS organizes products in a three-tier hierarchy: Product Class (top — e.g. ACCOUNT, LENDING), Product Type (middle — e.g. PERSONAL.LOAN, MORTGAGE), and Product (the saleable item). Temenos calls the middle tier a 'Product Group'. Both group similar products together and define which Product Attributes (interest, charges, schedules) they share."
+  },
+  {
+    "id": 365,
+    "topic": "Temenos Map",
+    "q": "In Temenos, the 'Property class' is the analogue of which CBS term?",
+    "options": [
+      "Product Class",
+      "Product Type",
+      "Product Attribute Class",
+      "Component"
+    ],
+    "correct": 2,
+    "tip": "A Product Attribute Class in CBS is a reusable set of characteristics/parameters/behaviors that can be applied across products — it standardizes how a feature (like an interest pattern) is defined and inherited. Temenos calls this a 'Property class'. The naming overlap is confusing: Temenos's lowercase 'Property' is the Attribute itself; 'Property class' is the Attribute Class."
+  },
+  {
+    "id": 366,
+    "topic": "Temenos Map",
+    "q": "Temenos calls it 'Product Line'. What's the CBS term?",
+    "options": [
+      "Product Class",
+      "Product Type",
+      "Product Attribute",
+      "Product Builder"
+    ],
+    "correct": 0,
+    "tip": "CBS 'Product Class' is the highest tier of the product hierarchy (e.g. ACCOUNT, LENDING, DEPOSIT). It defines the absolute set of permissible base components and whether each is mandatory or optional. Temenos uses the term 'Product Line' for this same top tier. Below it sit Product Types and the individual saleable Products."
+  },
+  {
+    "id": 367,
+    "topic": "Temenos Map",
+    "q": "What is the CBS equivalent of Temenos 'ARRANGEMENT'?",
+    "options": [
+      "Product",
+      "Contract",
+      "Component",
+      "Activity"
+    ],
+    "correct": 1,
+    "tip": "In CBS, a 'Contract' is the individual customer-specific agreement created from a Product blueprint (e.g. one specific 20-year mortgage for one specific borrower). It inherits properties from the Product but can override negotiated parameters like rate, margin, dates, or limits. Temenos calls this same instance an 'ARRANGEMENT'. The term ARRANGEMENT is also used by Backbase, which integrates with both systems."
+  },
+  {
+    "id": 368,
+    "topic": "Temenos Map",
+    "q": "Temenos 'PROPERTY' (Product Builder component) maps to which CBS term?",
+    "options": [
+      "Product",
+      "Contract",
+      "Component",
+      "Activity"
+    ],
+    "correct": 2,
+    "tip": "In CBS, a 'Component' is a structural element of a product or contract — examples include Interest, Charge, Schedule, Limit, Payment, and Insurance. Each Component controls one specific aspect of contract behavior; a complete product is built by assembling Components. Temenos calls these same structural elements 'PROPERTY' (uppercase, in the Product Builder context)."
+  },
+  {
+    "id": 369,
+    "topic": "Temenos Map",
+    "q": "In Temenos, the Dynamic Data Dictionary is implemented as which application?",
+    "options": [
+      "TABLE.DEF",
+      "FIELD.DEF",
+      "STANDARD.SELECTION",
+      "PROGRAM"
+    ],
+    "correct": 2,
+    "tip": "The Dynamic Data Dictionary (DDD) is the metadata layer that defines the field structure, types, and validation rules for every Table — it lets banks change schemas without recompiling code. In Temenos, the DDD is implemented as the application 'STANDARD.SELECTION'. The two CBS records that underpin DDD are TABLE.DEF (the table's field map) and FIELD.DEF (per-field rules)."
+  },
+  {
+    "id": 370,
+    "topic": "Temenos Map",
+    "q": "A 'Full Screen' projection in CBS corresponds to which Temenos concept?",
+    "options": [
+      "VERSION,ONLINE",
+      "COMMA-VERSION",
+      "FULL.VIEW",
+      "OPEN.SCREEN"
+    ],
+    "correct": 1,
+    "tip": "A 'Full Screen' in CBS is a special projection identified by a comma (,) right after the Table name — e.g. CUSTOMER, — and it requires ZERO authorization levels, meaning the record is committed immediately upon input with no second-user approval. Temenos calls this same pattern a 'COMMA-VERSION'. It's used for low-risk maintenance where the 4-Eyes principle isn't required."
+  },
+  {
+    "id": 371,
+    "topic": "Temenos Map",
+    "q": "Temenos 'Property' (lowercase, attached to products) maps to which CBS term?",
+    "options": [
+      "Component",
+      "Product Attribute",
+      "Plugin",
+      "Activity"
+    ],
+    "correct": 1,
+    "tip": "A 'Product Attribute' in CBS is a standardized, reusable business component you attach to a product — examples include Interest, Charges, and Term Amount. Temenos's lowercase 'Property' refers to this same idea. (Confusingly, uppercase 'PROPERTY' in Temenos's Product Builder is what CBS calls a 'Component'. Same source word, two different layers.)"
+  },
+  {
+    "id": 372,
+    "topic": "Temenos Map",
+    "q": "What CBS term maps to Temenos 'Activity'?",
+    "options": [
+      "Component",
+      "Product Attribute",
+      "Contract Operation",
+      "Override"
+    ],
+    "correct": 2,
+    "tip": "A 'Contract Operation' in CBS is the system mechanism that executes state changes and processing actions on a Contract — for example, applying a repayment, restructuring a loan, or accruing interest. Temenos calls this same mechanism an 'Activity'. Every change to a Contract must go through a defined Contract Operation/Activity rather than direct field editing — this guarantees audit trails and rule enforcement."
+  },
+  {
+    "id": 373,
+    "topic": "Temenos Map",
+    "q": "Temenos 'Activity class' maps to which CBS term?",
+    "options": [
+      "Override Class",
+      "Contract Operation Class",
+      "Product Class",
+      "Product Type"
+    ],
+    "correct": 1,
+    "tip": "A 'Contract Operation Class' in CBS is a grouping/classification of similar Contract Operations within the contract processing engine — useful for permissions and management. Temenos calls this an 'Activity class'. Don't confuse it with OVERRIDE.CLASS (a security class for who can approve a soft-rule exception)."
+  },
+  {
+    "id": 374,
+    "topic": "Temenos Map",
+    "q": "Temenos 'Design' (first lifecycle stage) maps to which CBS lifecycle stage?",
+    "options": [
+      "DefineCapability",
+      "ValidateCapability",
+      "EnableCapability",
+      "Catalogued"
+    ],
+    "correct": 0,
+    "tip": "Products in CBS pass through a three-stage lifecycle: DefineCapability (draft/configure in a sandbox), ValidateCapability (compile and check rules), EnableCapability (publish to the live catalog). The first stage — DefineCapability — is called 'Design' in Temenos. This is where you create the draft product without affecting any live Contracts."
+  },
+  {
+    "id": 375,
+    "topic": "Temenos Map",
+    "q": "Temenos 'Proof' lifecycle stage corresponds to which CBS stage?",
+    "options": [
+      "DefineCapability",
+      "ValidateCapability",
+      "EnableCapability",
+      "Catalogued"
+    ],
+    "correct": 1,
+    "tip": "The middle stage of the product lifecycle in CBS is 'ValidateCapability', where the system compiles the product definition, resolves all inherited parent conditions, and verifies that mandatory attributes and configuration rules are satisfied. Temenos calls this stage 'Proof'. The system blocks any product that fails this stage from reaching customers."
+  },
+  {
+    "id": 376,
+    "topic": "Temenos Map",
+    "q": "Temenos 'Publish' corresponds to which CBS lifecycle stage?",
+    "options": [
+      "DefineCapability",
+      "ValidateCapability",
+      "EnableCapability",
+      "Validated"
+    ],
+    "correct": 2,
+    "tip": "EnableCapability is the final lifecycle stage in CBS where a validated product is activated by generating its runtime representation and publishing it to PRODUCT.CATALOG — making it available for origination APIs and live contracts. Temenos calls this stage 'Publish'. With COMBINE.ACTIONS=YES, EnableCapability runs automatically right after a successful validation."
+  },
+  {
+    "id": 377,
+    "topic": "Temenos Map",
+    "q": "The CBS status 'Validated' is called what in Temenos?",
+    "options": [
+      "Designed",
+      "Proofed",
+      "Published",
+      "Catalogued"
+    ],
+    "correct": 1,
+    "tip": "'Validated' is a product STATUS in CBS — it means the product passed all system validation checks (inheritance resolution, mandatory attribute verification, condition consistency) but has not yet been published to the runtime catalog. Temenos uses 'Proofed' for the same status."
+  },
+  {
+    "id": 378,
+    "topic": "Temenos Map",
+    "q": "The CBS status 'Catalogued' corresponds to what in Temenos?",
+    "options": [
+      "Designed",
+      "Proofed",
+      "Published",
+      "Validated"
+    ],
+    "correct": 2,
+    "tip": "'Catalogued' is the CBS product STATUS meaning the validated product has been successfully published to PRODUCT.CATALOG and is available for live contract origination. Temenos calls this status 'Published'. PRODUCT.CATALOG is the read-only runtime registry of usable products; PRODUCT.BUILDER is the sandbox you stage changes in."
+  },
+  {
+    "id": 379,
+    "topic": "Temenos Map",
+    "q": "Temenos 'Product Designer' corresponds to which CBS environment?",
+    "options": [
+      "Product Catalog",
+      "Product Builder",
+      "Product Class",
+      "Product Factory"
+    ],
+    "correct": 1,
+    "tip": "PRODUCT.BUILDER is the sandbox configuration environment in CBS where administrators create and configure product drafts — defining attributes, inheritance, currencies, and conditions before submitting for validation. Temenos calls this same sandbox 'Product Designer'. Crucially, edits here don't affect the live PRODUCT.CATALOG, so existing Contracts keep running while you build the new product."
+  },
+  {
+    "id": 380,
+    "topic": "Temenos Map",
+    "q": "Which CBS component sits closest to Temenos 'AA' (Arrangement Architecture)?",
+    "options": [
+      "Plugin",
+      "Product Factory",
+      "Enquiry",
+      "Override"
+    ],
+    "correct": 1,
+    "tip": "CBS's 'Product Factory' (sometimes called Product Architecture) is the component-based framework that defines products as compositions of reusable Components (Interest, Fees, Schedules, Limits, Events) and creates per-customer Contracts from them. Temenos calls this same architecture 'AA' (Arrangement Architecture) — sometimes also referred to as Product Builder/Designer. It's the engine that lets banks rapidly assemble new products without writing code."
+  },
+  {
+    "id": 381,
+    "topic": "Temenos Map",
+    "q": "A user moving from Temenos to CBS sees a 'VERSION' — what should she now call it?",
+    "options": [
+      "Application",
+      "Projection",
+      "Routine",
+      "Property"
+    ],
+    "correct": 1,
+    "tip": "Temenos 'VERSION' = CBS 'Projection'. Both are role-specific configurations layered over a base Table/Application — controlling which fields appear, which are mandatory, default values, pre/post hooks, and whether authorization is required. So if a Temenos colleague refers to a 'CUSTOMER,CORP VERSION', the CBS equivalent terminology is the 'CUSTOMER,CORP Projection'."
+  },
+  {
+    "id": 382,
+    "topic": "Temenos Map",
+    "q": "A CBS architect explains 'Activities' to a Temenos colleague — what term should she use?",
+    "options": [
+      "Properties",
+      "Activities (same term in both)",
+      "Versions",
+      "Routines"
+    ],
+    "correct": 1,
+    "tip": "The term 'Activity' is shared across both vocabularies — it refers to a defined business action performed on a Contract (e.g. accrue interest, apply payment, restructure). The mechanism that executes them is called 'Contract Operation' in CBS and 'Activity' (system-side) in Temenos — so the user-facing concept of 'an Activity' translates one-to-one."
+  },
+  {
+    "id": 383,
+    "topic": "Temenos Map",
+    "q": "In a project with both CBS and Temenos screens, the team must edit a 'Routine'. Which CBS object?",
+    "options": [
+      "Table",
+      "Projection",
+      "Plugin",
+      "Enquiry"
+    ],
+    "correct": 2,
+    "tip": "Temenos 'Routine' = CBS 'Plugin'. Both are programmable logic units (jBase or Java) invoked from Projections/Versions to perform complex validations, financial calculations, or external integrations. The trigger points are the same too: pre-input hooks, post-authorize hooks, and onBlur Hot Field events."
+  },
+  {
+    "id": 384,
+    "topic": "Temenos Map",
+    "q": "Mapping the highest product hierarchy tier: CBS 'Product Class' = Temenos…",
+    "options": [
+      "Product Group",
+      "Product Line",
+      "Property",
+      "Application"
+    ],
+    "correct": 1,
+    "tip": "The top tier of the product hierarchy is called 'Product Class' in CBS and 'Product Line' in Temenos. It identifies broad categories like ACCOUNT, LENDING, or DEPOSIT and defines which base Components are mandatory or optional. Beneath this sits Product Type (Temenos: Product Group) and then the individual Product (Temenos: Product)."
+  },
+  {
+    "id": 385,
+    "topic": "Temenos Map",
+    "q": "The COMMA-VERSION pattern in Temenos signals zero-authorization. What's the implication in CBS Full Screen?",
+    "options": [
+      "Two users must approve",
+      "The record becomes authorized immediately upon input — no 4-Eyes",
+      "HOLD is required",
+      "The record goes to SIM"
+    ],
+    "correct": 1,
+    "tip": "A 'Full Screen' projection in CBS (identified by a comma after the Table name, like CUSTOMER,) — the equivalent of a Temenos COMMA-VERSION — bypasses the standard 4-Eyes authorization workflow. As soon as the user submits, the record is authorized and becomes LIVE. This is reserved for low-risk operations where requiring a second approver would add friction without security benefit."
+  },
+  {
+    "id": 386,
+    "topic": "Record/Field",
+    "q": "What is a Record in CBS?",
+    "options": [
+      "A backup file",
+      "A single instance of a Table representing one specific business object",
+      "A reporting tool",
+      "A user account"
+    ],
+    "correct": 1,
+    "tip": "A Table in CBS holds many Records — each Record is a single instance representing one specific business object. For example, the CUSTOMER Table holds many Records: 'CUSTOMER 123456' is one Record (one specific client), 'CUSTOMER 123457' is another. Think of a Table as the schema/container and a Record as one filled-in row. Each Record contains values for all the Fields defined by its Table."
+  },
+  {
+    "id": 387,
+    "topic": "Record/Field",
+    "q": "How is a Record uniquely identified?",
+    "options": [
+      "By color",
+      "By a primary key (ID) — often a client number, account number, deal ID, or alternate key like IBAN",
+      "By creation timestamp only",
+      "By the field count"
+    ],
+    "correct": 1,
+    "tip": "Every Record has a primary key — its unique ID — that lets the system fetch exactly that Record. The ID is typically a domain-meaningful value: a customer number, account number, deal ID, or contract ID. ACCOUNT Records can also be retrieved via an alternate key like IBAN. The primary key is what the standard operations (SEE, INPUT, AUTH, etc.) work against."
+  },
+  {
+    "id": 388,
+    "topic": "Record/Field",
+    "q": "What is a Field in CBS?",
+    "options": [
+      "A whole Record",
+      "A data element within a Record in a Table (like a column in a database)",
+      "A user role",
+      "A plugin"
+    ],
+    "correct": 1,
+    "tip": "A Field is one data element inside a Record — analogous to a column in a relational database table. Examples on a CUSTOMER Record include Customer Name, Date of Birth, Nationality; on an ACCOUNT Record they include Currency, Working Balance, Category. Each Field has metadata (type, validation rules, mandatory/optional status) defined in the Dynamic Data Dictionary (DDD)."
+  },
+  {
+    "id": 389,
+    "topic": "Record/Field",
+    "q": "Which of the following is NOT a property a Field can have?",
+    "options": [
+      "Mandatory or optional",
+      "Single-value or multi-value",
+      "System (vendor-defined) or locally customized",
+      "Cryptographically signed by default"
+    ],
+    "correct": 3,
+    "tip": "Fields can be: mandatory or optional (you must fill them in or not), single-value or multi-value (one value or a list), validated against dictionaries (the DDD checks types and constraints), and either system-defined (shipped by the vendor) or locally customized (added by the bank via DDD injection). Cryptographic signing is not a standard built-in Field property."
+  },
+  {
+    "id": 390,
+    "topic": "Record/Field",
+    "q": "What is a Multi-Value Field?",
+    "options": [
+      "A field shared across multiple records",
+      "A field that can hold multiple values within the same record",
+      "A field with multiple owners",
+      "A field stored in multiple databases"
+    ],
+    "correct": 1,
+    "tip": "A Multi-Value Field holds an ordered list of values inside a single Record — instead of needing a separate child table to hold the list. For example, a customer's PHONE Field can hold three phone numbers as multi-values on the same CUSTOMER Record. This is enabled by the DDD's Non-1NF (Non-First-Normal-Form) support, which lets one Record natively store repeating data."
+  },
+  {
+    "id": 391,
+    "topic": "Record/Field",
+    "q": "Why use a Multi-Value Field instead of a child table?",
+    "options": [
+      "Faster network",
+      "Native storage of repeating data inside one record — co-located, fewer joins, simpler model",
+      "Lower cost",
+      "Better encryption"
+    ],
+    "correct": 1,
+    "tip": "When repeating data (phone numbers, counterparties, repayment installments) is small and tightly tied to its parent Record, a Multi-Value Field stores it all inside that one Record. Benefits: no separate child table to manage, no joins to assemble the data, and the DDD automatically keeps related multi-value Fields aligned via Field Associations (the <, -, > markers). This is one of CBS's signature design choices."
+  },
+  {
+    "id": 392,
+    "topic": "Record/Field",
+    "q": "Canonical examples of Multi-Value Field use:",
+    "options": [
+      "Multiple phone numbers or addresses for a customer; multiple counterparties for a limit",
+      "Currency exchange rates",
+      "Holiday calendars",
+      "Login passwords"
+    ],
+    "correct": 0,
+    "tip": "The glossary highlights two textbook examples: (1) a customer with multiple phone numbers/addresses — all stored as repeating values inside the CUSTOMER Record's PHONE/ADDRESS Field; (2) a credit LIMIT Record with multiple counterparties — all stored inside one LIMIT Record's COUNTERPARTY Field. In both cases, the alternative (separate rows in a child table) would be more complex without adding value."
+  },
+  {
+    "id": 393,
+    "topic": "Record/Field",
+    "q": "Are Fields always vendor-defined?",
+    "options": [
+      "Yes — always",
+      "No — they can be system (vendor-defined) OR locally customized",
+      "Yes — for FIN classification",
+      "Only in INT tables"
+    ],
+    "correct": 1,
+    "tip": "Two kinds of Fields coexist: SYSTEM Fields (vendor-shipped, part of the core product) and LOCAL Fields (banks add their own via DDD customization injection). The DDD automatically injects custom local Fields into TABLE.DEF, instantly extending the Table without touching vendor code. This is what makes CBS adaptable to country-specific or bank-specific requirements without recompilation."
+  },
+  {
+    "id": 394,
+    "topic": "Record/Field",
+    "q": "A Record 'CUSTOMER 123456' represents what conceptually?",
+    "options": [
+      "One specific client",
+      "All clients in the bank",
+      "A reporting view",
+      "A backup snapshot"
+    ],
+    "correct": 0,
+    "tip": "Each Record is ONE specific business object. CUSTOMER 123456 is one specific client of the bank — distinct from CUSTOMER 123457 and every other customer. The CUSTOMER Table holds many such Records. This is the same as 'one row per entity' in a relational database: the table defines structure; rows (Records) are the actual instances."
+  },
+  {
+    "id": 395,
+    "topic": "Record/Field",
+    "q": "What is the role of dictionaries in validating Fields?",
+    "options": [
+      "They have no role",
+      "Fields can be validated against dictionaries (DDD) which enforce data types, format, and constraints",
+      "They only translate languages",
+      "They only count fields"
+    ],
+    "correct": 1,
+    "tip": "The DDD (Dynamic Data Dictionary) is the metadata layer that holds rules for every Field — its data type, format, length, allowed values, and any validation routines (like validateDate or validateAmount). Because the DDD is metadata, not code, an admin can update a rule (e.g. change a field from Numeric to Alphanumeric) and the change applies immediately without recompiling — this is called hot-swappable validation."
+  },
+  {
+    "id": 396,
+    "topic": "Record/Field",
+    "q": "Examples of Fields mentioned in the glossary:",
+    "options": [
+      "Customer Name, Date of Birth, Account Currency, Transfer Amount",
+      "Username, password, IP",
+      "Color, size, weight",
+      "Branch ID only"
+    ],
+    "correct": 0,
+    "tip": "Field examples cited in the glossary: Customer Name and Date of Birth (CUSTOMER Record), Account Currency (ACCOUNT Record), Transfer Amount (FUNDS.TRANSFER Record). Each Field has properties defined in the DDD: mandatory or optional, single or multi-value, validated against dictionaries, and either vendor-defined or locally customized."
+  },
+  {
+    "id": 397,
+    "topic": "Record/Field",
+    "q": "Does a Record contain values for every Field defined in its Table?",
+    "options": [
+      "Yes — every Field has a slot (possibly empty/null if optional)",
+      "No — only some Fields exist per Record",
+      "Only in INT Tables",
+      "Only after AUTH"
+    ],
+    "correct": 0,
+    "tip": "A Record contains a value position for every Field defined by its Table — optional Fields may be empty/null, but the slot exists. This is what makes Records uniform: any code reading a CUSTOMER Record knows exactly which Fields to expect based on the Table's definition in the DDD."
+  },
+  {
+    "id": 398,
+    "topic": "Record/Field",
+    "q": "A customer has three phone numbers. The cleanest model?",
+    "options": [
+      "Three separate customer records",
+      "A multi-value PHONE Field inside one customer record",
+      "Three child tables",
+      "Hardcoded constants"
+    ],
+    "correct": 1,
+    "tip": "Use a single multi-value PHONE Field inside ONE CUSTOMER Record. This is exactly what Non-1NF and multi-value Fields are designed for: keep the data co-located, no joins, automatic index alignment via the DDD's Field Association markers. Creating three separate CUSTOMER Records would imply three customers — totally wrong."
+  },
+  {
+    "id": 399,
+    "topic": "Record/Field",
+    "q": "A credit limit with multiple counterparties is best modeled via…",
+    "options": [
+      "One Record per counterparty",
+      "A multi-value COUNTERPARTY Field in one LIMIT Record",
+      "A linked list outside the system",
+      "Manual notes"
+    ],
+    "correct": 1,
+    "tip": "Per the glossary, a credit LIMIT with multiple counterparties uses a multi-value COUNTERPARTY Field inside one LIMIT Record. All counterparties live together on the limit they apply to. The DDD ensures related multi-value Fields (e.g. counterparty + counterparty's exposure) stay index-aligned via Field Association blocks."
+  },
+  {
+    "id": 400,
+    "topic": "Record/Field",
+    "q": "An IBAN can serve as an alternate key for which kind of Record?",
+    "options": [
+      "A customer",
+      "A program",
+      "An ACCOUNT Record",
+      "A holiday"
+    ],
+    "correct": 2,
+    "tip": "While Records are usually identified by their primary key (customer number, account number, etc.), some Records support alternate keys — IBAN is the canonical example for ACCOUNT Records. So you can SEE an ACCOUNT either by its account number or by its IBAN. The Resolution Waterfall (NAU → LIV → HIS → ARC) still applies — alternate keys just give another way in."
+  },
+  {
+    "id": 401,
+    "topic": "Enquiry/Report",
+    "q": "Per the glossary, an Enquiry is best described as…",
+    "options": [
+      "A write operation",
+      "A read-only view or report over one or more Tables",
+      "A backup",
+      "A plugin"
+    ],
+    "correct": 1,
+    "tip": "An Enquiry is a READ-ONLY configuration that defines: which Tables to query, which Fields to filter on, what sort order, and what to display. It's how you build reports and list views without writing code. Enquiries can also merge data dynamically across Tables (Soft Links) and combine the LIV, NAU, and HIS files into a single virtual view (Virtual Data Merging). They cannot mutate data."
+  },
+  {
+    "id": 402,
+    "topic": "Enquiry/Report",
+    "q": "A Report (per the glossary) is…",
+    "options": [
+      "The same as an Enquiry",
+      "A saved result set of an Enquiry, possibly executed with specific parameters",
+      "A live transaction",
+      "A user role"
+    ],
+    "correct": 1,
+    "tip": "An Enquiry is the DEFINITION (the query and display rules). A Report is the saved RESULT of running an Enquiry — often with parameters baked in (e.g. 'all loans > $1M, branch=Lisbon, month=April'). The separation lets one Enquiry produce many Reports for different parameter combinations without duplicating the underlying logic."
+  },
+  {
+    "id": 403,
+    "topic": "Enquiry/Report",
+    "q": "An Enquiry that joins ACCOUNT and CUSTOMER to show customer names beside accounts uses…",
+    "options": [
+      "Physical foreign keys",
+      "Soft Links (Virtual Joins)",
+      "A child table",
+      "A backup file"
+    ],
+    "correct": 1,
+    "tip": "Soft Links (also called Virtual Joins) let Enquiries fetch related data across Tables WITHOUT physical foreign keys at the database layer. For instance, ACCOUNT Records hold a CUSTOMER field; the Soft Link resolves that to fetch the customer's name from the CUSTOMER Table dynamically at display time. This is one of the Enquiry framework's most powerful features — no schema changes needed to enrich reports."
+  },
+  {
+    "id": 404,
+    "topic": "Enquiry/Report",
+    "q": "A 'saved result set with specific parameters' is most accurately a…",
+    "options": [
+      "Enquiry",
+      "Report",
+      "Projection",
+      "Plugin"
+    ],
+    "correct": 1,
+    "tip": "When you take an Enquiry and run it with specific parameter values (e.g. month=April, currency=USD) and save the output, you get a Report. Reports are useful for compliance archiving, scheduled distributions, and historical snapshots. Enquiries vs Reports: definition vs execution."
+  },
+  {
+    "id": 405,
+    "topic": "Enquiry/Report",
+    "q": "Difference between an Enquiry definition and a Report:",
+    "options": [
+      "No difference",
+      "Enquiry = the query/configuration; Report = a saved/parameterized run of an enquiry",
+      "Enquiry writes; Report reads",
+      "Enquiry runs nightly; Report runs hourly"
+    ],
+    "correct": 1,
+    "tip": "Enquiry = reusable configuration of WHAT and HOW to query. Report = a specific saved execution of that Enquiry, possibly with frozen parameters. Same Enquiry can power many Reports — e.g. one 'Loans-by-branch' Enquiry produces a Madrid Report, a Lisbon Report, etc. This separation is a hallmark of CBS's metadata-driven design."
+  },
+  {
+    "id": 406,
+    "topic": "Enquiry/Report",
+    "q": "An Enquiry can NOT do which of the following?",
+    "options": [
+      "Display data from multiple tables",
+      "Sort and filter records",
+      "Mutate the database directly",
+      "Render charts or grids"
+    ],
+    "correct": 2,
+    "tip": "Enquiries are strictly READ-ONLY — they cannot INPUT, AUTH, REVERSE, or otherwise mutate data. To act on the data shown by an Enquiry, the Fast Path mechanism lets users click a row and launch a target Projection (e.g. CUSTOMER|INPUT) with the record's @ID pre-filled. Enquiry sees; Projection acts. This separation enforces the rule that all writes pass through Projections."
+  },
+  {
+    "id": 407,
+    "topic": "Enquiry/Report",
+    "q": "Filter, sort, and display Fields are all defined in the…",
+    "options": [
+      "Plugin",
+      "Enquiry configuration",
+      "Projection",
+      "Audit fields"
+    ],
+    "correct": 1,
+    "tip": "The Enquiry configuration record is the single place where you specify: which Tables to read, what filters to apply (Fixed Selection for hardcoded filters, Dynamic Selection for user-driven ones), what sort order, and what Fields to display. No code is needed — the framework interprets the configuration at runtime."
+  },
+  {
+    "id": 408,
+    "topic": "Enquiry/Report",
+    "q": "A weekly compliance officer needs the same loan-portfolio output every Monday. Most efficient pattern?",
+    "options": [
+      "Re-build the Enquiry each week",
+      "Save it as a Report (parameterized run) for repeat execution",
+      "Email it manually",
+      "Hardcode it into a plugin"
+    ],
+    "correct": 1,
+    "tip": "Build the Enquiry once with the right structure, then save a Report that captures the specific parameters needed (week-of-year, branch list, currency filter, etc.). The Report can be re-run weekly without rebuilding. This pattern keeps the Enquiry general-purpose while letting different stakeholders own their own parameterized Reports."
+  },
+  {
+    "id": 409,
+    "topic": "Enquiry/Report",
+    "q": "Why does the system separate Enquiry (definition) from Report (saved run)?",
+    "options": [
+      "Storage limits",
+      "Reuse: one Enquiry can yield many Reports with different parameters",
+      "Encryption",
+      "Naming convention"
+    ],
+    "correct": 1,
+    "tip": "Separation of definition from execution is a classic CBS pattern: one Enquiry definition (e.g. 'Loans by Branch') powers many Reports (Madrid Q1, Lisbon Q1, Madrid Q2, etc.) without duplicating the underlying query logic. Update the Enquiry once; every downstream Report benefits. Mirrors how Projection-and-record relate, or Product-and-Contract."
+  },
+  {
+    "id": 410,
+    "topic": "Enquiry/Report",
+    "q": "An Enquiry's data merging behavior is best described as…",
+    "options": [
+      "Pure SQL on LIV",
+      "Virtual Data Merging across LIV/NAU/HIS, flagging INAU rows",
+      "Random samples",
+      "Only HIS data"
+    ],
+    "correct": 1,
+    "tip": "Records in CBS are scattered across lifecycle files: LIV (current authorized), NAU (drafts and edits pending approval), HIS (historical versions), DEL (deleted drafts), SIM (simulation). The Enquiry engine performs Virtual Data Merging — automatically combining LIV/NAU/HIS into one virtual view. Rows with pending NAU drafts are flagged 'INAU' (Input Not Authorised) so users know they're seeing in-flight changes."
+  },
+  {
+    "id": 411,
+    "topic": "Company/Branch",
+    "q": "What is a COMPANY in CBS?",
+    "options": [
+      "A vendor",
+      "A logical entity representing a bank or legal entity within a single instance",
+      "A database server",
+      "A reporting team"
+    ],
+    "correct": 1,
+    "tip": "A Company in CBS is a logical entity — a bank or legal entity — operating inside one CBS installation. Each Company maintains its own datasets (accounts, transactions) but can share parameters (country codes, currencies) and customer lists with other Companies. Multiple Companies in one installation is how a banking group runs subsidiaries or operating units inside a single CBS deployment."
+  },
+  {
+    "id": 412,
+    "topic": "Company/Branch",
+    "q": "Why is COMPANY critical?",
+    "options": [
+      "For UI styling",
+      "For separate accounting and regulatory reporting",
+      "To improve latency",
+      "To pick currencies"
+    ],
+    "correct": 1,
+    "tip": "Each Company has to close its own books and report to regulators independently. The Company concept is what enables this: financial data (FIN classification) is strictly segregated by Company, ensuring one entity's transactions don't pollute another's GL. Without Company separation, a banking group couldn't run multiple legal entities on one installation."
+  },
+  {
+    "id": 413,
+    "topic": "Company/Branch",
+    "q": "What is a Branch (Branch Company) per the glossary?",
+    "options": [
+      "A subordinate organizational unit operating within the Master Company",
+      "A separate database",
+      "A backup site",
+      "A different bank entirely"
+    ],
+    "correct": 0,
+    "tip": "A Branch is a CHILD Company under a Master Company. From a system perspective, branches are organizational subdivisions of the Master Company — they share its application Tables, and operational processes run centrally at the Master Company level. The branch identifier is embedded in record keys so the system knows which branch owns each record."
+  },
+  {
+    "id": 414,
+    "topic": "Company/Branch",
+    "q": "From a system perspective, the Master Company and its branches…",
+    "options": [
+      "Have separate Table Registries",
+      "Share the same application Tables in the Table Registry",
+      "Run on different servers",
+      "Use different software versions"
+    ],
+    "correct": 1,
+    "tip": "Master Company and all its branches share the SAME application Tables in the Table Registry — meaning the same data structures and rules apply uniformly across the group. The branches don't have isolated schemas. What differs is the record key, which includes the branch identifier so records can still be filtered/segregated per branch."
+  },
+  {
+    "id": 415,
+    "topic": "Company/Branch",
+    "q": "Operational processes (in the Master/Branch model) are executed where?",
+    "options": [
+      "Separately at each branch",
+      "Centrally at the Master Company level",
+      "Only at HQ vendor",
+      "Manually per branch"
+    ],
+    "correct": 1,
+    "tip": "Centralized execution at the Master Company level — branches are subdivisions, not independent operators. This is why End-of-Day (EOD) and Start-of-Day (SOD) batches can be run per Company (the Master) and naturally cover all branches. It also explains why the Master Company is described as 'the primary autonomous banking entity'."
+  },
+  {
+    "id": 416,
+    "topic": "Company/Branch",
+    "q": "The branch identifier appears in…",
+    "options": [
+      "The login screen",
+      "The record keys (i.e. inside the primary key)",
+      "Only in audit fields",
+      "Only in user names"
+    ],
+    "correct": 1,
+    "tip": "The branch/company identifier is part of record keys themselves — so when you look up ACCOUNT 10001, the system knows from the key which branch owns that account. This is how the shared Table Registry stays coherent across many branches without needing physically separate tables per branch."
+  },
+  {
+    "id": 417,
+    "topic": "Company/Branch",
+    "q": "Can Companies share parameters and customer lists?",
+    "options": [
+      "No — fully isolated",
+      "Yes — each Company maintains its own datasets but parameters and customers can be shared",
+      "Only with vendor approval",
+      "Only at year-end"
+    ],
+    "correct": 1,
+    "tip": "Yes. Each Company has its own transactional data (FIN), but installation-wide parameters (INT classification — COUNTRY, LANGUAGE, CURRENCY) are universally shared, and customer data (CUS classification) can be either shared or segregated depending on config. This flexibility lets a group share a single customer view across subsidiaries while keeping each subsidiary's accounts separate."
+  },
+  {
+    "id": 418,
+    "topic": "Company/Branch",
+    "q": "Which classification supports installation-wide sharing across all Companies?",
+    "options": [
+      "FIN",
+      "CUS",
+      "INT",
+      "SIM"
+    ],
+    "correct": 2,
+    "tip": "Tables in CBS have one of three classifications, controlling data scope. INT (Installation) — universally shared across every Company; one copy for the whole installation (e.g. COUNTRY, LANGUAGE). FIN (Financial) — strictly segregated per Company/book (e.g. ACCOUNT). CUS (Customer) — can be shared or segregated based on configuration."
+  },
+  {
+    "id": 419,
+    "topic": "Company/Branch",
+    "q": "Which classification is strictly segregated by Company/book?",
+    "options": [
+      "FIN",
+      "INT",
+      "SIM",
+      "ARC"
+    ],
+    "correct": 0,
+    "tip": "FIN (Financial) data — transactional records like ACCOUNT, FUNDS.TRANSFER — MUST be segregated by Company/book. Each Company owns its own FIN data; you cannot accidentally see another Company's accounts. This is a non-negotiable regulatory and accounting requirement, baked into the FILE registry's classification system."
+  },
+  {
+    "id": 420,
+    "topic": "Company/Branch",
+    "q": "Branches in CBS are architecturally best described as…",
+    "options": [
+      "Independent banks",
+      "Subdivisions of the Master Company that share Tables and operate centrally",
+      "Hardware partitions",
+      "Different products"
+    ],
+    "correct": 1,
+    "tip": "Architecturally, branches are subdivisions — not independent entities. They share Tables with their Master Company and rely on centralized operational processes. From the data model perspective, they're identified by a branch code inside record keys. This contrasts with separate Companies in the installation, which are independent banks/legal entities."
+  },
+  {
+    "id": 421,
+    "topic": "COB/EOD/SOD",
+    "q": "What does COB stand for?",
+    "options": [
+      "Close of Business",
+      "Cost of Banking",
+      "Center of Banking",
+      "Code of Behavior"
+    ],
+    "correct": 0,
+    "tip": "COB = Close of Business. It refers to the batch end-of-day processing cycle that finalizes one banking day and prepares the system for the next. COB is composed of two phases: EOD (End-of-Day) closes the current day; SOD (Start-of-Day) opens the next. Most banks run COB overnight; nothing else can happen on the affected Company while COB is running."
+  },
+  {
+    "id": 422,
+    "topic": "COB/EOD/SOD",
+    "q": "COB is divided into which two phases?",
+    "options": [
+      "EOD (End-of-Day) and SOD (Start-of-Day)",
+      "INPUT and OUTPUT",
+      "DRAFT and FINAL",
+      "OPEN and CLOSE"
+    ],
+    "correct": 0,
+    "tip": "COB has two halves: EOD (End-of-Day) closes the current banking day — accrues interest, processes standing orders, runs reports, performs day-end revaluations. SOD (Start-of-Day) opens the next banking day — rolls the bank date forward, resets daily counters, prepares the system for online transactions."
+  },
+  {
+    "id": 423,
+    "topic": "COB/EOD/SOD",
+    "q": "Which task is performed during COB?",
+    "options": [
+      "Interest calculation",
+      "Revaluation",
+      "Date rollover",
+      "All of the above"
+    ],
+    "correct": 3,
+    "tip": "COB executes a set of batch jobs covering everything that needs to happen between days: date rollovers (the bank date moves to the next working day, skipping weekends/holidays per the DATES and HOLIDAY Tables), interest calculations on accounts/loans, revaluation of foreign-currency balances against new exchange rates, standing-order processing, and various reporting routines."
+  },
+  {
+    "id": 424,
+    "topic": "COB/EOD/SOD",
+    "q": "Can COB batches be run per Company or only system-wide?",
+    "options": [
+      "Only system-wide",
+      "Per Company — batches can be run separately for each Company",
+      "Only at HQ",
+      "Only on weekends"
+    ],
+    "correct": 1,
+    "tip": "COB runs per Company. Each Company has its own COB cycle — useful because Companies may have different cut-off times (different time zones), different product mixes, and independent reporting deadlines. One Company's COB starting or finishing doesn't constrain another's, allowing 24/7 multi-company operation."
+  },
+  {
+    "id": 425,
+    "topic": "COB/EOD/SOD",
+    "q": "Which task is NOT typically part of COB?",
+    "options": [
+      "Interest accrual",
+      "Standing order processing",
+      "Customer onboarding (real-time)",
+      "Day rollover"
+    ],
+    "correct": 2,
+    "tip": "COB is a BATCH process — it handles things that run periodically. Customer onboarding is an ONLINE/real-time operation done during the banking day, not part of the nightly batch. COB tasks include interest accrual, standing orders, date rollovers, revaluations, reports, and day open/close."
+  },
+  {
+    "id": 426,
+    "topic": "COB/EOD/SOD",
+    "q": "EOD specifically focuses on…",
+    "options": [
+      "Ending the current banking day's processing",
+      "Generating user passwords",
+      "Hardware checks",
+      "Antivirus scans"
+    ],
+    "correct": 0,
+    "tip": "EOD = End-of-Day. It's the first half of COB — closing the current day's activities. It runs interest accruals, reconciles GL postings, generates end-of-day reports, revalues FX positions, and ensures everything is settled before SOD begins. EOD must complete cleanly before SOD opens the new day."
+  },
+  {
+    "id": 427,
+    "topic": "COB/EOD/SOD",
+    "q": "SOD specifically focuses on…",
+    "options": [
+      "Starting the next banking day's processing",
+      "Cleaning the database",
+      "Sending email",
+      "Logging out users"
+    ],
+    "correct": 0,
+    "tip": "SOD = Start-of-Day. It's the second half of COB — opening the next day. SOD advances the bank date (in the DATES Table), resets daily counters, runs any 'beginning of day' processes, and makes the system ready for online transactions. After SOD, tellers and online channels can resume."
+  },
+  {
+    "id": 428,
+    "topic": "COB/EOD/SOD",
+    "q": "Which Table primarily controls the Bank Date that COB rolls over?",
+    "options": [
+      "CUSTOMER",
+      "DATES",
+      "HOLIDAY",
+      "CURRENCY"
+    ],
+    "correct": 1,
+    "tip": "The DATES Table holds the Bank Date — the system's current operational date, which can differ from the calendar date during long COB cycles. SOD updates DATES to the next working day, consulting the HOLIDAY Table to skip weekends and bank holidays. Any process that checks 'today' actually reads from DATES."
+  },
+  {
+    "id": 429,
+    "topic": "COB/EOD/SOD",
+    "q": "Revaluation during COB typically involves…",
+    "options": [
+      "Re-computing foreign-currency balances against current exchange rates",
+      "Resetting passwords",
+      "Sending text messages",
+      "Backing up the database"
+    ],
+    "correct": 0,
+    "tip": "Revaluation re-computes foreign-currency balances against the day's closing rates so the balance sheet reflects current values. The CURRENCY Table provides the rates (including ISO codes and decimal places per currency). This ensures the bank's reported financial position is accurate at day's end."
+  },
+  {
+    "id": 430,
+    "topic": "COB/EOD/SOD",
+    "q": "Why might one Company's COB finish before another's?",
+    "options": [
+      "Random ordering",
+      "Batches run separately per Company, so volume, schedule, and config vary",
+      "Disk speed only",
+      "Time zone of vendor"
+    ],
+    "correct": 1,
+    "tip": "Because each Company runs its own COB independently, variables differ: transaction volume (more deposits/loans = more work), configured cut-off, product mix, and scheduling. A small subsidiary may finish COB in 30 minutes; a large one may take several hours. The COB-per-Company design is what enables this parallelism."
+  },
+  {
+    "id": 431,
+    "topic": "Auth/Security",
+    "q": "What is Authorisation in CBS?",
+    "options": [
+      "Login",
+      "The transaction approval mechanism",
+      "File compression",
+      "Currency exchange"
+    ],
+    "correct": 1,
+    "tip": "Authorisation is the approval mechanism that enforces the 4-Eyes Principle. Many transactions in CBS require a second user to confirm before they impact LIV (the authorized live state) and the General Ledger. The two-factor scheme is 'Initiator + Authoriser': one user creates/edits the record (which goes to NAU as UNAU); a different user must then AUTH it to make it LIVE."
+  },
+  {
+    "id": 432,
+    "topic": "Auth/Security",
+    "q": "The two roles in the standard authorisation scheme are…",
+    "options": [
+      "Customer + Teller",
+      "Initiator + Authoriser",
+      "Branch + HQ",
+      "Vendor + Client"
+    ],
+    "correct": 1,
+    "tip": "Initiator = the user who creates/edits the record via INPUT (the record lands in NAU as UNAU — Unauthorized). Authoriser = a DIFFERENT user who reviews and AUTH-approves it (the record moves to LIV). This separation prevents fraud and errors by ensuring no single individual can both create and approve a sensitive transaction."
+  },
+  {
+    "id": 433,
+    "topic": "Auth/Security",
+    "q": "In the security model, what is a USER?",
+    "options": [
+      "A customer of the bank",
+      "An individual interacting with the system",
+      "A vendor representative",
+      "A regulator"
+    ],
+    "correct": 1,
+    "tip": "USER = an individual (typically a bank employee) interacting with the system. Each USER has unique credentials and is identified in the audit trail. The USER concept is what the audit fields INPUTTER (who created/edited) and AUTHORISER (who approved) reference — both are tied back to specific user IDs."
+  },
+  {
+    "id": 434,
+    "topic": "Auth/Security",
+    "q": "What does a Profile / Role define?",
+    "options": [
+      "UI styling",
+      "Which Tables, Companies, and records a user can access; what operations are allowed; what data is visible",
+      "Holiday calendar",
+      "Currency rates"
+    ],
+    "correct": 1,
+    "tip": "A Profile (or Role) is the user's security envelope. It defines: which Tables the user can read/write, which Companies and branches they can act in, which specific records they can touch, what operations are allowed (INPUT, AUTHORISE, ENQUIRY, REVERSE, etc.), and what data is visible (filterable by Company/branch/unit). It's classic role-based access control (RBAC)."
+  },
+  {
+    "id": 435,
+    "topic": "Auth/Security",
+    "q": "Which operations might a role explicitly authorise?",
+    "options": [
+      "INPUT, AUTHORISE, ENQUIRY",
+      "Only Login",
+      "Only viewing",
+      "Only printing"
+    ],
+    "correct": 0,
+    "tip": "Profiles grant granular operation permissions. Common ones: INPUT (create/edit), AUTHORISE (approve UNAU records), ENQUIRY (read-only reporting), REVERSE (cancel a live transaction), DELETE (remove drafts). Different roles get different combinations — tellers can INPUT and ENQUIRY; managers can also AUTHORISE; admins may have everything."
+  },
+  {
+    "id": 436,
+    "topic": "Auth/Security",
+    "q": "Why does the security model emphasize segregation of duties?",
+    "options": [
+      "For cost reasons",
+      "To prevent any single user from both initiating and approving sensitive transactions",
+      "Vendor mandate",
+      "Network performance"
+    ],
+    "correct": 1,
+    "tip": "Segregation of duties is a fundamental anti-fraud control: no single person should be able to create AND approve the same transaction. The Profile system enforces this — a teller's role typically excludes AUTHORISE on transactions they Initiate. The audit fields INPUTTER and AUTHORISER are always recorded, and they must differ for any 4-Eyes transaction to be valid."
+  },
+  {
+    "id": 437,
+    "topic": "Auth/Security",
+    "q": "A two-factor scheme requires which two distinct actors?",
+    "options": [
+      "Initiator and Authoriser",
+      "Customer and Teller",
+      "Branch and HQ",
+      "Auditor and Vendor"
+    ],
+    "correct": 0,
+    "tip": "The 4-Eyes Principle requires Initiator (creates the record via INPUT) and Authoriser (approves via AUTH). Two factors = two different users. This is enforced both by the Profile system (preventing the same role from doing both) AND by the AUTHORISER audit field, which records who actually approved each version."
+  },
+  {
+    "id": 438,
+    "topic": "Auth/Security",
+    "q": "Data visibility (per-Profile) can be limited by which dimensions?",
+    "options": [
+      "COMPANY, branch, unit",
+      "Only COMPANY",
+      "Only branch",
+      "Only unit"
+    ],
+    "correct": 0,
+    "tip": "Profiles can restrict visible data by COMPANY (legal entity), branch (subdivision), and unit (department/desk). A teller at the Lisbon branch of Subsidiary A would only see records belonging to that scope — not records from Subsidiary B or from a different branch. This makes the system safe for use across complex multi-entity banking groups."
+  },
+  {
+    "id": 439,
+    "topic": "Auth/Security",
+    "q": "What three operational areas does the security model expressly support segregation between?",
+    "options": [
+      "Front-office, back-office, administration",
+      "Sales, marketing, IT",
+      "Tellers, managers, vendors",
+      "Online, offline, hybrid"
+    ],
+    "correct": 0,
+    "tip": "Standard banking segregation: front-office (customer-facing — tellers, RMs), back-office (operations, settlement, reconciliation), and administration (system config, user management). Different Profiles per area prevent any one person from controlling the full lifecycle of a transaction — a core principle in regulated banking."
+  },
+  {
+    "id": 440,
+    "topic": "Auth/Security",
+    "q": "If a user is configured as Initiator for FUNDS.TRANSFER, can she also AUTHORISE her own transfer?",
+    "options": [
+      "Yes — same user always",
+      "No — the Profile typically prevents the same user from authorising her own input",
+      "Only at month-end",
+      "Only above $1M"
+    ],
+    "correct": 1,
+    "tip": "The Profile system is designed to prevent this. Even if a user has both INPUT and AUTHORISE permissions on FUNDS.TRANSFER, the system distinguishes WHOSE record is being authorised: the original Initiator (recorded in INPUTTER) cannot also be the Authoriser (recorded in AUTHORISER). This is enforced at the framework level — not a per-user toggle."
+  },
+  {
+    "id": 441,
+    "topic": "Auth/Security",
+    "q": "An ENQUIRY-only Profile means…",
+    "options": [
+      "The user can read but cannot create/edit/approve",
+      "The user has admin rights",
+      "Customer-facing only",
+      "Vendor-only"
+    ],
+    "correct": 0,
+    "tip": "An ENQUIRY-only Profile grants read access via Enquiries — the user can run reports, view lists, drill into details — but cannot INPUT (create), AUTHORISE (approve), REVERSE, or otherwise mutate the database. Useful for compliance officers, internal auditors, and read-only management dashboards."
+  },
+  {
+    "id": 442,
+    "topic": "Auth/Security",
+    "q": "Profiles often differ between which staff types?",
+    "options": [
+      "Tellers, branch managers, and administrators",
+      "Vendors and customers",
+      "Holidays and working days",
+      "Regulators and shareholders"
+    ],
+    "correct": 0,
+    "tip": "Typical Profiles by role: TELLER (INPUT on transactions, ENQUIRY on accounts, no AUTHORISE), MANAGER (everything the teller has + AUTHORISE for relevant amount thresholds), ADMIN (system configuration, USER table, override management). Each is scoped to specific Tables, operations, and data visibility."
+  },
+  {
+    "id": 443,
+    "topic": "Auth/Security",
+    "q": "What audit fields trace the Initiator and Authoriser of a record?",
+    "options": [
+      "INPUTTER and AUTHORISER (multi-valued)",
+      "NAME and DATE",
+      "BRANCH and CURRENCY",
+      "COMPANY and SECTOR"
+    ],
+    "correct": 0,
+    "tip": "Every Record's audit block records two arrays: INPUTTER (the user IDs and departments that created/modified each version) and AUTHORISER (the user IDs and departments that approved each version). They're multi-valued because a Record may go through many input/approve cycles over its lifetime — the audit captures the FULL chain."
+  },
+  {
+    "id": 444,
+    "topic": "Auth/Security",
+    "q": "Why are INPUTTER and AUTHORISER multi-valued?",
+    "options": [
+      "UI display only",
+      "To capture the full chain when multiple edits/approvals occur over the record's lifecycle",
+      "Random database choice",
+      "To save storage"
+    ],
+    "correct": 1,
+    "tip": "A Record can be amended many times — each amendment is a new INPUT/AUTH cycle. The multi-value audit fields preserve every cycle: who edited the v1, who approved v1, who edited v2, who approved v2, and so on. This is critical for compliance investigations: 'who approved the third amendment to this loan and when?' Multi-value INPUTTER/AUTHORISER answer that."
+  },
+  {
+    "id": 445,
+    "topic": "Auth/Security",
+    "q": "A 'Profile' in CBS is most analogous to which industry concept?",
+    "options": [
+      "A user's display name",
+      "A role-based access-control set",
+      "A backup config",
+      "A printer setup"
+    ],
+    "correct": 1,
+    "tip": "Profiles in CBS implement role-based access control (RBAC) — the industry-standard model where permissions are granted to roles, and users inherit them via role assignment. Where CBS goes further than basic RBAC is in the dimensional scoping: by Table, Company, branch, unit, AND operation type."
+  },
+  {
+    "id": 446,
+    "topic": "Product/Contract",
+    "q": "Per the glossary, a Product is best described as…",
+    "options": [
+      "A specific customer contract",
+      "A configurable blueprint that defines structure, properties, and conditions required to create an Arrangement (Contract)",
+      "A backup file",
+      "A reporting tool"
+    ],
+    "correct": 1,
+    "tip": "A Product is a BLUEPRINT — not an actual customer contract. It defines the structure, properties, and conditions (interest formula, fee schedule, repayment terms) that a Contract must follow. One Product (e.g. 'Gold Mortgage') can spawn thousands of Contracts (one per customer who takes out that mortgage). Products can also be abstract — declaring conditions that descendant products must concretize."
+  },
+  {
+    "id": 447,
+    "topic": "Product/Contract",
+    "q": "A Contract (= Temenos ARRANGEMENT) is…",
+    "options": [
+      "The Product itself",
+      "An individual customer contract created from a Product in Product Factory",
+      "A reporting view",
+      "A user role"
+    ],
+    "correct": 1,
+    "tip": "A Contract is the per-customer instance born from a Product. So if 'Gold Mortgage' is the Product, then 'John Smith's 20-year Gold Mortgage signed on 2024-03-01 at 4.5%' is a Contract. The Contract inherits everything from the Product but can override negotiated parameters (rate, margin, dates, limits) specific to that customer."
+  },
+  {
+    "id": 448,
+    "topic": "Product/Contract",
+    "q": "Which parameters can a Contract override from its parent Product?",
+    "options": [
+      "None — Contract is fixed",
+      "Rate, margin, dates, limits — negotiation parameters",
+      "Only the name",
+      "Only the currency"
+    ],
+    "correct": 1,
+    "tip": "The Contract can override parameters that legitimately vary per customer: interest rate, margin, start/end dates, limits, etc. These are the 'negotiation' parameters. Other Product attributes — like which Components apply, the underlying schedules' structure, accounting rules — are inherited from the Product and aren't typically overridden at the Contract level."
+  },
+  {
+    "id": 449,
+    "topic": "Product/Contract",
+    "q": "What is a COMPONENT in Product Builder?",
+    "options": [
+      "A UI button",
+      "A structural element of a product or arrangement (e.g. Interest, Charge, Schedule, Limit, Payment, Insurance)",
+      "A user",
+      "A holiday"
+    ],
+    "correct": 1,
+    "tip": "A Component is one piece of a Product's structure — like a building block. Each Component controls a specific aspect: Interest defines the interest calculation, Charge defines fees, Schedule defines repayment installments, Limit defines credit limits, Payment defines payment processing, Insurance defines bundled insurance. A complete Product is composed of multiple Components."
+  },
+  {
+    "id": 450,
+    "topic": "Product/Contract",
+    "q": "A complete product definition is formed by…",
+    "options": [
+      "A single component",
+      "A set of components together",
+      "Only the name",
+      "Only the parent product"
+    ],
+    "correct": 1,
+    "tip": "A Product isn't a single thing — it's an assembly of Components. A Mortgage Product typically includes an Interest Component, a Charge Component (fees), a Schedule Component (monthly repayments), a Limit Component (credit limit), maybe an Insurance Component. Together, they define how the Product behaves end-to-end."
+  },
+  {
+    "id": 451,
+    "topic": "Product/Contract",
+    "q": "Which is NOT a typical Product Component?",
+    "options": [
+      "Interest",
+      "Charge",
+      "Schedule",
+      "Username"
+    ],
+    "correct": 3,
+    "tip": "Typical Components per the glossary: Interest, Charge, Schedule, Limit, Payment, Insurance. Username is a security concept (USER Table) — it has nothing to do with product structure. Components are always business/financial building blocks of the contract behavior."
+  },
+  {
+    "id": 452,
+    "topic": "Product/Contract",
+    "q": "Where in the Temenos vocabulary does 'COMPONENT' map?",
+    "options": [
+      "VERSION",
+      "PROPERTY",
+      "ROUTINE",
+      "ARRANGEMENT"
+    ],
+    "correct": 1,
+    "tip": "CBS COMPONENT = Temenos PROPERTY (uppercase, as a Product Builder element). Beware the naming collision: Temenos uppercase 'PROPERTY' is a Component; lowercase 'Property' is a Product Attribute. CBS uses two distinct words ('Component' for the building block, 'Product Attribute' for the reusable behavior class) to avoid this confusion."
+  },
+  {
+    "id": 453,
+    "topic": "Product/Contract",
+    "q": "A Product can serve as a parent entity with…",
+    "options": [
+      "Abstract conditions that must be redefined in the descendant",
+      "Only fixed values",
+      "No conditions at all",
+      "Random conditions"
+    ],
+    "correct": 0,
+    "tip": "Products can be ABSTRACT — they declare conditions but leave them to be filled in by descendant Products. For instance, a base 'Mortgage' Product might declare 'rate must be set' without specifying what; concrete descendants like 'Gold Mortgage' and 'Diamond Mortgage' override that with actual rates. This abstraction is the basis of PARENT.PRODUCT inheritance."
+  },
+  {
+    "id": 454,
+    "topic": "Product/Contract",
+    "q": "PARENT.PRODUCT inheritance allows a child to…",
+    "options": [
+      "Replace the parent entirely",
+      "Inherit attributes/conditions and override only the delta",
+      "Use a different schema",
+      "Use a different database"
+    ],
+    "correct": 1,
+    "tip": "If you set a Product's PARENT.PRODUCT to another Product, the child inherits all the parent's attributes and conditions — you only specify the DELTA (the differences). To create 'Diamond Mortgage' identical to 'Gold Mortgage' except 0.5% lower rate, define Diamond with PARENT.PRODUCT=Gold and just override the rate. Reduces drift and configuration time dramatically."
+  },
+  {
+    "id": 455,
+    "topic": "Product/Contract",
+    "q": "Why does the system distinguish Product (blueprint) from Contract (instance)?",
+    "options": [
+      "Marketing reasons",
+      "Reuse + versioning: one Product spawns many Contracts; effective-dated changes to Product don't disrupt active Contracts",
+      "Storage cost",
+      "Vendor mandate"
+    ],
+    "correct": 1,
+    "tip": "Reuse: one Product blueprint serves thousands of customers' Contracts. Versioning: Products are versioned by PRODUCT.ID + EFFECTIVE.DATE — new versions can be scheduled to take effect at a future date without disrupting Contracts already in force under the old version. This is the same pattern as having a class and many instances in OO programming."
+  },
+  {
+    "id": 456,
+    "topic": "Product/Contract",
+    "q": "Which Contract field would NOT typically be inheritance-overridable?",
+    "options": [
+      "Rate",
+      "Margin",
+      "Dates",
+      "Product Class (top tier)"
+    ],
+    "correct": 3,
+    "tip": "Negotiable per-Contract: rate, margin, start/end dates, limits. NOT negotiable per-Contract: the architectural framing — Product Class (top tier — ACCOUNT/LENDING/DEPOSIT), the set of Components used, the system-level accounting hooks. These are inherited rigidly from the Product hierarchy and shape the Contract's overall behavior."
+  },
+  {
+    "id": 457,
+    "topic": "Product/Contract",
+    "q": "A Personal Loan with a special promotional rate for a VIP customer would be modeled as…",
+    "options": [
+      "A new Product for that one customer",
+      "A standard Contract from the Personal Loan Product, with rate overridden at the Contract level",
+      "A manual ledger entry",
+      "A SIM record"
+    ],
+    "correct": 1,
+    "tip": "Standard pattern: use the existing Personal Loan Product but override the negotiated rate in that VIP's Contract. Creating a new Product per customer would explode product count, complicate maintenance, and defeat the purpose of the Product/Contract distinction. Per-customer negotiation belongs at the Contract level."
+  },
+  {
+    "id": 458,
+    "topic": "Product/Contract",
+    "q": "A new bank product launching with the same Interest behavior as an existing one benefits from…",
+    "options": [
+      "Code duplication",
+      "Modular Building-Block Assembly — share the Interest Component, no duplication",
+      "Manual entry",
+      "A new database"
+    ],
+    "correct": 1,
+    "tip": "Components are reusable building blocks. The same Interest Component can be plugged into many Products. So if the bank tweaks the Interest Component (fixes a rounding bug, adds a new pattern), every Product using that Component instantly benefits — no per-Product code change needed. This is one of the Product Factory's biggest leverage points."
+  },
+  {
+    "id": 459,
+    "topic": "Product/Contract",
+    "q": "If a bank enhances the 'Charges' Component, which Products benefit?",
+    "options": [
+      "Only new Products",
+      "Every Product using that Component instantly benefits",
+      "Only the latest version",
+      "No Products"
+    ],
+    "correct": 1,
+    "tip": "Modular Building-Block Assembly means a Component change propagates everywhere the Component is used. Enhance Charges once — and every Product that includes Charges picks up the improvement automatically. Single change, system-wide benefit. This is the key advantage of composition over per-Product hardcoding."
+  },
+  {
+    "id": 460,
+    "topic": "Product/Contract",
+    "q": "The Contract Operation mechanism is responsible for…",
+    "options": [
+      "Executing state changes and processing actions on Contracts created from Products",
+      "Approving loans manually",
+      "Sending emails",
+      "Backup"
+    ],
+    "correct": 0,
+    "tip": "Contract Operation = the system engine that runs defined business actions (Activities) on Contracts: applying a payment, restructuring a loan, accruing interest, etc. The key point is that Contracts can ONLY be modified via Contract Operations / Activities — not by free-form Field editing. This ensures every change is rule-checked, audited, and lifecycle-aware. Temenos calls this an 'Activity'."
+  },
+  {
+    "id": 461,
+    "topic": "Soft Accounting",
+    "q": "What is Soft Accounting?",
+    "options": [
+      "A bookkeeping skill",
+      "Flexible accounting configuration framework within Product Factory allowing financial postings to be adjusted via configuration rather than code",
+      "An external accounting tool",
+      "A backup ledger"
+    ],
+    "correct": 1,
+    "tip": "Soft Accounting is the framework that lets banks adjust how transactions post to the General Ledger via CONFIGURATION rather than code changes. The same business event (e.g. interest accrual) can produce different GL postings in different countries, products, or regulatory regimes — all defined as config. This is critical for international banks operating under multiple accounting standards (IFRS, US GAAP, local regulators)."
+  },
+  {
+    "id": 462,
+    "topic": "Soft Accounting",
+    "q": "Why is Soft Accounting valuable to a bank?",
+    "options": [
+      "It reduces customer count",
+      "It adapts accounting rules to products/entities/regulators without changing code",
+      "It backs up faster",
+      "It improves UI"
+    ],
+    "correct": 1,
+    "tip": "Without Soft Accounting, every accounting rule change (new regulator, new product variant, new local treatment) would require a developer to modify code, test, and deploy — slow and risky. Soft Accounting reduces these to config changes that take minutes and don't touch the codebase. This is essential in a regulated industry where rules change frequently."
+  },
+  {
+    "id": 463,
+    "topic": "Soft Accounting",
+    "q": "Soft Accounting lives within which architecture?",
+    "options": [
+      "Product Factory",
+      "Plugin Architecture",
+      "Enquiry framework",
+      "Audit framework"
+    ],
+    "correct": 0,
+    "tip": "Soft Accounting is part of the Product Factory — accounting behavior is configured per Product (and inheritable to Contracts) so that different Products can post differently. The Product Factory's component-based design naturally accommodates Soft Accounting as another configurable Component layer."
+  },
+  {
+    "id": 464,
+    "topic": "Soft Accounting",
+    "q": "A bank operating in two regulatory environments uses Soft Accounting to…",
+    "options": [
+      "Hide records",
+      "Tailor financial postings per environment through configuration",
+      "Block transactions",
+      "Bypass audit"
+    ],
+    "correct": 1,
+    "tip": "Concrete example: the same loan disbursement might post one set of GL entries under IFRS rules (used by the European subsidiary) and a different set under US GAAP rules (used by the American subsidiary). Soft Accounting handles this through configuration — same business event, different postings, no code change."
+  },
+  {
+    "id": 465,
+    "topic": "Consolidation",
+    "q": "What is a Consolidation Key?",
+    "options": [
+      "A login key",
+      "A configurable aggregation key used for financial consolidation and reporting",
+      "A primary key",
+      "An encryption key"
+    ],
+    "correct": 1,
+    "tip": "A Consolidation Key is an aggregation tag attached to financial postings to group them for reporting. By configuring keys (by region, currency, product type, etc.), the bank can roll up data for consolidated financial statements (e.g. group-level P&L). The key structure is configurable so each bank can build the consolidation hierarchies relevant to their org chart and regulatory reporting needs."
+  },
+  {
+    "id": 466,
+    "topic": "Consolidation",
+    "q": "Why are Consolidation Keys configurable?",
+    "options": [
+      "For UI",
+      "So banks can define their own aggregation hierarchies for reporting",
+      "To compress data",
+      "To slow down reports"
+    ],
+    "correct": 1,
+    "tip": "Different banks consolidate differently. A retail bank might consolidate by branch and product family; a multinational might consolidate by country and currency; an investment bank might consolidate by desk and trading book. Configurable Consolidation Keys let each bank define its own dimensions without vendor changes."
+  },
+  {
+    "id": 467,
+    "topic": "Activity",
+    "q": "What is an ACTIVITY in Product Factory?",
+    "options": [
+      "A user login event",
+      "A business action performed on a Contract within the Product Factory",
+      "A backup process",
+      "A holiday"
+    ],
+    "correct": 1,
+    "tip": "An Activity (= Contract Operation in CBS internals) is a defined business action you can perform on a Contract — examples: apply a repayment, accrue interest, draw down on a facility, restructure terms, close the contract. Every Contract change MUST go through an Activity; you cannot just edit a Contract's Fields directly. This enforces consistency, audit, and business-rule integrity."
+  },
+  {
+    "id": 468,
+    "topic": "Activity",
+    "q": "Why can't Product Factory components be modified arbitrarily?",
+    "options": [
+      "Vendor whim",
+      "Because all changes must occur through defined Activities — preserving controlled, auditable contract evolution",
+      "To slow down work",
+      "Random restriction"
+    ],
+    "correct": 1,
+    "tip": "Free-form editing of a Contract's components would bypass business rules and break the audit trail. Activities encapsulate every legitimate change as a defined operation with rules, validations, and ledger impacts. The result: every Contract change has a known reason, was performed by a known user, and respected all applicable business rules — vital for regulated banking."
+  },
+  {
+    "id": 469,
+    "topic": "Activity",
+    "q": "Compared with traditional Table editing, the Activity model is…",
+    "options": [
+      "Less controlled",
+      "More controlled — every change is a defined, auditable action",
+      "Random",
+      "Identical"
+    ],
+    "correct": 1,
+    "tip": "Traditional Tables let users edit fields directly through Projections (with 4-Eyes authorisation). The Product Factory Activity model goes further: even within a Contract you can't free-edit fields — you must invoke a defined Activity. This narrows the surface area dramatically and ensures every change to a Contract is a 'known move' with predictable consequences."
+  },
+  {
+    "id": 470,
+    "topic": "Override",
+    "q": "What is an OVERRIDE in CBS?",
+    "options": [
+      "A user role",
+      "A structured, non-blocking validation exception generated when a soft business rule is breached",
+      "A backup type",
+      "A login bypass"
+    ],
+    "correct": 1,
+    "tip": "An Override is a SOFT validation exception. When a rule is breached that isn't a hard stop (e.g. customer exceeded their soft limit by a small amount), the system raises an Override. The transaction is held in unauthorized status (in NAU) and can only proceed once a user with the right OVERRIDE.CLASS approves the override. Hard validation errors block entirely; Overrides allow approved exceptions."
+  },
+  {
+    "id": 471,
+    "topic": "Override",
+    "q": "Which class controls who can approve a specific Override?",
+    "options": [
+      "USER.CLASS",
+      "OVERRIDE.CLASS — security classification for override approvers",
+      "AUTH.CLASS",
+      "COMPANY.CLASS"
+    ],
+    "correct": 1,
+    "tip": "OVERRIDE.CLASS is a security classification on the Override itself, defining which Profiles/Roles are entitled to approve THIS kind of Override. So a low-severity Override might be approvable by a team lead (OVERRIDE.CLASS = TEAM_LEAD); a high-severity one might need a senior manager (OVERRIDE.CLASS = SENIOR_MANAGER). This gives fine-grained control over exception approval."
+  },
+  {
+    "id": 472,
+    "topic": "Override",
+    "q": "Override vs hard validation failure — what's the difference?",
+    "options": [
+      "No difference",
+      "Override = soft rule, can be approved by authorised user; hard failure = blocks entirely",
+      "Override = harder",
+      "Hard = faster"
+    ],
+    "correct": 1,
+    "tip": "Hard validation failure: the transaction is invalid (e.g. wrong format, missing mandatory field, illegal date) — no one can approve their way past it; the user must fix the data. Soft rule breach → Override: business judgment is needed; a properly classified user can approve the exception and let the transaction proceed. Both are recorded; Overrides additionally create an audit-trail of who approved the exception."
+  },
+  {
+    "id": 473,
+    "topic": "Override",
+    "q": "An Override-pending transaction is held in which status?",
+    "options": [
+      "LIVE",
+      "Unauthorized — until OVERRIDE.CLASS approver intervenes",
+      "DEL",
+      "REVE"
+    ],
+    "correct": 1,
+    "tip": "The transaction sits in unauthorized status (typically in the NAU file as UNAU or INAU) until an appropriately classed user reviews and approves the Override. Only then does the normal AUTH flow continue. Until override approval, the transaction cannot affect the GL or LIV state — it's effectively quarantined."
+  },
+  {
+    "id": 474,
+    "topic": "Override",
+    "q": "Why use Overrides instead of blocking the transaction outright?",
+    "options": [
+      "For UI",
+      "To allow legitimate exceptions with controlled, auditable approval — preserving business flexibility",
+      "To slow processing",
+      "Vendor mandate"
+    ],
+    "correct": 1,
+    "tip": "Banking has many soft rules that should usually hold but occasionally need to bend for legitimate reasons — a long-standing customer slightly exceeding their limit, an early payment that breaks a schedule rule, a manual fee waiver for goodwill. Overrides let these proceed WITH proper approval rather than blanket-blocking. Every override is logged with who approved it, when, and under which OVERRIDE.CLASS — full audit trail."
+  },
+  {
+    "id": 475,
+    "topic": "Schema",
+    "q": "What is a Schema in CBS?",
+    "options": [
+      "A user login template",
+      "The logical structure of a Table defining the set of Fields, their types, attributes, and data-handling rules",
+      "A backup format",
+      "A reporting view"
+    ],
+    "correct": 1,
+    "tip": "The Schema is the logical metadata model of a Table — it defines what Fields exist, what types they are (text, number, date, etc.), what attributes they have (mandatory, multi-value), and what data-handling rules apply (validation, defaulting, formatting). The Dynamic Data Dictionary (DDD) operates on the Schema; Projections reference it; the runtime uses it to validate every read and write."
+  },
+  {
+    "id": 476,
+    "topic": "Schema",
+    "q": "The Schema serves as the…",
+    "options": [
+      "Backup config",
+      "Metadata model of a Table",
+      "Login screen",
+      "Network setting"
+    ],
+    "correct": 1,
+    "tip": "The Schema is the source-of-truth metadata for the Table. It says 'these are the Fields, this is their shape, these are the rules'. Everything else — UI rendering (via Projections), validation (via DDD), reporting (via Enquiries) — references the Schema. Change the Schema and all downstream consumers respect the change."
+  },
+  {
+    "id": 477,
+    "topic": "Override",
+    "q": "An OVERRIDE in CBS is best described as a…",
+    "options": [
+      "Permanent rule change",
+      "One-off, non-blocking, approval-required exception",
+      "Backup operation",
+      "Encryption key"
+    ],
+    "correct": 1,
+    "tip": "Overrides are per-transaction exceptions — they don't change the underlying rule for other transactions, they just grant approval for THIS one. The rule remains in force; the exception is logged. This is fundamentally different from changing the validation rule in DDD (which would affect all future records)."
+  },
+  {
+    "id": 478,
+    "topic": "Soft Accounting",
+    "q": "Hard-coded accounting vs Soft Accounting — which is easier to change for new regulations?",
+    "options": [
+      "Hard-coded",
+      "Soft Accounting — config change rather than code change",
+      "They're equal",
+      "Neither"
+    ],
+    "correct": 1,
+    "tip": "Hard-coded accounting requires developers to modify code, run tests, release through change management — typically weeks. Soft Accounting reduces it to a configuration change validated by business analysts — typically hours. In a regulated industry where rules can change at a regulator's whim, this agility is enormous: lower cost, lower risk, faster compliance."
+  },
+  {
+    "id": 479,
+    "topic": "Activity",
+    "q": "Why does the Product Factory enforce 'no arbitrary edits' on Components?",
+    "options": [
+      "For UI consistency",
+      "To preserve audit, business rules, and lifecycle integrity — every change is a defined Activity",
+      "To slow business",
+      "Random restriction"
+    ],
+    "correct": 1,
+    "tip": "If users could directly edit a Contract's Interest Component or Schedule, the audit trail would be ambiguous ('who changed what why?'), business rules could be silently violated, and lifecycle invariants could break. Forcing every change through a defined Activity means every Contract change has a known cause, a recorded actor, and respects all rules. It's the heart of why Product Factory is suitable for banking."
+  },
+  {
+    "id": 480,
+    "topic": "Schema",
+    "q": "An admin needs to know how a Table validates data. Where should she look?",
+    "options": [
+      "The HIS file",
+      "The Schema (metadata model defining Fields, types, validation) — accessed via DDD",
+      "The DEL file",
+      "The login screen"
+    ],
+    "correct": 1,
+    "tip": "The Schema in the Dynamic Data Dictionary is the source of truth for validation behavior. It tells you each Field's type, allowed values, mandatory/optional status, default values, and any attached validation routines. Because the DDD is hot-swappable, admins can also update validation rules here and they take effect immediately — no recompilation."
   }
 ]

@@ -10398,5 +10398,655 @@
     ],
     "correct": 1,
     "tip": "Reading current state = synchronous pull = API gateway. Notifications about CHANGE = async push = External Event Publisher. Different consumer patterns demand different mechanisms. The architecture explicitly separates them so external consumers pick the right shape: 'show me current balance' (gateway), 'tell me when it changes' (events). Forcing the wrong pattern (webhook for current reads, gateway for change notifications) gives bad UX and load characteristics."
+  },
+  {
+    "id": 801,
+    "topic": "Architecture Detail",
+    "q": "An engineer suggests merging the BFF (Backend-For-Frontend) responsibilities into the core CBS API layer to reduce 'one extra service'. The architect rejects this. The strongest principled reason is…",
+    "options": [
+      "The BFF runs slower",
+      "Separation of concerns — BFF serves ONE consumer (the web app) and aggregates data for it; the CBS API serves MANY consumers and must remain consumer-agnostic. Merging couples them",
+      "Vendor mandate",
+      "Random preference"
+    ],
+    "correct": 1,
+    "tip": "If the CBS API absorbed BFF logic, it would start shaping responses for the web app — at which point a mobile app or partner API integrating with CBS would suffer from web-app-specific quirks. Keeping BFF separate means: the core API stays clean and reusable; the BFF can aggregate, transform, and shape data freely for ONE consumer; future consumers (mobile, partners) get fresh BFFs without disturbing each other. Classic separation-of-concerns win."
+  },
+  {
+    "id": 802,
+    "topic": "Architecture Detail",
+    "q": "In the Application Registry, what's the precise distinction between an 'Action' and an 'Activity'?",
+    "options": [
+      "No difference",
+      "An Action is a SINGLE piece of reusable function (e.g. 'validate amount'); an Activity is a GROUP of actions composed into a business operation (e.g. 'DISBURSE-LOAN')",
+      "Activity is bigger code",
+      "Random naming"
+    ],
+    "correct": 1,
+    "tip": "Action = smallest reusable unit ('check balance', 'apply fee', 'validate signature'). Activity = orchestrated set of Actions forming a meaningful business operation ('LENDING-DISBURSE-COMMITMENT' might compose: validate, draw on Term Amount, post to Account, raise accounting). This composition lets the same Action be reused across many Activities without duplication. Activities are user/system-triggered; Actions are building blocks."
+  },
+  {
+    "id": 803,
+    "topic": "Architecture Detail",
+    "q": "The Application Orchestrator within the registry is described as handling 'API composition, bulk processing, AND dynamic query engine'. Why pair the query engine WITH composition + bulk?",
+    "options": [
+      "Random",
+      "All three serve cross-application read patterns: compose data from many apps in one response; process many records in bulk; query across apps dynamically — sharing a single optimised path benefits all three",
+      "Coincidence",
+      "Vendor preference"
+    ],
+    "correct": 1,
+    "tip": "If each app implemented its own composition / bulk / query, you'd get 20 inconsistent implementations. The Application Orchestrator runs ONE optimised read engine — applications register their data shapes; the engine composes responses, runs bulk operations, executes cross-app queries (OFS-style). One mature implementation; consistent semantics; easier to optimise and audit. Less code, more reliability."
+  },
+  {
+    "id": 804,
+    "topic": "Architecture Detail",
+    "q": "Strapi serves dual roles: dynamic UI configuration AND caching layer. Why combine these in one component rather than separate them?",
+    "options": [
+      "Lazy design",
+      "UI configuration changes rarely; serving it through a CMS that's already cache-aware avoids adding a separate cache for static-ish frontend assets. Strapi naturally caches what it serves",
+      "Random",
+      "Cost only"
+    ],
+    "correct": 1,
+    "tip": "UI configuration (layouts, copy, validation rules) is changed by admins, then read by thousands of users — perfect for caching. Strapi inherently caches its content delivery, so the same component handles both 'configure' and 'serve cached'. Adding a separate Redis/Memcached layer for the same purpose would mean two systems to manage with overlapping concerns. Architectural minimalism: don't add a layer when an existing one suffices."
+  },
+  {
+    "id": 805,
+    "topic": "Architecture Detail",
+    "q": "Why does Keycloak need to handle BOTH user pool management AND service-to-service token validation?",
+    "options": [
+      "Random",
+      "Both are identity questions — humans authenticating to APIs and services authenticating to each other use the same protocols (OAuth/OIDC). Reusing one engine means consistent token policy, key rotation, and revocation",
+      "Random",
+      "Cost"
+    ],
+    "correct": 1,
+    "tip": "Separating human-auth and service-auth into different engines means: two key rotation policies; two revocation flows; subtle policy drift. One engine = one source of truth for identity. When a token issue arises (compromised key, revocation), you act in one place. Keycloak's flexibility — supporting humans (login flows) and services (client credentials) — is why it's chosen for both."
+  },
+  {
+    "id": 806,
+    "topic": "Architecture Detail",
+    "q": "The Activity Orchestrator receives activities from COB, the Application Registry, AND the API. Why expose three different entry points?",
+    "options": [
+      "Confusion",
+      "Activities can be triggered by: scheduled batch (COB), custom bank applications (registry), or external/user request (API). Each is a legitimate origin; all converge through the same orchestrator so behaviour is consistent regardless of trigger",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "The same Activity (e.g. APPLY-LATE-FEE) might be triggered nightly by COB, on-demand by an API call, or by a custom bank application detecting a missed payment. All three triggers should run the IDENTICAL Activity logic. By routing all three into the same orchestrator, the system guarantees this consistency — without each trigger needing its own implementation."
+  },
+  {
+    "id": 807,
+    "topic": "Architecture Detail",
+    "q": "An asynchronous integration architecture is deliberately NOT shown in detail on the high-level diagram. The architect's stated reasoning is…",
+    "options": [
+      "It doesn't exist",
+      "Async sequence/orchestration is a separate detailed topic; high-level diagrams must stay readable — over-stuffing them with sequence detail defeats their purpose",
+      "Random",
+      "Hidden info"
+    ],
+    "correct": 1,
+    "tip": "Diagrams have a hierarchy of detail (C4: Context → Container → Component → Code). Putting sequence-level async detail on a Container-level diagram pollutes it for stakeholders who only need the high-level. Async details live in sequence diagrams (separately maintained, separately reviewed). Knowing which level each detail belongs to is part of architecture craftsmanship."
+  },
+  {
+    "id": 808,
+    "topic": "Architecture Detail",
+    "q": "The architect mentions 'sequence diagrams are high-level and will be changed during specification'. What's the principled posture being communicated?",
+    "options": [
+      "Lazy planning",
+      "Early sequence diagrams are HYPOTHESES — concrete implementation reveals details that shift them. Premature commitment to detailed sequences risks anchoring on wrong assumptions",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Detailed up-front sequence design feels rigorous but often anchors teams on assumptions that don't survive contact with implementation realities (latency, error modes, race conditions). High-level sequences capture INTENT — concrete sequences get refined when constraints emerge. This is part of mature iterative design: commit early to direction, defer detail commitment."
+  },
+  {
+    "id": 809,
+    "topic": "Architecture Detail",
+    "q": "Collateral management is explicitly 'out of scope at the moment but we still need to aim for it'. The strategic intent is…",
+    "options": [
+      "Random",
+      "Phase Zero scope discipline excludes collateral, but the architecture must NOT preclude it — design now so adding collateral later is additive, not architecture-breaking",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "'Out of scope but plan for' is a discipline that prevents scope creep WITHOUT closing future doors. Architects pick component boundaries, data models, and interfaces compatible with future collateral. The Phase Zero codebase doesn't ship collateral; the structure invites it cleanly later. Opposite to 'we'll figure it out later' which often forces painful retrofitting."
+  },
+  {
+    "id": 810,
+    "topic": "Architecture Detail",
+    "q": "The Provision Model service is specifically 'used in COB for asset classification and provision calculation'. Why couple it tightly to COB rather than being on-demand?",
+    "options": [
+      "Random",
+      "Provisioning is a daily/periodic regulatory exercise — running it inside COB (when balances are settled) ensures accurate inputs; running it ad-hoc during the day uses stale state",
+      "Random",
+      "Vendor mandate"
+    ],
+    "correct": 1,
+    "tip": "Provisioning needs CONSISTENT inputs: each day's final balances, classifications, and exposures. During business hours those are moving targets. Running provisioning inside the COB pipeline (after balances settle, before reports run) means: same inputs every day, reproducible results, regulatory accuracy. On-demand provisioning during the day would produce 'snapshots' that don't match official EOD figures."
+  },
+  {
+    "id": 811,
+    "topic": "Architecture Detail",
+    "q": "What does the 'Configuration module' specifically encompass per the transcript?",
+    "options": [
+      "Application code",
+      "System tables, system dates, calendars, parameterisation — the cross-cutting reference data many applications and the activity orchestration consume",
+      "Customer data",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "Configuration module = the single source of truth for reference / parametric data: DATES, HOLIDAY, CURRENCY, COUNTRY, system parameters. Every application that needs to know 'what date is it?' or 'is this a holiday?' or 'what's the rounding rule for KRW?' reads from this module. Centralising prevents drift (no app keeps a stale local copy) and makes regulatory updates atomic."
+  },
+  {
+    "id": 812,
+    "topic": "Architecture Detail",
+    "q": "The External Event Publisher and Delivery Service are both 'outbound' but kept separate. The key difference is…",
+    "options": [
+      "Same thing",
+      "External Event Publisher is webhook-based (subscribers PULL their event types); Delivery Service is direct integration using templates (printing, SMS, email, Swift) — different consumers, different patterns",
+      "Random",
+      "Naming only"
+    ],
+    "correct": 1,
+    "tip": "Webhooks suit consumers who define their own subscription (an external app wanting to know when accounts open). Direct delivery suits well-known integrations (printers, SMS gateways, Swift networks) where templates and protocol-specific framing are needed. Putting them in one component would conflate event semantics with delivery semantics. Separate modules keep each concern focused."
+  },
+  {
+    "id": 813,
+    "topic": "Architecture Detail",
+    "q": "FCM (Financial Crime Management) acts as a 'gateway' to external providers. Beyond just routing requests, what other benefits does the gateway pattern provide here?",
+    "options": [
+      "Random",
+      "Consistent retry/timeout policy across providers; provider-swap capability (change vendor without changing callers); single audit point for compliance; hides provider-specific protocol details from callers",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Gateway > raw client because it provides architectural insulation. If callers used providers directly: every caller implements retry/timeout; provider changes ripple everywhere; compliance auditing scatters. Gateway centralises these cross-cutting concerns. The cost is one extra hop; the gain is operational and architectural sanity. Same pattern as the Configuration module — centralise concerns vs scatter them."
+  },
+  {
+    "id": 814,
+    "topic": "Architecture Detail",
+    "q": "An architect would describe Strapi's choice over WordPress for headless CMS as…",
+    "options": [
+      "WordPress is too expensive",
+      "WordPress is traditional (CMS + frontend coupled); Strapi is HEADLESS (CMS just provides content/config via API). CBS frontend is React/Next — needs a backend-only CMS to feed it, not a tightly-coupled WordPress-style stack",
+      "Marketing",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "Traditional CMS (WordPress) renders pages itself — the CMS IS the frontend. CBS frontend is already a React/Next app; we just need a configurable content/config source. Headless CMS exposes content via API — the React app fetches and renders. Strapi fits this 'API-only CMS' role. Using WordPress would mean fighting against its rendering model to get just the data layer."
+  },
+  {
+    "id": 815,
+    "topic": "Architecture Detail",
+    "q": "The architect chose to NOT show ESB / message bus in detail because…",
+    "options": [
+      "It doesn't exist",
+      "It's still being decided (Kafka vs Kafka+RabbitMQ) and async integration is a separate diagram concern; showing tentative choices at high level would confuse stakeholders",
+      "Hidden",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "Showing a tentative choice as if decided gives stakeholders false confidence. Architectural integrity: surface what's DECIDED on diagrams; flag what's IN DISCUSSION explicitly (yellow blocks in the deck). Stakeholders then know where to ask questions and where decisions are firm. 'Honest about state' is itself a design quality."
+  },
+  {
+    "id": 816,
+    "topic": "Infra Detail",
+    "q": "HashiCorp Vault is specifically chosen for 'internal certificate management for mutual TLS between services'. Why is mTLS between internal services treated as a security compliance requirement?",
+    "options": [
+      "Random",
+      "Zero-trust security: in-cluster traffic must NOT be implicitly trusted — every service-to-service call must prove identity via certificate. Without mTLS, a compromised pod gains free reach inside the cluster",
+      "Random",
+      "Vendor mandate"
+    ],
+    "correct": 1,
+    "tip": "Pre-zero-trust: cluster firewall = security perimeter. Get inside the cluster, you're trusted. Modern (and bank-regulator) view: assume the cluster IS the threat surface. mTLS means each service has a cryptographic identity; calls authenticate at the connection level. Vault rotates certificates so a compromised cert has short useful life. This converts a static perimeter into per-connection authentication."
+  },
+  {
+    "id": 817,
+    "topic": "Infra Detail",
+    "q": "Container Registry and CI/CD pipeline placement are marked as 'yellow' (under discussion). The actual decision depends on…",
+    "options": [
+      "Random",
+      "Bank's policy on whether external (CBS team) tools can deploy into their infrastructure. If bank restricts external access, registries/pipelines must live bank-side; if not, CBS-team-side is simpler",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Highly-regulated banks may forbid third-party CI/CD touching production; they want everything within their managed boundary. Less-regulated environments are happy for the vendor team to push releases directly. The decision changes the entire deployment workflow. Hence: cannot finalise architecture until bank policy is known. This is the realistic shape of B2B banking architecture."
+  },
+  {
+    "id": 818,
+    "topic": "Infra Detail",
+    "q": "Two Kubernetes clusters, one per data centre. Why not one logical cluster spanning both?",
+    "options": [
+      "Random",
+      "Spanning a single cluster across geographically separate data centres introduces latency, split-brain risk, and complicates failover. One-cluster-per-DC keeps each independently operable; replication happens at the data layer, not the orchestration layer",
+      "Random",
+      "Vendor mandate"
+    ],
+    "correct": 1,
+    "tip": "Stretched clusters across DCs face: high latency between control-plane components, hard split-brain scenarios on network partition, complex maintenance. Per-DC clusters: each DC's cluster is independently healthy; if DC1 fails, DC2's cluster keeps running. Replication / failover happens at databases (PostgreSQL replication) and event streams (Kafka mirroring). Cleaner failure modes; standard pattern for multi-DC banking."
+  },
+  {
+    "id": 819,
+    "topic": "Infra Detail",
+    "q": "ElasticSearch is chosen for logging AND can also host Jaeger for tracing. Why is this 'reusing one tool for two purposes' beneficial?",
+    "options": [
+      "Random",
+      "Same backend store, same indexing/scaling skills, same operational tooling — the team doesn't need expertise in two separate stacks (e.g. Splunk + Tempo). Plus search across logs+traces becomes trivial",
+      "Random",
+      "Cost"
+    ],
+    "correct": 1,
+    "tip": "If logs are in Elastic but traces are in Tempo, correlating a trace ID with its surrounding logs requires cross-system search. Storing both in Elastic means: one query language, one tuning model, one capacity plan, one on-call playbook. The trade-off is Elastic must scale to both workloads — usually fine if sized right. Team skill economics often justify this consolidation."
+  },
+  {
+    "id": 820,
+    "topic": "Infra Detail",
+    "q": "Longhorn is chosen for block (blob-on-VM) storage specifically because of…",
+    "options": [
+      "Random",
+      "Kubernetes context — Longhorn is Kubernetes-native; integrates with PVCs (Persistent Volume Claims) naturally; no external SAN required for stateful pods",
+      "Random",
+      "Cost only"
+    ],
+    "correct": 1,
+    "tip": "Stateful pods in Kubernetes need persistent volumes that survive pod restarts and node failures. Longhorn provides distributed, replicated block storage backed by node-local disks — Kubernetes-native (no external storage vendor). Replication factor protects against node loss. The 'no external SAN required' is huge for bank deployments where bringing in extra storage hardware is a procurement project."
+  },
+  {
+    "id": 821,
+    "topic": "Infra Detail",
+    "q": "Filebeat is paired with Logstash for log shipping. What does each do?",
+    "options": [
+      "Random",
+      "Filebeat = lightweight agent on each VM/pod that ships log lines; Logstash = central pipeline that parses, transforms, enriches, and routes them into ElasticSearch indices",
+      "Same thing",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "Filebeat is intentionally tiny — its job is to harvest log files and forward them, nothing else. Logstash sits centrally and does the heavy lifting: parsing log formats, enriching with metadata, dropping noise, routing to the right Elastic index. Splitting agent (Filebeat) from processor (Logstash) keeps each VM's footprint minimal while centralising complex parsing logic."
+  },
+  {
+    "id": 822,
+    "topic": "Infra Detail",
+    "q": "Jaeger vs Grafana Tempo for tracing — the architecture decision will be logged in an ADR. Why is a formal decision log valuable here?",
+    "options": [
+      "Bureaucracy",
+      "Future teams will ask 'why did we pick X?' months later — without ADRs, the reasoning is lost. ADRs capture decision + context + alternatives + consequences so the answer survives team turnover",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Architecture Decision Records (ADRs) document not just WHAT was chosen but WHY — and what alternatives were considered. Without ADRs, six months later someone asks 'why Jaeger?' and the original architect has moved on; nobody knows. With ADRs, the rationale survives. They're cheap to write and pay back enormously when (not if) the question recurs."
+  },
+  {
+    "id": 823,
+    "topic": "Infra Detail",
+    "q": "The development VMs are deliberately bare-metal rather than cloud (e.g. Azure VMs). Why mirror production this closely in dev?",
+    "options": [
+      "Random",
+      "Cloud VMs have different latency, networking, and IO profiles than bare metal — bugs that appear only on bare metal would never surface in cloud dev, then fail in production. Mirror prod = catch issues early",
+      "Cost",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "Classic 'works in dev, fails in prod' bugs often come from environment divergence. Cloud-vs-baremetal differences include: disk IO patterns, network virtualisation latency, CPU isolation, hardware-level reliability characteristics. Banking workloads are sensitive to these. Bare-metal dev costs more but catches issues at dev time — far cheaper than hunting them in production."
+  },
+  {
+    "id": 824,
+    "topic": "Infra Detail",
+    "q": "Bank-managed infrastructure includes an 'ICAP server for scanning' and 'quarantine storage for file uploads'. What does this protect against?",
+    "options": [
+      "Random",
+      "Malicious file uploads — every uploaded document is intercepted by ICAP (Internet Content Adaptation Protocol) for AV/malware scanning; suspicious files go to quarantine instead of reaching CBS storage",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Customers upload IDs, statements, scans. Without scanning, a poisoned PDF could embed malware that triggers when bank staff open it — or worse, propagates. ICAP is the standard protocol for in-band content scanning. Files pass through ICAP → if clean, into CBS storage; if not, quarantine for forensics. This is bank-managed because content scanning policy/engines are typically the bank's IT-security responsibility."
+  },
+  {
+    "id": 825,
+    "topic": "Infra Detail",
+    "q": "Keycloak is configured to federate with the bank's Active Directory. The cleanest reason to federate (rather than syncing users) is…",
+    "options": [
+      "Random",
+      "AD remains the single source of truth — when an employee is deactivated in AD (e.g. termination), the CBS login fails immediately. Sync-based models have a lag window where deactivated employees can still log in",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Sync = periodic copy from AD into CBS user store. Window between deactivation and next sync = security exposure. Federation = CBS Keycloak DELEGATES authentication to AD live; every login checks AD's current state. Deactivation is immediate. For an institution where employee termination must instantly cut access, federation is the only safe pattern."
+  },
+  {
+    "id": 826,
+    "topic": "Infra Detail",
+    "q": "Bank-managed VMs are required from the bank's side. Why does the CBS team accept this dependency rather than provisioning their own?",
+    "options": [
+      "Cost",
+      "Banks insist on owning physical/virtual infrastructure inside their datacentre (regulatory, sovereignty); CBS team provisioning servers inside the bank's DC is usually not permitted",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Banking regulators typically require infrastructure to be owned/operated by the regulated entity — the bank. Vendors aren't allowed to bring their own hardware into the bank's DC. So CBS deploys ON the bank's VMs. This isn't a technical choice — it's a regulatory boundary. Architecture must accept it cleanly: 'bank gives us VMs; we deploy ON them; we don't run our own'."
+  },
+  {
+    "id": 827,
+    "topic": "Infra Detail",
+    "q": "Object storage uses SeaweedFS for 'data lake'-like capability. The reason it can act as a data lake is…",
+    "options": [
+      "Random",
+      "SeaweedFS exposes S3-compatible API + scales horizontally + replicates across DCs — making it functionally equivalent to AWS S3 or Azure Blob for analytical/blob data needs",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Data lakes typically need: S3-compatible API (so any tool integrates), horizontal scaling (petabytes of data), replication (durability), eventual consistency tolerance. SeaweedFS provides all of these. The bank-on-premise version of a cloud data lake. Same usage patterns: unstructured/semi-structured data, ML/analytics processing, archive. Cloud-equivalence without leaving the bank's data centre."
+  },
+  {
+    "id": 828,
+    "topic": "Infra Detail",
+    "q": "Why is RabbitMQ described as 'might be added if patterns dictate' rather than committed up-front?",
+    "options": [
+      "Random",
+      "Avoiding over-engineering — Kafka covers most needs (events, audit, fan-out). Adding RabbitMQ doubles operational surface. Commit only when a specific need (e.g. request-reply, priority queues) clearly demands it",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Two message systems = two sets of clients, monitoring, scaling configs, ops playbooks. Worth it ONLY if Kafka genuinely can't cover a need. Most patterns (events, replay, fan-out) Kafka handles well. RabbitMQ wins at: priority queues, request-reply, dead-letter exchanges. Defer the addition until a real use case justifies the operational cost. Defaults matter: defaulting to LESS is usually wiser."
+  },
+  {
+    "id": 829,
+    "topic": "Infra Detail",
+    "q": "PostgreSQL replication for financial reporting uses 'eventual consistency'. Why is eventual consistency acceptable for reporting but unacceptable for transactions?",
+    "options": [
+      "Random",
+      "Reports are READ-mostly snapshots showing recent history (slight lag is OK); transactions are WRITES that MUST see canonical state to avoid double-spends. Different consistency tolerances per workload",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "A wire transfer reading a slightly stale balance could approve a double-spend. Eventual consistency = death for transactions. A report showing yesterday's totals as 'a few seconds late' is invisible to users. Mixing both on the same DB = compromise both. Splitting them (OLTP strong consistency; reporting eventual) optimises each workload. This is why architectures split read replicas from primaries."
+  },
+  {
+    "id": 830,
+    "topic": "Infra Detail",
+    "q": "The architect references 'OFS-type integrations' as one of the Application Orchestrator's use cases. OFS in Temenos terminology means…",
+    "options": [
+      "Random",
+      "Open Financial Service — Temenos's integration API standard; the Application Orchestrator's dynamic query engine can serve OFS-like multi-application requests in CBS",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Temenos OFS (Open Financial Service) is their canonical integration channel — XML-based requests that span multiple applications, with transformations, validations, etc. The Application Orchestrator must support similar patterns in CBS for external systems and integrations to compose requests across applications. Knowing this pedigree explains why the orchestrator specifically lists 'dynamic query engine + bulk processing + API composition' as its triad."
+  },
+  {
+    "id": 831,
+    "topic": "24/7 Ops",
+    "q": "The 24/7 operation mechanism is described as 'switching the clocks'. The architectural prerequisite making this possible is…",
+    "options": [
+      "Random",
+      "Decoupling business date from server clock — transactions tag with the business date they belong to, COB advances the business date, and the system can simultaneously process 'today closing' and 'tomorrow opening'",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "If business date == server clock, COB requires a downtime window. Decoupling them lets the system accept incoming transactions tagged 'next business day' while COB processes 'current business day'. Functionally, the system serves two business days briefly. Customer experience: no downtime. The architectural cost: every transaction-touching component must respect the business date as a first-class concept."
+  },
+  {
+    "id": 832,
+    "topic": "24/7 Ops",
+    "q": "Eric asks how a CBS that handles 24/7 can still produce a consistent EOD report. The technical answer is…",
+    "options": [
+      "Random",
+      "EOD reports use a 'cut-off' moment — transactions tagged with that day's business date are included; later transactions belong to the next business day and don't pollute the report. Cut-off is logical, not physical-time-based",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Without a logical cut-off, 'EOD' becomes ambiguous: does 23:59:30 count? What about 23:59:59 in another timezone? Logical cut-off (defined by business date, not wall clock) gives every transaction an unambiguous day. EOD report queries for 'all transactions where business_date = today' — clean criterion, deterministic result, regardless of when the transaction was physically posted."
+  },
+  {
+    "id": 833,
+    "topic": "24/7 Ops",
+    "q": "If COB hits an error mid-run during 24/7 ops, how does the architecture handle 'next day' transactions already accepted?",
+    "options": [
+      "Discards them",
+      "COB's rollback mechanism must preserve forward-committed transactions — they're already authorised under the new business date and must survive the rollback of the OLD business date's close",
+      "Crashes",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "Naive rollback (undo everything since COB started) would invalidate accepted next-day transactions — losing customer work. The architecture must distinguish: 'closing day' work (rollbackable) vs 'next day' transactions (already valid, must persist). COB's rollback scope is its OWN work, not customer-facing transactions that have already crossed into the new business date. Non-trivial concurrency engineering."
+  },
+  {
+    "id": 834,
+    "topic": "DR",
+    "q": "Two data centres with eventual sync. If DC1 fails mid-transaction, the customer's transaction in DC2 might…",
+    "options": [
+      "Be lost",
+      "See a slightly stale view of state from DC1 — eventual sync means the latest DC1 state may not have replicated yet. Bank tolerates this for read consistency; writes serialise to a designated primary",
+      "Be duplicated",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "Eventual sync = there's a replication lag window. If DC1 had just written and lag was 2s when it failed, DC2 doesn't yet have those 2s of writes. To prevent double-spend, writes typically pin to a primary DC; reads can be served eventually-consistently from secondary. DR failover then promotes DC2 to primary, accepts that any in-flight DC1 writes within the lag window are lost (which the bank manages with retry+idempotency)."
+  },
+  {
+    "id": 835,
+    "topic": "DR",
+    "q": "Why does the architect specifically split 'object storage management' (SeaweedFS+Postgres) from 'blob storage management' (Longhorn)?",
+    "options": [
+      "Coincidence",
+      "Different use cases: object storage = S3-style buckets for documents/data-lake (high volume, scale-out); blob storage on Longhorn = persistent volumes for stateful pods (databases, message brokers needing block IO)",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Object storage: customer documents, archives, ML data — accessed via S3 API, eventually consistent, scaled by volume. Block/persistent volumes: a PostgreSQL primary's data files — accessed via filesystem, strict consistency, scaled by IOPS. They're fundamentally different storage classes. Using one for the other (S3 for a DB file or block storage for blob archive) would be a serious anti-pattern."
+  },
+  {
+    "id": 836,
+    "topic": "Reporting",
+    "q": "Why is financial reporting designed as primarily ASYNCHRONOUS rather than running synchronously when requested?",
+    "options": [
+      "Random",
+      "Reports may scan huge data volumes; running them sync blocks the report requester AND loads the OLTP system (or its replica). Async means: data flows into the reporting store continuously; reports query that store independently of OLTP",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "A sync report against 50M transactions = minutes of waiting AND heavy OLTP load. Async: events flow from OLTP into the reporting store (via Kafka). Reports query the reporting store. OLTP stays fast; report generation can scale separately; users don't wait. The async coupling is via event streams — natural fit for Kafka's persistent log."
+  },
+  {
+    "id": 837,
+    "topic": "Reporting",
+    "q": "Andre says 'gathering information will be asynchronous, mostly from the accounting service'. The 'mostly' caveat hints at…",
+    "options": [
+      "Hesitation",
+      "Some reports need data from non-accounting services (Customer, Limits, Activity History) — the financial reporting layer composes across services via async events from each",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Pure-accounting reports (balance sheet, P&L) come from STMT.ENTRY / CATEG.ENTRY. But regulatory reports often need: customer attributes (Sector, Country) from Customer service, limit info from Limits, activity history. The reporting layer subscribes to events from each — composing a complete reporting view. 'Mostly accounting' acknowledges this composition without burying the lead."
+  },
+  {
+    "id": 838,
+    "topic": "Reporting",
+    "q": "Onboarding a new country = onboarding new report types. Why is this not a 'one report engine' issue but a 'per-country compliance' issue?",
+    "options": [
+      "Random",
+      "Each country's regulator demands specific report formats, fields, frequencies — the reporting engine is configurable enough to produce them, but each new country requires its own report definitions and possibly compliance attestation",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "A regulator-mandated report has VERY specific requirements: exact field set, exact format, exact filing cadence. The engine doesn't ship knowing every country's rules; it ships flexible enough to be configured for any. Onboarding South Sudan = configuring its specific reports + getting them signed off by compliance. Engine = reusable; per-country rules = bespoke work. Honest scoping."
+  },
+  {
+    "id": 839,
+    "topic": "Reporting",
+    "q": "Why is financial reporting hosted across multiple DCs (not single-DC like, say, a teller terminal)?",
+    "options": [
+      "Random",
+      "Reporting is regulatory-critical — missing a regulatory deadline due to single-DC outage = compliance breach. Multi-DC reporting ensures reports can be generated even if one DC fails",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Regulators have deadlines (e.g. submit X report by 9am on the 15th of the month). Missing them carries fines or sanction. Hosting reporting in a single DC = single point of failure for compliance. Multi-DC reporting: even if a DC fails on the 14th, reports still generate on the 15th from the surviving DC. The data is eventually consistent (acceptable for reporting); availability is non-optional."
+  },
+  {
+    "id": 840,
+    "topic": "Reporting",
+    "q": "Eric asks about handling DATA LAKE-style reporting needs. The architecture's answer is essentially…",
+    "options": [
+      "Build a new system",
+      "SeaweedFS object storage + accounting service events + reporting service together fulfil data-lake-style needs without a separate explicit 'data lake' product",
+      "Random",
+      "Buy a vendor"
+    ],
+    "correct": 1,
+    "tip": "A 'data lake' isn't a product — it's a pattern: store all data, structured and unstructured, queryable in flexible ways. SeaweedFS handles the blob side (documents, exports). Accounting service emits structured events into Kafka, landing in the reporting store. Together they satisfy 'data lake' needs. Banks don't always need a separate explicit DL stack."
+  },
+  {
+    "id": 841,
+    "topic": "Reporting",
+    "q": "Eric ties financial reporting to South Sudan specifically. Why is per-region report scoping more than just 'pick currency and language'?",
+    "options": [
+      "Random",
+      "Each region has unique compliance requirements: data retention, formats, mandatory fields, reporting frequency, regulator-specific filing channels — far beyond UI localisation",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "UI localisation (French menus) is trivial. Compliance per region is profound: South Sudan's 10-year retention; CEMAC's specific report format; UEMOA's particular templates. Each demands specific FIELDS, FREQUENCIES, FORMATS, sometimes specific filing endpoints. Reporting engine must be flexible enough to produce them all — and configuration must be region-specific. 'Pick a language' would be wildly under-scoped."
+  },
+  {
+    "id": 842,
+    "topic": "Architecture Detail",
+    "q": "Why does the architecture introduce an 'Application Service' inside the registry, alongside the orchestrator?",
+    "options": [
+      "Redundancy",
+      "Orchestrator EXECUTES; Application Service is the CATALOG of registered applications, knowing how to communicate with each. Separating registry-of-apps from execute-engine is clean separation",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Conceptually: 'WHAT apps exist + how to call them' (Application Service) vs 'EXECUTE this composition across apps' (Application Orchestrator). Same as how kubelet (executes) is separate from API server (knows what should run). Singular responsibility per component; testability; cleaner ops. Lumping them = one large component with tangled responsibilities."
+  },
+  {
+    "id": 843,
+    "topic": "Architecture Detail",
+    "q": "Why is Action listed as a separately registered concept alongside Activity, Arrangement, etc., when Actions are 'just' building blocks?",
+    "options": [
+      "Bureaucracy",
+      "Actions are REUSABLE across many contexts — registering them as first-class lets multiple Activities, Activities in different products, and even bank-custom code all reuse them without duplication",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "If Actions lived inside Activities, reusing 'validate balance' across 10 activities = 10 copies or weird sub-imports. Registering Actions in their own namespace lets ANY Activity, custom application, or even a Plugin invoke them by name. Same Action; many callers; no duplication. The catalogue style scales as the platform matures."
+  },
+  {
+    "id": 844,
+    "topic": "Architecture Detail",
+    "q": "The transfer service 'encapsulates every money movement to be secure'. Why centralise money movement here rather than per-product?",
+    "options": [
+      "Random",
+      "Money movement is the highest-risk operation in the bank. Centralising it: one battle-tested code path; one audit point; consistent fraud checks; consistent regulatory hooks — all products move money the same canonical way",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "If loans, deposits, cards, FT all moved money their own way: fraud screens scattered; AML hooks inconsistent; audit trails uneven; bugs in one product don't get fixed in others. Centralising in Transfer service: one canonical mover; everyone uses it; one place to add a screen, one place to fix a bug. Same principle as the FCM gateway — high-risk concerns belong in shared, audited surfaces."
+  },
+  {
+    "id": 845,
+    "topic": "Architecture Detail",
+    "q": "Andre says the high-level architecture diagram 'may change during deep dive'. The healthy interpretation of this is…",
+    "options": [
+      "Lack of commitment",
+      "High-level design is a HYPOTHESIS to be refined by detailed analysis — committing to never changing it would mean detailed analysis can't surface needed refinements. Honest expectation-setting",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Pretending the high-level design is final blocks legitimate refinement. Architects who commit too early either: refuse needed changes (rigid), or change quietly (eroding trust). Saying upfront 'this WILL refine' sets a healthy expectation. Stakeholders understand that decisions evolve; refinements are tracked (ADRs); the system improves. Mature posture."
+  },
+  {
+    "id": 846,
+    "topic": "Architecture Detail",
+    "q": "The transcript reveals 'Architecture Decision Log' (ADL) will be maintained. Why is the existence of an ADL itself an architectural quality?",
+    "options": [
+      "Random",
+      "An ADL externalises decision rationale — making the architecture's reasoning available to future maintainers, auditors, and regulators. Without ADL, the architecture is opaque",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Architecture that can't explain itself is fragile: future changes risk violating unstated assumptions. ADLs make the implicit explicit. Regulators love them ('show me how you decided X'). New team members ramp faster ('I see now why we use Strapi'). Defending against challenges is easier ('here's the ADR that captures the trade-off'). An ADL is itself a deliverable, not just paperwork."
+  },
+  {
+    "id": 847,
+    "topic": "Architecture Detail",
+    "q": "The architect references 'OFS-type Temenos-like integrations' to explain the Application Orchestrator's dynamic query needs. The takeaway about being Temenos-inspired is…",
+    "options": [
+      "Copying Temenos",
+      "Taking Temenos's PROVEN integration shapes as targets — not as code to copy, but as patterns the CBS Application Orchestrator must support to satisfy real-world bank integration needs",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Banks integrating with CBS will demand patterns they already understand: OFS-style multi-app queries, bulk operations, composition. CBS supporting these patterns reduces integration friction. The CBS implementation is greenfield (not Temenos code); the INTERFACE SHAPE benefits from being Temenos-similar so partners can reuse their playbooks. Pragmatic inheritance of patterns without inheriting legacy."
+  },
+  {
+    "id": 848,
+    "topic": "Architecture Detail",
+    "q": "Why does the architect explicitly mention that the BFF won't grow into a 'data joiner' for the core CBS API (avoiding the legacy mistake)?",
+    "options": [
+      "Random",
+      "Legacy BFFs that absorb data-joining become performance bottlenecks (queries across multiple DBs, merging in memory). Keeping BFF as a thin frontend-view-optimiser means joining stays in the data layer where it's optimised",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Legacy BFFs evolved into data-stitching layers because it was easy: 'just merge these two services' becomes 'just merge ten'. Each merge in BFF memory is slow, brittle, and unable to leverage DB-level optimisation. The architectural posture: BFF formats / optimises VIEW; joins happen IN the data layer (via Application Orchestrator's query engine). Hard-won lesson from many legacy systems."
+  },
+  {
+    "id": 849,
+    "topic": "Architecture Detail",
+    "q": "Why does the architecture FORBID asynchronous integration between core services? Wait — does it?",
+    "options": [
+      "Yes — all sync",
+      "No — async IS used between services (via Kafka). The architect just deferred showing async detail at high level because it's a separate diagram layer. The system is intentionally async-friendly",
+      "All async",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "Misreading the transcript: 'no asynchronous integrations yet described here because it's already a pretty big diagram' = 'we deferred showing them on THIS diagram'. NOT 'we don't have async'. Modern microservice architectures rely heavily on async for resilience and scale. CBS is no exception. The high-level diagram leaves async to sequence diagrams for clarity."
+  },
+  {
+    "id": 850,
+    "topic": "Architecture Detail",
+    "q": "Andrew references the production target as 'virtual machines, NOT EKS/Kubernetes-Engine PaaS'. The reason for not using a managed K8s service is…",
+    "options": [
+      "Random",
+      "Banks deploy on-prem (or in their own DC) — managed Kubernetes services (EKS/AKS/GKE) require cloud infrastructure the bank may not have, or sovereignty issues. Self-managed K8s on bank VMs is the lowest-friction path",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Managed K8s services tie you to a cloud provider; banks often can't use them due to sovereignty, regulatory, or pure 'we own our DC' posture. Self-hosting K8s (RKE2, Rancher) on the bank's bare-metal VMs is portable, sovereignty-friendly, and works in any environment. Trade-off: bank/CBS team operates the cluster rather than offloading to AWS/GCP. Acceptable for the multi-region, multi-bank deployment model."
   }
 ]

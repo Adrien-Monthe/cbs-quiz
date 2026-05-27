@@ -215,7 +215,7 @@
 
   <header>
     <h1>🏦 CBS Core Knowledge Quiz</h1>
-    <p>50 random questions from the question pool · Master the Core Banking System</p>
+    <p>80 random questions from the question pool · Master the Core Banking System</p>
   </header>
 
   <!-- START SCREEN -->
@@ -223,7 +223,7 @@
     <h2 style="margin-top:0">Ready to test yourself?</h2>
     <p style="color:var(--muted)">Enter your name to start. Your score will be added to the global leaderboard.</p>
     <input id="player-name" class="input" placeholder="Your name (e.g. Adrien)" maxlength="40" />
-    <button id="start-btn" class="btn">Start Quiz (50 questions)</button>
+    <button id="start-btn" class="btn">Start Quiz (80 questions)</button>
     <button id="show-leaderboard-btn" class="btn btn-secondary" style="margin-top:10px">🏆 View Leaderboard</button>
     <div class="small">Including scenario questions that test understanding, not just memory</div>
   </div>
@@ -231,7 +231,7 @@
   <!-- QUIZ SCREEN -->
   <div id="quiz-screen" class="card hidden">
     <div class="meta">
-      <span id="q-counter">Question 1 / 50</span>
+      <span id="q-counter">Question 1 / 80</span>
       <span id="q-score">Score: 0</span>
     </div>
     <div class="progress-bar"><div id="progress-fill" class="progress-fill" style="width:0%"></div></div>
@@ -246,7 +246,7 @@
   <div id="results-screen" class="card hidden">
     <div class="score-display">
       <div id="verdict" class="verdict">🎉 Well done!</div>
-      <div class="score-number"><span id="final-score">0</span> / 50</div>
+      <div class="score-number"><span id="final-score">0</span> / 80</div>
       <div class="score-label"><span id="percent-label">0%</span> correct</div>
     </div>
 
@@ -286,7 +286,7 @@
    Pure vanilla JS. No build step. GitHub Pages ready.
    ========================================================= */
 
-const QUIZ_LENGTH = 50;
+const QUIZ_LENGTH = 80;
 const STATE = {
   playerName: '',
   picked: [],          // 20 picked questions for this round
@@ -452,6 +452,17 @@ function getBackend() {
   return null;
 }
 
+// Dedupe scores by submission timestamp (unique per quiz session).
+// Later entries win — so corrected name spellings are preserved.
+function dedupeScores(scores) {
+  if (!Array.isArray(scores)) return [];
+  const byDate = {};
+  for (const e of scores) {
+    if (e && e.date) byDate[e.date] = e;
+  }
+  return Object.values(byDate);
+}
+
 async function fetchSharedScores() {
   const b = getBackend();
   if (!b) return null;
@@ -463,8 +474,8 @@ async function fetchSharedScores() {
       const data = await res.json();
       // Firebase POST gives us {auto-id: entry, ...}. Normalize to an array.
       if (!data) return [];
-      if (Array.isArray(data)) return data.filter(Boolean);
-      return Object.values(data);
+      const arr = Array.isArray(data) ? data.filter(Boolean) : Object.values(data);
+      return dedupeScores(arr);
     }
     if (b.type === 'pantry') {
       // Pantry: GET basket; if missing, return empty
@@ -472,7 +483,7 @@ async function fetchSharedScores() {
       if (res.status === 400) return []; // basket doesn't exist yet
       if (!res.ok) throw new Error('Pantry HTTP ' + res.status);
       const data = await res.json();
-      return Array.isArray(data.scores) ? data.scores : [];
+      return dedupeScores(Array.isArray(data.scores) ? data.scores : []);
     }
   } catch (e) {
     console.warn('Shared scores fetch failed, falling back to local.', e);
@@ -495,12 +506,16 @@ async function pushSharedScore(entry) {
       return res.ok;
     }
     if (b.type === 'pantry') {
-      // Pantry has no "append" — fetch, push, replace the basket.
+      // Pantry has no "append" — fetch, push, dedupe, replace the basket.
       const current = await fetchSharedScores() || [];
-      current.push(entry);
+      // dedupe defensively (fetchSharedScores already does it, but belt-and-braces)
+      const deduped = dedupeScores(current);
+      deduped.push(entry);
+      // Re-dedupe in case our own date somehow collides (extremely unlikely)
+      const clean = dedupeScores(deduped);
       // Keep top 200 by score (then fastest) to bound size
-      current.sort((a,b) => b.score - a.score || a.seconds - b.seconds);
-      const trimmed = current.slice(0, 200);
+      clean.sort((a,b) => b.score - a.score || a.seconds - b.seconds);
+      const trimmed = clean.slice(0, 200);
       const res = await fetch(`https://getpantry.cloud/apiv1/pantry/${b.id}/basket/cbs_quiz_scores`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -595,6 +610,65 @@ $('player-name').addEventListener('keydown', e => { if (e.key === 'Enter') start
 // Sanity check the question bank loaded
 if (!window.QUESTIONS || window.QUESTIONS.length === 0) {
   document.body.innerHTML = '<div style="color:#ef4444;padding:24px">⚠️ questions.js failed to load.</div>';
+}
+
+// ---- Admin cleanup mode: visit ...?cleanup to dedupe the shared leaderboard ----
+// Reachable URL: https://your-site/?cleanup
+if (new URLSearchParams(location.search).has('cleanup')) {
+  (async () => {
+    const b = getBackend();
+    if (!b) { alert('No shared backend configured.'); return; }
+    if (b.type !== 'pantry' && b.type !== 'firebase') { alert('Unknown backend.'); return; }
+
+    const orig = await fetchSharedScoresRaw(b);
+    if (orig === null) { alert('Could not fetch scores.'); return; }
+    const cleaned = dedupeScores(orig).sort((a,b) => b.score - a.score || a.seconds - b.seconds);
+    const msg = `Leaderboard cleanup\n\nBefore: ${orig.length} entries\nAfter:  ${cleaned.length} entries (deduped)\n\nPush the cleaned list to the shared backend?`;
+    if (!confirm(msg)) return;
+
+    let ok = false;
+    if (b.type === 'pantry') {
+      const r = await fetch(`https://getpantry.cloud/apiv1/pantry/${b.id}/basket/cbs_quiz_scores`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scores: cleaned })
+      });
+      ok = r.ok;
+    } else if (b.type === 'firebase') {
+      const r = await fetch(`${b.url}/scores.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cleaned)
+      });
+      ok = r.ok;
+    }
+    alert(ok ? `✅ Leaderboard cleaned. ${cleaned.length} unique entries pushed.` : '❌ Push failed — see browser console.');
+  })();
+}
+
+// Raw fetch helper used only by the cleanup mode (no dedupe applied,
+// so we can show the BEFORE count accurately)
+async function fetchSharedScoresRaw(b) {
+  try {
+    if (b.type === 'pantry') {
+      const r = await fetch(`https://getpantry.cloud/apiv1/pantry/${b.id}/basket/cbs_quiz_scores`);
+      if (r.status === 400) return [];
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const data = await r.json();
+      return Array.isArray(data.scores) ? data.scores : [];
+    }
+    if (b.type === 'firebase') {
+      const r = await fetch(`${b.url}/scores.json`);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const data = await r.json();
+      if (!data) return [];
+      return Array.isArray(data) ? data.filter(Boolean) : Object.values(data);
+    }
+  } catch (e) {
+    console.warn('Raw fetch failed.', e);
+    return null;
+  }
+  return null;
 }
 </script>
 </body>

@@ -24,7 +24,7 @@ from pathlib import Path
 HERE = Path(__file__).parent
 QUESTIONS_FILE = HERE / "questions.json"
 SCORES_FILE = HERE / "scores.json"
-QUIZ_LENGTH = 50
+QUIZ_LENGTH = 80
 
 # ---- ANSI colors (works on most modern terminals) ------------------------
 class C:
@@ -87,7 +87,7 @@ def save_score(entry: dict) -> None:
 def banner() -> None:
     print(f"{C.CYAN}{C.BOLD}")
     print("=" * 60)
-    print("        CBS CORE KNOWLEDGE QUIZ - 50 Random Questions")
+    print("        CBS CORE KNOWLEDGE QUIZ - 80 Random Questions")
     print("=" * 60)
     print(f"{C.RESET}")
 
@@ -197,7 +197,7 @@ def menu(all_q: list) -> None:
     while True:
         clear_screen()
         banner()
-        print(f"  {C.CYAN}1.{C.RESET} Take the quiz (50 random questions)")
+        print(f"  {C.CYAN}1.{C.RESET} Take the quiz (80 random questions)")
         print(f"  {C.CYAN}2.{C.RESET} View leaderboard")
         print(f"  {C.CYAN}3.{C.RESET} Quit\n")
         choice = input(f"{C.YELLOW}Your choice: {C.RESET}").strip()

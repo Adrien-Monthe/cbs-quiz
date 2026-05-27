@@ -9098,5 +9098,1305 @@
     ],
     "correct": 1,
     "tip": "The Product-vs-Instance split is consistent across the platform: CARD.TYPE defines behavior (VISA Platinum, 3-year expiry); CARD.ISSUE is an instance for a specific customer. CHEQUE.TYPE defines behavior; CHEQUE.ISSUE is the actual book. PRODUCT defines lending behavior; ARRANGEMENT is the customer loan. Same separation everywhere — change the product once, all instances benefit (or stay frozen if NON.TRACKING)."
+  },
+  {
+    "id": 701,
+    "topic": "Project Strategy",
+    "q": "The team wants the new CBS to 'match Temenos robustness while being lighter'. Which technical choice would BEST embody both goals?",
+    "options": [
+      "Copying Temenos features one-for-one into the new system",
+      "Adopting Temenos's architectural principles (AA, virtual GL, registry) but selecting only the components the bank actually needs for its scale",
+      "Replacing every Temenos pattern with a custom invented equivalent",
+      "Outsourcing everything to a Temenos consultant"
+    ],
+    "correct": 1,
+    "tip": "Matching robustness = adopting the proven structural principles (Arrangement Architecture, virtual ledger, registries) — these are what give Temenos its enterprise-grade behaviour. 'Being lighter' = NOT carrying features the bank doesn't need yet (e.g. niche Forex products). Selective adoption keeps the system maintainable while the architecture remains industry-grade. Copy-everything bloats; reinvent-everything loses Temenos's hard-won lessons."
+  },
+  {
+    "id": 702,
+    "topic": "Project Strategy",
+    "q": "A bank stakeholder asks: 'Why do you separate the core models from the APIs?' Strongest justification?",
+    "options": [
+      "APIs change frequently (new clients, channels); core models must remain stable — coupling them forces constant model churn whenever a channel evolves",
+      "It makes the code shorter",
+      "Customers prefer it",
+      "Regulators mandate it explicitly"
+    ],
+    "correct": 0,
+    "tip": "Core models encode business invariants (a Customer, an Arrangement, a Balance) that shouldn't be invalidated by UI changes. APIs are the contract with channels and evolve constantly — new mobile features, new partner integrations, new regulatory endpoints. Coupling them means every channel change forces a model rewrite. Separating them lets each layer evolve at its natural pace and keeps the audit-critical core stable for regulators."
+  },
+  {
+    "id": 703,
+    "topic": "Project Strategy",
+    "q": "A 'customer-centric' CBS anchors accounting and products to the customer rather than to accounts. Which downstream benefit follows MOST directly?",
+    "options": [
+      "Faster login",
+      "Easier 360° risk view — total exposure to one customer across their loans, accounts, and contracts can be computed without cross-table joins",
+      "Lower hardware cost",
+      "Simpler frontend"
+    ],
+    "correct": 1,
+    "tip": "When the customer is the anchor, every contract/account/balance has a clean direct reference back to the same Party. Group risk, regulatory KYC, AML and credit-aggregation queries become single-hop walks instead of complex multi-Table joins. Banks that anchored on Account first historically struggled with 'which is the real customer profile?' across merged accounts — customer-centric design prevents that mess from day one."
+  },
+  {
+    "id": 704,
+    "topic": "Project Strategy",
+    "q": "Phase Zero scope was deliberately limited to core accounts, products, and basic payment-hub integration. What's the strongest argument for this scoping?",
+    "options": [
+      "Deposits and loans are unimportant",
+      "Without a working accounts + posting + product spine, every later module (deposits, loans, cards) lacks a stable foundation to attach to",
+      "It saves money",
+      "The bank already has deposits"
+    ],
+    "correct": 1,
+    "tip": "Loans, deposits, cards, mortgages, treasury — all stand on top of: account balances, product configuration, and posting. Without that spine working end-to-end, building deposits next means simultaneously fighting deposit-domain complexity AND foundational ambiguity. Phase Zero exists to make the spine bulletproof; subsequent phases then add one product at a time on a known-good base. Slicing by 'layer of depth' is more honest than slicing by 'product breadth'."
+  },
+  {
+    "id": 705,
+    "topic": "Project Strategy",
+    "q": "The proposal emphasizes 'embedding data management features like auditability and the four-eyes principle by design'. What does 'by design' add over just 'enforcing them later'?",
+    "options": [
+      "Nothing — the result is the same",
+      "Audit and 4-Eyes are baked into the kernel (every record carries audit fields; NAU/LIV separation is structural) — no application can accidentally bypass them",
+      "It's just a marketing phrase",
+      "It avoids needing developers"
+    ],
+    "correct": 1,
+    "tip": "By-design means the controls live in the kernel/framework. INPUTTER/AUTHORISER are on EVERY record automatically; NAU singleton enforces the 4-Eyes flow regardless of which app initiates it. A later-bolted-on approach relies on every developer remembering to call the audit library — one forgotten call breaks the audit chain. By design = unbypassable; later = best-effort."
+  },
+  {
+    "id": 706,
+    "topic": "Project Strategy",
+    "q": "Why frame the CBS explicitly as a transactional / OLTP system rather than a hybrid OLTP/OLAP one?",
+    "options": [
+      "OLAP is illegal in banking",
+      "OLTP and OLAP have conflicting optimisation requirements (row vs column store, latency vs throughput); trying to be both compromises both",
+      "OLAP isn't needed",
+      "It's cheaper to call it OLTP"
+    ],
+    "correct": 1,
+    "tip": "OLTP = high-frequency, low-latency, row-level reads/writes (a teller processing a deposit). OLAP = ad-hoc analytical queries over millions of rows (group risk dashboards). Their storage layouts, indexing, and consistency models diverge. Modern designs use a transactional OLTP core (PostgreSQL) and stream changes into a separate analytical store. Calling the CBS 'OLTP' is an architectural commitment to keeping the core fast and consistent."
+  },
+  {
+    "id": 707,
+    "topic": "Project Strategy",
+    "q": "The project's preliminary roadmap explicitly divides CBS modules into phases. From a delivery-risk perspective, which phasing principle minimizes risk most?",
+    "options": [
+      "Build everything in parallel for fastest delivery",
+      "Earlier phases deliver the foundation modules other modules depend on (registries, ledger, AA spine) before product modules (cards, loans)",
+      "Random phasing",
+      "Most-customer-visible features first"
+    ],
+    "correct": 1,
+    "tip": "Dependency-respecting phasing means each phase delivers a stable layer the next phase builds on. Building cards (Phase 3) before the AA spine (Phase 1) creates rework when the spine arrives. Foundation-first phasing trades 'customer visibility now' for 'no rework later' — a critical bet on a multi-year project where rework cost compounds."
+  },
+  {
+    "id": 708,
+    "topic": "Project Strategy",
+    "q": "Why is regional analysis (CEMAC, UEMOA, South Sudan, Liberia) needed even though the CBS itself is region-agnostic?",
+    "options": [
+      "Marketing reasons",
+      "Each region's data retention, language, KYC/AML, and compliance rules differ — and they shape NFRs and Configurability requirements before phase zero ships",
+      "Random requirement",
+      "All regions are identical"
+    ],
+    "correct": 1,
+    "tip": "Region-specific rules drive non-functional decisions: 10-year retention in South Sudan = 400TB storage planning; CEMAC regulators dictate certain reports; UEMOA may require certain languages. If phase zero ships without supporting these as configurable, every region adds a code release. Regional analysis lets configurability requirements be captured in the framework, not bolted on later."
+  },
+  {
+    "id": 709,
+    "topic": "Project Strategy",
+    "q": "The team adopts 'Temenos best practices… while incorporating modern frameworks like Beyond'. What risk does this pragmatic blend manage?",
+    "options": [
+      "No risk",
+      "Pure-Temenos clone = no modernization benefit; pure-greenfield = repeating decade-old lessons the hard way; blending captures battle-tested patterns plus modern tooling",
+      "Marketing concerns",
+      "Licensing only"
+    ],
+    "correct": 1,
+    "tip": "Pure-Temenos clones inherit Temenos's legacy weight (jBase quirks, COBOL-era patterns in places). Pure-greenfield re-discovers issues like 'oh, accounting must be transaction-driven not coupled' that Temenos already solved. The pragmatic blend takes Temenos's STRUCTURAL wins (AA, virtual GL, registry) but rebuilds them on modern frameworks (PostgreSQL, Kafka, Kubernetes). Best of both worlds; minimises both risks."
+  },
+  {
+    "id": 710,
+    "topic": "Project Strategy",
+    "q": "Andrei Sech noted Temenos accounting uses 'hard accounting' for most models but 'soft accounting' for arrangement products. Why this split?",
+    "options": [
+      "Random choice",
+      "Standard transactions (FT, Teller) have well-understood, stable postings (hard); arrangement products vary by product (loan vs lease vs syndicated) and benefit from configurable allocation rules (soft)",
+      "Hard is older",
+      "Soft is faster"
+    ],
+    "correct": 1,
+    "tip": "Stable, common transactions (cash deposit, wire transfer) have one canonical posting pattern — hard-code it once, get speed and certainty. Arrangement products differ wildly: a mortgage's accounting differs from a leasing accrual differs from an Islamic-finance contract. Soft Accounting (allocation rules per product) handles that variability without bloating the core. Split by 'where flexibility actually pays off'."
+  },
+  {
+    "id": 711,
+    "topic": "Project Strategy",
+    "q": "The team committed to delivering documents 24h before each working session. From a meeting-effectiveness perspective, the strongest reason is…",
+    "options": [
+      "Etiquette",
+      "Lets stakeholders pre-read and arrive with informed questions — turning the session from a presentation into a decision-making discussion",
+      "Random rule",
+      "Required by Confluence"
+    ],
+    "correct": 1,
+    "tip": "Without pre-reads, sessions degrade into one-way presentations where the architect explains while the bank listens. With pre-reads, attendees arrive with specific questions and counter-proposals — turning the hour into decisions, not exposition. For a multi-stakeholder project like CBS, this difference compounds over many sessions: 5 minutes saved per attendee per session × 20 sessions × 10 attendees = 16 hours saved."
+  },
+  {
+    "id": 712,
+    "topic": "Project Strategy",
+    "q": "Why staff three teams (rather than one large team) for CBS delivery?",
+    "options": [
+      "Random",
+      "Three teams enable parallel work on independent modules (kernel, product factory, payments) — but coordination overhead grows with team count, so 'three' balances parallelism against integration cost",
+      "More headcount",
+      "Vendor preference"
+    ],
+    "correct": 1,
+    "tip": "One team = serial bottleneck; many teams = coordination chaos. Three teams aligned with major architectural seams (foundation, products, channels) let each work on largely independent surface area while sharing common interfaces. Brooks's Law: adding teams adds communication cost as n²; the 'right' team count maximises parallel value before coordination cost overtakes it."
+  },
+  {
+    "id": 713,
+    "topic": "Project Strategy",
+    "q": "The team plans to gradually off-board members from Payment Hub to CBS. What execution risk does 'gradually' (vs 'all at once') manage?",
+    "options": [
+      "No risk",
+      "Off-boarding everyone at once means losing all current Payment Hub support; gradual moves preserve domain knowledge transfer and ongoing operations",
+      "Random reason",
+      "Vendor mandate"
+    ],
+    "correct": 1,
+    "tip": "Payment Hub is a running production system — its team holds tribal knowledge that's tacit and hard to document. Yanking everyone leaves operations brittle and CBS without context. Gradual transfer means: (a) some Payment Hub coverage remains, (b) leavers train their replacements, (c) the CBS team grows in waves it can absorb. Same logic applies to most rebuilds: brick-by-brick beats forklift."
+  },
+  {
+    "id": 714,
+    "topic": "Project Strategy",
+    "q": "The MVP definition includes 'multicurrency support from day one' even though it complicates Phase Zero. Why not defer multicurrency?",
+    "options": [
+      "Complexity is fun",
+      "Adding multicurrency LATER means retrofitting every Table (Balance, GL key, Transaction Code) — far more disruptive than baking it in from the start",
+      "Customer demand",
+      "Random choice"
+    ],
+    "correct": 1,
+    "tip": "Multicurrency isn't a feature — it's a pervasive concern affecting every monetary field, every posting, every report. Retrofitting it means changing thousands of code paths and migrating data. Building it in from day one costs ~20% extra in Phase Zero; bolting it on later costs ~10× that and risks data corruption. Pervasive concerns must be designed in early."
+  },
+  {
+    "id": 715,
+    "topic": "Project Strategy",
+    "q": "Joel Kamdem asked for documents 24h before each session. This is a quality control on which dimension of the delivery process?",
+    "options": [
+      "Schedule",
+      "Decision quality — informed stakeholders make better-aligned decisions than reactive ones; investing 24h of reading saves weeks of rework from misaligned decisions",
+      "Speed",
+      "Cost"
+    ],
+    "correct": 1,
+    "tip": "Quality control isn't only about deliverables — it's also about decision quality at gates. A session where a bank stakeholder makes an off-the-cuff decision often reverses a week later when they've thought about it. 24h of pre-read makes those decisions stickier. The 24h rule is essentially a process-level quality gate that prevents downstream rework."
+  },
+  {
+    "id": 716,
+    "topic": "Accounting Mastery",
+    "q": "Andrei Sech contrasted 'manual entries with explicit debit/credit accounts' (legacy) with 'entries automatically raised online' (modern). The deepest implication of this shift for operations staff is…",
+    "options": [
+      "They press fewer buttons",
+      "The TRANSACTION becomes the single source of truth — staff can no longer 'fix' the ledger separately from the business event that produced it",
+      "Salaries change",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "When operators typed entries by hand, the business event and the accounting entry were independent artefacts — and could disagree. Transaction-driven means the entry IS derived from the event; you can't 'patch the books' without also reversing the underlying transaction. That tight coupling eliminates a common class of reconciliation pain, but takes away the operator's ability to 'just adjust' the GL. Discipline up, hidden fixes gone."
+  },
+  {
+    "id": 717,
+    "topic": "Accounting Mastery",
+    "q": "Modern accounting entries are 'richer' than legacy ones (transaction codes, P&L category, account officer, FX original equivalent). What's the architectural payoff of this richness?",
+    "options": [
+      "Larger files",
+      "Reports become a PROJECTION over richer data — new analytical slices (by officer, by category, by FX) require config, not new postings or new tables",
+      "Random benefit",
+      "Slower posting"
+    ],
+    "correct": 1,
+    "tip": "Reports as projections means: same underlying entries, multiple views via Consolidation Keys. Want profitability by Account Officer? Already in the data. Want product-line P&L? Already there. Without that richness, a new report would mean changing posting logic or adding a parallel data store. Richer entries = report-by-config not report-by-code. The cost is bigger rows; the win is analytical agility."
+  },
+  {
+    "id": 718,
+    "topic": "Accounting Mastery",
+    "q": "A bank wants to compute interest on Saturday's value-dated transactions even though Saturday isn't a business day. Which date attribute pair correctly reflects this?",
+    "options": [
+      "Booking=Sat, Value=Sat",
+      "Booking=Mon (next business day), Value=Sat (when interest starts accruing)",
+      "Booking=Sat, Value=Mon",
+      "All dates equal"
+    ],
+    "correct": 1,
+    "tip": "Booking Date = when the entry hits the ledger (must be a business day for the books to close cleanly — so Monday). Value Date = the economic date the funds count for interest/balance (Saturday — what the customer 'feels'). The dates legitimately diverge because the business calendar doesn't match the calendar calendar. Picking the right date per use (interest, statement period, FX rate) is core accounting policy."
+  },
+  {
+    "id": 719,
+    "topic": "Accounting Mastery",
+    "q": "Consolidation Keys replace fixed GL accounts. The MOST important architectural advantage of this is…",
+    "options": [
+      "Smaller database",
+      "The bank can adapt to new countries' GL chart-of-accounts regulations via configuration only — without changing posting logic or migrating historic entries",
+      "Faster posting",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "Different countries have different GL numbering and grouping requirements. Fixed GL accounts mean 'add a new country = rewrite postings'. Consolidation Keys describe entries by DIMENSIONS (product, currency, sector); each country's chart-of-accounts becomes a CONFIGURATION that aggregates dimensions into its required structure. Same posting works for South Sudan, UEMOA, CEMAC. Configurability bought via abstraction."
+  },
+  {
+    "id": 720,
+    "topic": "Accounting Mastery",
+    "q": "Why does category-based P&L accounting (T24 / Globus categories 1-19999) outperform a flat chart-of-accounts approach for multi-product banks?",
+    "options": [
+      "Fewer files",
+      "Categories impose structure (income vs expense; by source) that lets the system aggregate consistently across products WITHOUT each product reinventing P&L semantics",
+      "Random advantage",
+      "Lower compute"
+    ],
+    "correct": 1,
+    "tip": "Without category structure, each product reinvents 'where does my fee revenue post?' — leading to drift and inconsistent reports. Categories impose a shared taxonomy: every fee revenue post falls in a known range; every interest expense too. New products plug into the existing taxonomy. Reports stay coherent as the product catalogue grows. Structure = scalable consistency."
+  },
+  {
+    "id": 721,
+    "topic": "Accounting Mastery",
+    "q": "Andrei Sech flagged a concern that using Blockly/formula-builders for account entry generation 'lacks the flexibility of a virtual GL based on keys'. What's the deeper trade-off being highlighted?",
+    "options": [
+      "Blockly is slow",
+      "Per-event formulas only express WHERE each entry goes; Consolidation Keys express the entry's DIMENSIONS — keys support unforeseen future reports, formulas only support pre-planned ones",
+      "Blockly is hard to learn",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "A formula 'debit GL 1010, credit GL 2100' answers ONE report's question — the formula-author had to know what to post. Keys instead capture WHAT this entry IS (product=mortgage, currency=USD, sector=retail, type=fee-income); future reports SELECT entries by dimension combinations the formula-author never anticipated. Keys are forward-compatible; formulas are forward-fragile."
+  },
+  {
+    "id": 722,
+    "topic": "Accounting Mastery",
+    "q": "A 'pyramid' model is described: operations at the foundation, entries grouped above, then aggregated GL lines, then reports at top. What does each layer enable INDEPENDENTLY of the others?",
+    "options": [
+      "Nothing independently",
+      "Each layer can be replaced without breaking adjacent ones: change report definitions without touching entries; change posting rules without rewriting reports",
+      "Layers can't be independent",
+      "All layers are identical"
+    ],
+    "correct": 1,
+    "tip": "The pyramid IS architectural decoupling. Operations don't know about reports; reports don't know about transactions. Each layer has a contract with its neighbours. The bank can change a report definition (top) without affecting the posting engine (bottom). The bank can refactor postings (middle) without rewriting reports IF the dimensions stay stable. This is what enables independent module evolution."
+  },
+  {
+    "id": 723,
+    "topic": "Accounting Mastery",
+    "q": "Why does a transaction-driven model also REDUCE the number of GL accounts that exist?",
+    "options": [
+      "It deletes them",
+      "GL accounts are CREATED only when an entry first needs them (driven by key combinations encountered) — instead of pre-creating thousands of empty accounts upfront",
+      "Random",
+      "Customer count drops"
+    ],
+    "correct": 1,
+    "tip": "Legacy approach: pre-define every possible GL account in advance (15,000+). Most stay empty. Transaction-driven approach: when an entry needs to land somewhere, the system materialises the GL key on demand. Result: only GL accounts that ACTUALLY hold balances exist. Queries are faster (less to scan); admin is lighter (no empty-account cleanup); reports cleaner (no 0-balance noise)."
+  },
+  {
+    "id": 724,
+    "topic": "Accounting Mastery",
+    "q": "The legacy model has 'delayed visibility'; transaction-driven has 'real-time visibility'. From a treasury / risk perspective, what NEW capability does real-time enable that delayed can't?",
+    "options": [
+      "Faster reports",
+      "Intra-day liquidity decisions — treasury can see current cash position any second and act before close of business, instead of working from yesterday's stale snapshot",
+      "Random",
+      "Lower cost"
+    ],
+    "correct": 1,
+    "tip": "With delayed visibility, treasury operates on yesterday's data — any decision today is partly blind. With real-time visibility, intra-day cash management becomes possible: spot a liquidity gap at 11am, fix it by 2pm. For a multi-currency bank with intra-day FX flows, this is the difference between proactive and reactive treasury — directly affecting funding cost and risk exposure."
+  },
+  {
+    "id": 725,
+    "topic": "Accounting Mastery",
+    "q": "Soft Accounting uses 'allocation rules' to produce entries from events. Compared with hard-coded posting, the deepest benefit is…",
+    "options": [
+      "Less code",
+      "When regulators change accounting treatment (e.g. new IFRS rule), the bank adjusts allocation rules in config — without touching the operational code path that handles customer transactions",
+      "Random",
+      "Faster"
+    ],
+    "correct": 1,
+    "tip": "Hard-coded posting means a regulatory change forces a code release: high risk, slow, expensive. With soft allocation rules, the regulator-driven update is a config change — quickly testable, easily auditable, reversible. The TRANSACTION code path stays untouched (customers' UX is unchanged). Decoupling the regulator's pace from the engineering pace is one of the highest-value benefits of soft accounting."
+  },
+  {
+    "id": 726,
+    "topic": "Accounting Mastery",
+    "q": "What does 'accounting is designed as a flexible multicomponent system' really mean from an engineering perspective?",
+    "options": [
+      "Random",
+      "Posting, consolidation, reporting are SEPARATE services with defined contracts — each can be scaled, replaced, or upgraded without touching the others",
+      "It's marketing",
+      "Single monolith"
+    ],
+    "correct": 1,
+    "tip": "Multicomponent = independent services connected by contracts (events, key formats). Posting service writes entries. Consolidation service aggregates by keys. Reporting service queries aggregates. Each scales independently (heavy posting load doesn't slow reports). Each can be upgraded independently (new posting engine doesn't break reports). This is what enables modern operational characteristics — scaling, observability, partial deployments."
+  },
+  {
+    "id": 727,
+    "topic": "Accounting Mastery",
+    "q": "The system models a single transaction as having multiple distinct dates (booking, value, trade, processing). Why does each need to exist separately even though they often coincide?",
+    "options": [
+      "Padding",
+      "Each date carries DIFFERENT legal/financial semantics — interest pricing (value), tax year (booking), regulatory reporting (trade), batch sequencing (processing) — collapsing them loses information",
+      "Random",
+      "All dates are the same"
+    ],
+    "correct": 1,
+    "tip": "A trade date 31-Dec might value-date 02-Jan and book on 03-Jan. Tax reporting uses booking year; interest uses value date; trade-date drives MiFID reporting. Collapse all to 'date' = lose distinctions regulators need. Modeling them separately is more expensive but lets the same transaction satisfy multiple disparate downstream consumers. Critical for cross-border, multi-regulator banking."
+  },
+  {
+    "id": 728,
+    "topic": "Accounting Mastery",
+    "q": "Reports are described as a 'projection' over accounting data. What architectural property does this give the reports layer?",
+    "options": [
+      "Random",
+      "Reports add no operational load — adding a new report doesn't change postings; reports query already-captured data via key combinations",
+      "Slowness",
+      "Lock contention"
+    ],
+    "correct": 1,
+    "tip": "If reports were materialized differently (e.g. each report keeping its own pre-aggregated table), adding a new report would force the posting engine to write to one more place. Projection-based reports mean: posting writes to the canonical data; reports SELECT and aggregate as queries. Add a report → zero impact on the posting hot path. The cost is read-time aggregation; with consolidation already done, it's cheap."
+  },
+  {
+    "id": 729,
+    "topic": "Accounting Mastery",
+    "q": "A bank wants to report under both local GAAP and IFRS simultaneously. The transaction-driven model handles this how?",
+    "options": [
+      "Run the system twice",
+      "Same underlying entries; two separate consolidation key configurations roll them up differently per standard — no parallel postings",
+      "Random",
+      "Manual reconciliation"
+    ],
+    "correct": 1,
+    "tip": "Parallel postings (one set per standard) doubles storage, doubles processing, and risks divergence. Single canonical entries with multiple key configurations gives both views from the same source — guaranteed consistency, no divergence possible. Each GAAP / IFRS view is just a different roll-up of the same entries. This is the killer feature of dimensional accounting."
+  },
+  {
+    "id": 730,
+    "topic": "Accounting Mastery",
+    "q": "Foreign-original-equivalent amounts on every entry exist for what specific reconciliation purpose?",
+    "options": [
+      "UI display",
+      "Auditing FX positions — reconciling the bank's books in local currency against original-currency exposures requires both amounts on every cross-currency entry",
+      "Random",
+      "Customer statements"
+    ],
+    "correct": 1,
+    "tip": "Without original-currency amounts, you can only see 'this entry was worth X in LCY today' — you've lost the FX exposure. With both AMOUNT.LCY and AMOUNT.FCY on each entry, the bank can answer 'how much USD do we owe in total?' (sum AMOUNT.FCY for USD entries) and 'what's that worth in our local books today?' (sum AMOUNT.LCY for same entries) — both critical for FX risk and regulatory reporting."
+  },
+  {
+    "id": 731,
+    "topic": "Accounting Mastery",
+    "q": "What's the architectural significance of saying 'accounting is the BACKBONE of a CBS'?",
+    "options": [
+      "Random branding",
+      "Every other module (loans, deposits, cards) eventually produces accounting entries — get the backbone wrong and every product builds on quicksand",
+      "Marketing",
+      "Spinal joke"
+    ],
+    "correct": 1,
+    "tip": "Accounting is the universal interface every product module talks to. A misdesigned accounting layer leaks into every product's design: workarounds, hacks, manual reconciliations, hidden journals. A clean accounting layer lets every product simply RAISE ENTRIES and trust the system to consolidate/report correctly. Getting it right first = leverage; getting it wrong first = tax on every later feature."
+  },
+  {
+    "id": 732,
+    "topic": "Accounting Mastery",
+    "q": "Why is 'operations form the foundation of the pyramid' (not 'entries form the foundation')?",
+    "options": [
+      "Random",
+      "Operations are what the bank does to serve customers (the real-world business events); entries are derived FROM operations. Modelling entries as the ground truth would mean operations could disagree with the books",
+      "Random",
+      "Layers are inverted"
+    ],
+    "correct": 1,
+    "tip": "If entries were ground truth, you could have entries with no operation behind them (= fictional). Making operations ground truth means entries can only exist as derivatives of real business events — eliminating the 'phantom entries' fraud vector. The pyramid bottom = operations (the real world); everything above is derived. This is what 'transaction-driven' really means at its deepest level."
+  },
+  {
+    "id": 733,
+    "topic": "Accounting Mastery",
+    "q": "A bank disabled real-time posting to 'speed up the user-facing transaction'. What hidden cost did they incur?",
+    "options": [
+      "No cost",
+      "Loss of intra-day GL accuracy — the GL is now batched, so any inter-step decision (limit check, balance lookup, fraud screen) operates on stale numbers; cumulative drift across modules",
+      "Random",
+      "UI slower"
+    ],
+    "correct": 1,
+    "tip": "Real-time posting isn't a luxury — many checks downstream RELY on current ledger state. Limit checks compare against current balance; fraud screens compare against today's transactions; AML compares against intra-day flows. Batching posting means all those checks operate on stale data — false negatives (frauds get through), false positives (limits incorrectly trip). The 'speed-up' shifts cost from UI latency to downstream correctness."
+  },
+  {
+    "id": 734,
+    "topic": "Accounting Mastery",
+    "q": "An audit requirement says 'every accounting entry must trace back to a customer-facing operation'. The transaction-driven model satisfies this how?",
+    "options": [
+      "By accident",
+      "By design — entries are derived from operations and carry the operation's identifier; auditing 'show me what operation produced GL line X' is a single lookup",
+      "Random",
+      "Manual notes"
+    ],
+    "correct": 1,
+    "tip": "Each STMT.ENTRY / CATEG.ENTRY carries TRANSACTION.CODE and references back to the originating contract/event. Auditor query: 'show me the operation behind this GL entry' = follow the reference, see the FT/Teller/Activity. Legacy systems where entries were keyed in manually couldn't always reconstruct this — operators left notes 'wash entry for misposting on Tue' that auditors had to interpret."
+  },
+  {
+    "id": 735,
+    "topic": "Accounting Mastery",
+    "q": "A scenario: the system applies a late fee to 1,000 customers in a nightly batch. Under transaction-driven accounting, what's true?",
+    "options": [
+      "1,000 manual GL entries are typed",
+      "1,000 fee-Activities run; each automatically raises its own STMT.ENTRY + CATEG.ENTRY pair; no manual journal touches the GL",
+      "One mega-entry is posted",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "Each fee is an Activity (well-defined operation). Each Activity raises its own entries. The 'batch' is just a scheduler running many Activities — each individually transaction-driven. The GL gets 1,000 + 1,000 entries; consolidation rolls them up. No human types anything. The audit trail shows each fee event tied to a customer. Same model scales from 1 fee to 1 million."
+  },
+  {
+    "id": 736,
+    "topic": "NFR Mastery",
+    "q": "Four 'Architecture Significant Requirements' (ASRs) shape the CBS: Security, Availability, Scalability, Observability — plus Configurability. Why are these called 'architecture-significant' rather than just 'requirements'?",
+    "options": [
+      "They sound impressive",
+      "Each fundamentally CONSTRAINS how the system is built — bolting them on later requires rearchitecting; building without them forces them",
+      "Random importance",
+      "Random label"
+    ],
+    "correct": 1,
+    "tip": "Functional requirements describe WHAT the system does (compute interest, post entries). ASRs describe HOW the system must behave (with 99.9% uptime, with zero-trust security). These can't be added later as features — they demand structural decisions: distributed vs monolith, mTLS vs perimeter security, batch vs streaming. Calling them 'architecture-significant' flags them for early decision."
+  },
+  {
+    "id": 737,
+    "topic": "NFR Mastery",
+    "q": "Zero-trust security says 'verify every request, regardless of network location'. What's the most concrete architectural consequence?",
+    "options": [
+      "Slower",
+      "Every internal service-to-service call requires authentication (e.g. mTLS via Istio) — there's no 'trusted internal network' assumption",
+      "More VPNs",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "Pre-zero-trust: inside the corporate firewall = trusted (no auth between services). Zero-trust: every call (even between two pods on the same cluster) must prove identity. Architecturally this means: service mesh (Istio) with mTLS by default, every service has a verified identity (Keycloak), no 'internal' shortcuts. Costs latency overhead; gains: a compromised pod doesn't get a free pass."
+  },
+  {
+    "id": 738,
+    "topic": "NFR Mastery",
+    "q": "Policy as Code (PaC) is highlighted with a 100% coverage goal for critical domains. PaC's advantage over written policies is…",
+    "options": [
+      "Faster typing",
+      "Policies are executable — automatically enforced at request time (admission controllers, OPA), not just documented and hoped-for. Drift is impossible because deployment fails if policy fails",
+      "Random",
+      "Less paperwork"
+    ],
+    "correct": 1,
+    "tip": "Written policy: 'all PII must be encrypted' — relies on every dev to remember. PaC: an Open Policy Agent rule enforces 'reject any deployment without encryption-at-rest annotations' at admission time. Cannot drift. Cannot be forgotten. New regulation = new policy code = enforced from minute one. The 100% coverage goal means: every critical domain has executable enforcement, not just a wiki page."
+  },
+  {
+    "id": 739,
+    "topic": "NFR Mastery",
+    "q": "Target regions are CEMAC, UEMOA, South Sudan, and Liberia. Why does identifying target regions BEFORE finalising the architecture matter?",
+    "options": [
+      "Random",
+      "Compliance regulations per region (data localisation, retention, encryption standards) drive concrete architectural choices — region-agnostic architecture often can't satisfy all rules",
+      "Currency mix",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "South Sudan's 10-year retention drives 400TB storage planning. CEMAC may require data residency (servers physically in the region). Liberia may have specific encryption rules. Designing region-agnostic means picking the union of all rules — possibly more restrictive than any single region needs. Knowing target regions = right-sizing the architecture to actual requirements."
+  },
+  {
+    "id": 740,
+    "topic": "NFR Mastery",
+    "q": "99.9% availability = ~8.76h downtime/year. Why is this target heavily dependent on the BANK'S infrastructure, not just the CBS architecture?",
+    "options": [
+      "The CBS handles everything",
+      "Availability is end-to-end: bank's network, power, hardware can fail in ways CBS architecture can't recover from. CBS can guarantee its own layer; the composite SLA depends on every layer",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "A CBS with multi-region failover can survive datacentre loss — but if the bank's single network feed cuts, the CBS is unreachable. CBS uptime ≠ user-facing uptime. The composite SLA needs ALL layers to meet 99.9%. Hence 'custom tier plans' per bank: high-tier banks have redundant infrastructure; lower-tier have to accept lower composite uptime even with a great CBS."
+  },
+  {
+    "id": 741,
+    "topic": "NFR Mastery",
+    "q": "55-56 GB of logs per day is projected. What's the MOST important downstream consequence to plan for?",
+    "options": [
+      "Disk cost",
+      "Retention policy + log management at scale — costs go beyond storage to indexing/searching/archiving; without policy, logs accumulate uselessly and breach retention regulations",
+      "Random",
+      "More tape drives"
+    ],
+    "correct": 1,
+    "tip": "55GB/day = 20TB/year just in logs. Indexing for search costs more than storage. Retention regulations may require keeping logs for years AND auditable deletion afterwards. Without a clear log lifecycle (hot → warm → cold → delete), the cost spirals and compliance breaks. ElasticSearch index management + Logstash filtering + retention policy must all be planned BEFORE volumes ramp up."
+  },
+  {
+    "id": 742,
+    "topic": "NFR Mastery",
+    "q": "Scalability is described as 'a continuation of availability'. Why couple them rather than treating them separately?",
+    "options": [
+      "Random",
+      "Under load spikes, capacity to scale IS what keeps the system available — running out of capacity = effective downtime even if no component crashed",
+      "Same word",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "A non-scalable system at 110% load = effectively down for the over-110% portion of users — even though every component is 'up'. Scalability is the ability to HANDLE load growth without availability loss. They're two sides of the same coin: capacity headroom and recovery from failure. Treating them together forces an integrated capacity plan."
+  },
+  {
+    "id": 743,
+    "topic": "NFR Mastery",
+    "q": "Observability collects logs, metrics, AND traces. Why all three rather than just 'good logging'?",
+    "options": [
+      "Industry fashion",
+      "Each answers different questions: logs (what happened?), metrics (how often/how slow?), traces (which path through services?). One alone leaves blind spots",
+      "Random",
+      "Vendor mandate"
+    ],
+    "correct": 1,
+    "tip": "Logs tell you a transaction failed. Metrics tell you 5% of transactions fail at peak. Traces tell you the failure happens in the AML hook calling an external provider that timed out. Each tool answers questions the others can't. Modern systems need all three because production issues span multiple services and require correlation. Observability stack (Prometheus + Jaeger + Logstash) is structured around this triad."
+  },
+  {
+    "id": 744,
+    "topic": "NFR Mastery",
+    "q": "The team supports Configurability with 'no-code' AND code-customization. The reason both exist is…",
+    "options": [
+      "Random",
+      "Common adaptations should be config-only (catch 90% of bank-specific needs cheaply); deeply unique processes need code (the 10% no config language could express). Both = pragmatic balance",
+      "Marketing",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "Pure-no-code: config languages can't express every business process; banks with unique workflows would be blocked. Pure-code: every minor change is a release; banks waste IT capacity on trivial parameterisation. Hybrid: 90% of customisation is config (per-bank rates, fee structures, calendars); the other 10% gets code hooks (custom validations, exotic integrations). Pareto-optimal."
+  },
+  {
+    "id": 745,
+    "topic": "NFR Mastery",
+    "q": "A bank's MOST realistic concurrent peak is between the 4th and 5th tier of the calculator. Why does this single number drive so much of the architecture?",
+    "options": [
+      "Random",
+      "Concurrent peak drives compute, network, DB connections, log throughput — many downstream NFRs derive from this one assumption, so a wrong estimate cascades into wrong sizing",
+      "Random",
+      "Cost"
+    ],
+    "correct": 1,
+    "tip": "Concurrent peak isn't 'how many users total' — it's 'how many ACTIVE at once'. From peak you derive: max DB connections, request-per-second capacity, log generation rate, network throughput, autoscaling triggers. Under-estimate = production capacity crisis; over-estimate = massive over-spend. Why architects insist on getting this number right BEFORE finalising the stack."
+  },
+  {
+    "id": 746,
+    "topic": "NFR Mastery",
+    "q": "10-year data retention × 40 TB/year = ~400 TB. Why is cloud archive storage primarily 'a bank responsibility' rather than CBS team responsibility?",
+    "options": [
+      "CBS doesn't care",
+      "Data sovereignty + compliance: who owns/encrypts/audits the archive is a regulatory question the BANK answers; CBS provides hooks but the storage choice is the bank's risk decision",
+      "Random",
+      "Cheaper for bank"
+    ],
+    "correct": 1,
+    "tip": "Cloud archive raises sovereignty questions (which jurisdiction holds the data?), encryption-key custody, and audit access — all of which are bank-and-regulator decisions, not engineering decisions. CBS provides the export/archive API; whether the bank chooses local tape, regional cloud, or hyperscaler is their risk. Architecture exposes the seam; business chooses the substrate."
+  },
+  {
+    "id": 747,
+    "topic": "NFR Mastery",
+    "q": "UI translation is described as 'simpler' than translating technical messages. Why is technical message translation hard?",
+    "options": [
+      "Random",
+      "Technical messages (in compliance reports, audit trails) are read by regulators who may require LEGAL precision in the local language — informal translation risks legal mismatch",
+      "More words",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "A UI button 'Submit' can be translated loosely. A compliance report stating 'transaction reversed due to insufficient funds at value date' carries legal weight — regulators may interpret the exact wording, and a sloppy translation could change legal meaning. Hence technical-message translation needs SOURCE OF TRUTH governance (which language is authoritative?) plus legally-reviewed translations."
+  },
+  {
+    "id": 748,
+    "topic": "NFR Mastery",
+    "q": "Automatic failover capability is said to depend on 'the bank's operations team and knowledge'. Why isn't auto-failover purely a software capability?",
+    "options": [
+      "Random",
+      "When primary fails, the secondary needs to be HEALTHY, MONITORED, and the team must know how to verify failover succeeded + handle the eventual failback. Without ops maturity, auto-failover fails silently",
+      "Random",
+      "Hardware"
+    ],
+    "correct": 1,
+    "tip": "Auto-failover software flips a switch. But: was the secondary actually replicating? Did all dependent systems failover too? When primary recovers, who fails back and how? Without ops team practice (chaos drills), auto-failover at 3am could fail silently and the bank wakes up to broken consistency. Software provides the mechanism; ops maturity provides the reliability."
+  },
+  {
+    "id": 749,
+    "topic": "NFR Mastery",
+    "q": "'Every requirement adds complexity, time, and resource needs.' What's the management lesson?",
+    "options": [
+      "Add more requirements",
+      "Aggressive prioritisation is itself a critical architecture activity — saying NO to nice-to-haves before they touch the design is cheaper than removing them later",
+      "Build everything",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "Every yes adds cost; every no preserves capacity. Pre-design prioritisation is the cheapest place to say no — once a requirement is in the design, removing it can break downstream assumptions. The reminder that 'every requirement adds complexity' is a discipline against scope creep. Architects who can't say no end up with bloated, unfinishable systems."
+  },
+  {
+    "id": 750,
+    "topic": "NFR Mastery",
+    "q": "Deployment strategy and 'configurability could be skipped in phase zero to meet delivery'. What's the engineering trade-off being made?",
+    "options": [
+      "Random",
+      "Configurability now = framework cost + delay; hard-code now and add config later = faster phase 0 but harder retrofit. Pragmatic in Phase Zero only if the retrofit cost is bounded",
+      "It's free",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "Phase Zero deadline pressure may justify deferring configurability. The trade-off: hard-coded values are quicker to ship but harder to change later (every change = release). Acceptable when (a) the values rarely change in Phase Zero, (b) the retrofit path is known and bounded. Dangerous when 'temporary hardcoding' calcifies into permanent inflexibility. Architects must enter such trade-offs eyes-open with a retrofit plan."
+  },
+  {
+    "id": 751,
+    "topic": "NFR Mastery",
+    "q": "Vulnerability patching is part of NFRs. Why frame patching as architecture-significant?",
+    "options": [
+      "Compliance",
+      "Patch cadence drives architecture: zero-downtime patching requires blue-green or canary; quick CVE response requires automated CI/CD — these structural choices made or not at design time",
+      "Random",
+      "Vendor mandate"
+    ],
+    "correct": 1,
+    "tip": "If patching requires 4h downtime, you've broken availability. If patching takes 6 weeks to test, you're exposed to CVEs. Both depend on architectural choices: blue-green deploys, canary rollouts, automated testing — all decided at design time. Treating patching as an afterthought leads to monthly maintenance windows or month-long CVE exposure. Hence ASR status."
+  },
+  {
+    "id": 752,
+    "topic": "NFR Mastery",
+    "q": "Why does Andrei Sialila emphasise 'narrowing the scope and prioritising' specifically when discussing NFRs?",
+    "options": [
+      "Random",
+      "NFRs have compounding cost — adding one 9 to availability multiplies engineering effort; getting every NFR perfect means delivering nothing. Narrow scope = ship a usable system",
+      "Marketing",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "99% → 99.9% might cost 2× engineering; 99.9% → 99.99% might cost 5×. Each 9 added isn't linear cost. Same for every NFR. Demanding 'best in class' across all NFRs ensures the project never ships. Narrowing = picking which NFRs are truly required (e.g. 99.9% for payments) vs which can tolerate less (99% for reporting). Honest prioritisation prevents perfectionism paralysis."
+  },
+  {
+    "id": 753,
+    "topic": "NFR Mastery",
+    "q": "An NFR like 'support for Portuguese language' looks small but can be architecturally significant when…",
+    "options": [
+      "It costs nothing",
+      "When the system MUST display all entities (messages, statements, reports) in Portuguese — driving an i18n framework, multi-language data model, and translation pipeline through every layer",
+      "Just frontend",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "If Portuguese is only UI, it's a translation file. If Portuguese is required across statements, reports, compliance documents, and audit trails, then EVERY content-producing layer needs i18n support — including the DDD-driven dynamic text, error messages from plugins, regulatory reports. That's a system-wide concern, not a frontend feature. Hence: 'small NFR' can be massive depending on depth."
+  },
+  {
+    "id": 754,
+    "topic": "NFR Mastery",
+    "q": "Why is dependency on 'bank's operations team and knowledge' itself listed as an NFR consideration?",
+    "options": [
+      "Random",
+      "Some NFRs (availability, failover, observability) require human action — the architecture can't realise them solely through software, so 'who operates this' is part of the architectural scope",
+      "HR",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "Availability requires humans to triage alerts. Failover requires humans to validate the failover. Observability is useless without humans who can READ the dashboards. Treating these as 'someone else's problem' guarantees they fail in production. The architecture must include the operations model: who's on-call, what playbooks, what training. Skipping this is architecture incomplete."
+  },
+  {
+    "id": 755,
+    "topic": "NFR Mastery",
+    "q": "Why does Andrei Sech specifically distinguish 'NFR figures are a mix of good-practice figures AND TBDs requiring alignment'?",
+    "options": [
+      "Random",
+      "Mixing good-practice defaults with explicitly-TBD items makes the document HONEST about what's assumed vs what needs decision — avoiding silently-baked-in assumptions",
+      "Vendor habit",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "Marking defaults as 'industry good practice' and TBDs as 'needs alignment' communicates two different invitations: 'we did our research here' vs 'we need your input here'. Hides nothing; surfaces decisions explicitly. Compare with a sloppy doc that mixes defaults and assumptions in the same prose — the bank then can't tell what they need to push back on. Document honesty is itself an NFR-management discipline."
+  },
+  {
+    "id": 756,
+    "topic": "AA Mastery",
+    "q": "Andrei Sech compares AA to 'a car manufacturing factory: cars are designed from components like engine, wheels'. The deepest banking parallel this analogy makes is…",
+    "options": [
+      "Random",
+      "Reusable, standardised components beat bespoke design — same engine in many car models; same Interest component in many products. Banks gain scale exactly the way auto makers do",
+      "Marketing",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "The factory metaphor isn't aesthetic — it's structural. Auto factories don't redesign every car; they assemble from a shared parts library. Banks adopting AA similarly stop hand-crafting each product; they assemble from a Component library. The benefits transfer directly: faster time-to-market, lower defect rate, easier maintenance, predictable economics. The metaphor explains WHY AA exists, not just what it looks like."
+  },
+  {
+    "id": 757,
+    "topic": "AA Mastery",
+    "q": "Product conditions vs Arrangement conditions: a Product Manager updates a Product's interest rate. What happens to existing customer Arrangements?",
+    "options": [
+      "Their rate auto-changes",
+      "Depends on TRACKING mode — TRACKING contracts pick up the new rate; NON.TRACKING are frozen at original; CUSTOMER.TRACKING is hybrid",
+      "Nothing ever changes",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "The PRODUCT defines the master conditions; the ARRANGEMENT carries its own conditions (initially inherited). The link between them is governed by ARR.LINK. TRACKING = follow product updates (mass rate change applies). NON.TRACKING = locked at creation (the customer's rate is contractually fixed). CUSTOMER.TRACKING = some attributes locked (negotiated rate) while others track. This per-Arrangement control is what separates a flexible bank from a rigid one."
+  },
+  {
+    "id": 758,
+    "topic": "AA Mastery",
+    "q": "AA is described as having 'design stage, proof stage, ready-for-sale stage'. Why is 'proof' a SEPARATE step rather than being part of design?",
+    "options": [
+      "Random",
+      "Proof is a system-driven QUALITY GATE — it compiles, resolves inheritance, checks mandatory attributes. Separating it from design forces validation to happen before sale, regardless of design-time confidence",
+      "Marketing",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "If design and proof were one step, 'finishing design' could mean 'I think it's done' — depending on the designer's diligence. Separating proof forces the SYSTEM (not the designer) to verify completeness. The product manager cannot bypass proof; it's a structural gate. This catches errors a human designer might miss (missing accounting attribute, conflicting inheritance) — protecting customers from misconfigured products."
+  },
+  {
+    "id": 759,
+    "topic": "AA Mastery",
+    "q": "'Effective and expiry dates' on a product enable scheduled changes. A bank wants a fee schedule to drop from $25 to $20 starting next quarter. The cleanest approach is…",
+    "options": [
+      "Edit the product on the start date",
+      "Stage a NEW product version with EFFECTIVE.DATE = next quarter start; the system swaps automatically — no weekend ops needed",
+      "Send memos to all branches",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "Manually editing on the day = weekend ops + human error risk. Effective-dating decouples WHEN you stage the change from WHEN it activates. Architects can plan months ahead; bank ops can verify long before; on the effective date, the system simply uses the new version. Same pattern for any time-based change: rates, fees, T&Cs, regulatory adjustments. Built-in scheduling."
+  },
+  {
+    "id": 760,
+    "topic": "AA Mastery",
+    "q": "Business vs technical AA components: a 'Penalty Schedule' is which?",
+    "options": [
+      "Technical",
+      "Business — it encodes business behaviour (when penalties trigger, how much, on what events) that bankers reason about",
+      "Both equally",
+      "Neither"
+    ],
+    "correct": 1,
+    "tip": "Business components encode business semantics: Interest, Charges, Schedules, Limits — bankers can describe their behaviour without thinking about code. Technical components are framework concerns: Screen Forms, Extension Hooks, API Versioning — these support business components but encode no banking logic. Penalty Schedule is squarely business: bankers configure it; technicians don't need to understand it."
+  },
+  {
+    "id": 761,
+    "topic": "AA Mastery",
+    "q": "Multiple balance types (Current, Total Commitment, Accrual) exist 'dynamically'. Why dynamically rather than always present?",
+    "options": [
+      "Random",
+      "Only contracts that need them get them — a simple savings account doesn't need 'Total Commitment'; a complex revolving loan does. Dynamic = right-sized data per contract",
+      "Faster",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "If every Arrangement carried every possible balance type, simple products would waste storage and complicate queries with empty fields. Dynamic appearance means: the system MATERIALISES a balance type when the contract has a reason to track it (e.g. Total Commitment appears when there's an undrawn facility). Right-sized data structures; clearer semantics."
+  },
+  {
+    "id": 762,
+    "topic": "AA Mastery",
+    "q": "Andrei Sech says financial activities 'raise accounting entries based on ALLOCATION RULES defined at the PRODUCT level'. The architectural insight is…",
+    "options": [
+      "Random",
+      "Accounting rules belong to the PRODUCT (where they're configured once) — not to each Arrangement (where they'd be duplicated thousands of times). Centralisation enables consistency and easy updates",
+      "Marketing",
+      "Random"
+    ],
+    "correct": 1,
+    "tip": "If allocation rules lived on each Arrangement, updating them (say, a regulator changes how interest is posted) would mean editing thousands of records. Centralised at the Product level means: edit once, all Arrangements (with TRACKING) pick up the change. Consistency by default. Same principle as 'business rules on Product, not on UI/EOD' — single source of truth."
+  },
+  {
+    "id": 763,
+    "topic": "AA Mastery",
+    "q": "'Any change to an arrangement is executed via an Activity'. The strongest reason for this strict rule is…",
+    "options": [
+      "Code clarity",
+      "Direct edits would bypass: validation, accounting impact, audit trail, lifecycle rules. Forcing changes through Activities makes EVERY change rule-checked and observable",
+      "Random",
+      "Vendor preference"
+    ],
+    "correct": 1,
+    "tip": "Picture a developer 'just updating the interest rate field' directly. No allocation rule fires → accounting drifts. No audit entry → regulator can't trace. No lifecycle check → maybe the contract shouldn't allow changes in current state. Forcing changes through Activities means every change is intentional, validated, audited, and consistent. Removing the shortcut REMOVES the entire class of subtle bugs."
+  },
+  {
+    "id": 764,
+    "topic": "AA Mastery",
+    "q": "Activities support 'deterministic backdating and replay'. What problem does this specifically solve?",
+    "options": [
+      "Random",
+      "An operator discovers a missing transaction from 3 days ago — needs to insert it without breaking subsequent activities. Replay rewinds, inserts, replays — producing the state as if the activity had been there originally",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Naive backdating just changes a date and hopes for the best — but interest accruals between then and now would be wrong; subsequent activities depended on the wrong state. Replay rewinds all activities since the backdate, applies the new one, then re-runs the rewound ones — producing the exact state that WOULD have existed. Same answer as if no error had occurred. Critical for operational correctness without manual catch-up."
+  },
+  {
+    "id": 765,
+    "topic": "AA Mastery",
+    "q": "The Activity Orchestrator ensures 'identical behaviour across all channels'. Why is this hard to achieve without a central orchestrator?",
+    "options": [
+      "Random",
+      "Without a central path, each channel (mobile, branch, API) tends to implement its own version of the activity → behaviour drifts → identical operations produce different outcomes per channel",
+      "Random",
+      "Vendor mandate"
+    ],
+    "correct": 1,
+    "tip": "Pre-orchestrator world: mobile app posts a transfer one way; branch teller posts it another way; corporate API a third. Subtle differences emerge — different fees applied, different validations, different audit detail. Orchestrator centralises the activity logic; every channel just triggers the same Activity. Same outcome, regardless of entry point. Eliminates 'channel-dependent behaviour' bugs."
+  },
+  {
+    "id": 766,
+    "topic": "AA Mastery",
+    "q": "End-of-Day processing is described as a 'staged, dependency-driven orchestration layer'. The 'staged' part means…",
+    "options": [
+      "Random",
+      "EOD jobs run in DEPENDENCY ORDER — interest accruals before capitalisation before reports — so no job operates on stale data from a not-yet-run predecessor",
+      "Random",
+      "All parallel"
+    ],
+    "correct": 1,
+    "tip": "If EOD jobs ran in random order, reports would generate before accruals finished — producing wrong numbers. Staged = explicit dependency graph: 'capitalisation needs accruals'; 'reports need both'. Each stage waits for predecessors. The 5-Phase COB (A-S-R-D-O) is this principle made concrete. Lets the bank know reports are ALWAYS accurate at the time they're generated."
+  },
+  {
+    "id": 767,
+    "topic": "AA Mastery",
+    "q": "AA 'centralises business rules into property classes'. The complexity-management win is…",
+    "options": [
+      "Random",
+      "Bank logic isn't scattered across products — adding a new product reuses property classes; updating a property class improves every product that uses it. Linear scaling instead of quadratic",
+      "Random",
+      "Vendor mandate"
+    ],
+    "correct": 1,
+    "tip": "Without property classes, every product re-encodes the interest logic. 10 products = 10 copies of interest logic = 10 places to fix bugs. With property classes, interest is ONE thing; 10 products use it. Adding product #11 = configure components, not write logic. Adding a new behaviour to interest = one change, benefits 11 products. This is what makes the catalogue scale beyond a handful of products."
+  },
+  {
+    "id": 768,
+    "topic": "AA Mastery",
+    "q": "AA's 'activity history' is praised as easier to audit than traditional change logs. The deeper reason is…",
+    "options": [
+      "Random",
+      "Activity history is BUSINESS-SEMANTIC: 'CHANGE-INTEREST 5%→6% on 2026-03-15 by user X' — readable by auditors. Traditional change logs are FIELD-LEVEL: 'rate field changed' — readable by developers",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Field-level change logs make auditors hunt: 'this field changed — but what business action caused it?' Activity-level history says directly: this was a 'CHANGE-INTEREST' activity by this user on this date. Auditors and regulators speak business — and the audit trail meets them in their language. Less translation work; less ambiguity; faster audits."
+  },
+  {
+    "id": 769,
+    "topic": "AA Mastery",
+    "q": "AA-tracked contracts let 'a single product update cascade to all existing contracts'. What's the operational scale benefit?",
+    "options": [
+      "Random",
+      "When central bank changes base rate, the bank updates ONE product → thousands of contracts adjust automatically. Manual approach = thousands of contract edits, days of work, error risk",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Without cascade, a base-rate change requires touching every contract. For a retail bank with 200,000 mortgages, that's 200,000 edits. Cascade = update the product condition; tracker propagates. Done in minutes; zero human error. The bank can react to market/regulatory changes at the speed of the change itself, not at the speed of back-office bandwidth."
+  },
+  {
+    "id": 770,
+    "topic": "AA Mastery",
+    "q": "Trade-off: AA introduces 'performance and scalability constraints due to activity overhead'. Why accept this cost?",
+    "options": [
+      "Random",
+      "Activity overhead buys consistency, auditability, deterministic backdating, atomic transactions, governance — qualities that ad-hoc direct edits would sacrifice. The cost is small per-activity; the gains are systemic",
+      "Random",
+      "Vendor mandate"
+    ],
+    "correct": 1,
+    "tip": "Each Activity wrapper adds milliseconds of overhead. Multiplied across thousands per day, that adds up — but compared to running an inconsistent ledger, it's nothing. The trade-off is: small predictable performance cost vs. eliminating an entire CLASS of correctness bugs. Engineering teams have universally chosen the former. AA's overhead is the price of a reliable system."
+  },
+  {
+    "id": 771,
+    "topic": "AA Mastery",
+    "q": "Trade-off: AA has 'integration complexity requiring bulk processing'. Why does AA require bulk-mode integration?",
+    "options": [
+      "Random",
+      "External systems often deliver many transactions at once (a file from clearing); AA's per-activity overhead becomes prohibitive at high volume unless bulk processing batches activities efficiently",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "AA optimises for correctness per activity. When 50,000 incoming SEPA payments arrive, processing them one-activity-at-a-time saturates the orchestrator. Bulk processing batches similar activities, sharing setup/teardown. The architecture must explicitly support bulk — without it, high-volume integrations stall. This is the operational reality of accepting AA: you get the wins but must engineer bulk paths."
+  },
+  {
+    "id": 772,
+    "topic": "AA Mastery",
+    "q": "Trade-off: 'data spread across multiple records' increases operational complexity. The concrete pain?",
+    "options": [
+      "Random",
+      "An Arrangement's full state is in ARRANGEMENT + balance records + activity history + condition records — a single bug investigation may need to join across all these. Simpler 'one row per loan' was easier to spelunk",
+      "Random",
+      "Vendor mandate"
+    ],
+    "correct": 1,
+    "tip": "Legacy 'one big loan row' was a debugging shortcut: open one record, see everything. AA spreads across Arrangement, Conditions, Activities, Balances — for very good reasons (each has its own lifecycle, audit, update semantics). But for the engineer chasing 'why is this loan in this state?', it means joining multiple records. The system needs good tooling (Composite Screens, Activity History views) to compensate."
+  },
+  {
+    "id": 773,
+    "topic": "AA Mastery",
+    "q": "Negotiation rules let a relationship manager grant a slight rate discount within pre-approved limits. Why bake this into AA rather than 'just letting them edit the rate'?",
+    "options": [
+      "Random",
+      "Limits enforce risk policy SYSTEMICALLY (e.g. max 0.5% below standard) — preventing rogue negotiation that exposes the bank. The customer gets flexibility; the bank retains control",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Free-form rate editing = relationship manager could give a 5% discount to a friend → bank loses money. Negotiation rules: 'this rate is negotiable, MIN/MAX defined' → relationship manager can offer up to the floor, not below. Customer happy; bank's risk policy enforced automatically. The structural control replaces approval workflows."
+  },
+  {
+    "id": 774,
+    "topic": "AA Mastery",
+    "q": "The reverse-and-replay capability handles backdating 'automatically'. What manual process does this replace?",
+    "options": [
+      "Random",
+      "Operator computing the delta between 'what happened' and 'what should have happened', then manually posting corrective entries to bridge — error-prone and slow",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Pre-replay: backdating meant calculating each affected accrual/event by hand, posting reversals, posting the new transaction, recomputing balances — hours of work per case, frequent errors. Replay does this mechanically: it knows every activity since the backdate, can mathematically rewind/redo each. Operator effort drops to seconds; correctness becomes mechanical."
+  },
+  {
+    "id": 775,
+    "topic": "AA Mastery",
+    "q": "Oleksandr Stashenko noted that 'arrangements and activities have not been found built so far — may need to be built from scratch'. The strategic implication is…",
+    "options": [
+      "Random",
+      "AA's value is in the FULL chain (Product → Arrangement → Activity → posting). Having Products but no Arrangements/Activities = the architecture isn't realised; significant build work remains",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Products without Arrangements = templates with no instances. Arrangements without Activities = state without controlled changes. The architectural value only materialises when the full chain is built and connected. Recognising this gap shapes Phase Zero priorities: build the missing chain links before scaling outward to specific products."
+  },
+  {
+    "id": 776,
+    "topic": "AA Mastery",
+    "q": "Why is the 'reusable building blocks' framing more valuable for a bank's COMPETITIVE POSITION than 'fast product launches' alone?",
+    "options": [
+      "Random",
+      "Reusable blocks mean every NEW product improves the COMMON layer; over time the bank's capability platform compounds — unlike each product being its own silo where improvements don't transfer",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Fast launches help once. Reusable blocks compound: building product #5 makes building product #6 cheaper, because the components are now battle-tested and richer. Competitors who chose siloed products see linear development cost; banks with AA see decreasing marginal cost per product. Over years, that gap is enormous. The architectural choice is a compounding strategic asset."
+  },
+  {
+    "id": 777,
+    "topic": "AA Mastery",
+    "q": "AA component activity-based processing solves 'distributed posting responsibilities risking inconsistent financial behavior'. The mechanism?",
+    "options": [
+      "Random",
+      "All financial state changes route through Activities → single posting pipeline → posting can't disagree with itself because there's only one source",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Pre-AA: posting logic scattered across modules (FT module posts its way; teller module posts its way; loan module posts a third way). Discrepancies emerge as the codebase diverges. AA: all posting flows through the activity → allocation rule → entry pipeline. One canonical path. If it has a bug, everything has it (which is detectable); if it works, everything works."
+  },
+  {
+    "id": 778,
+    "topic": "AA Mastery",
+    "q": "How does AA's strict 'arrangement architecture-based for contract modules' help future regulatory adaptation?",
+    "options": [
+      "Random",
+      "Regulators evolving rules (capital treatment, accounting, disclosure) typically target product CATEGORIES; AA's product hierarchy lets banks apply regulatory updates at the right level uniformly",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "A regulator says 'all mortgages over 20 years now require X disclosure'. Without product hierarchy, you'd hunt for affected products. AA: update the relevant Product Class or Product Type once; all child products inherit. Regulatory change ↔ architecture's inheritance points line up — making adaptations predictable, not exploratory."
+  },
+  {
+    "id": 779,
+    "topic": "AA Mastery",
+    "q": "The activity orchestrator unifies 'validation, execution, posting, auditing'. The deepest correctness benefit is…",
+    "options": [
+      "Random",
+      "These four steps are guaranteed to run TOGETHER in the same atomic transaction — partial failure rolls all back; partial success is impossible",
+      "Random",
+      "Vendor mandate"
+    ],
+    "correct": 1,
+    "tip": "Imagine: validation passes, execution succeeds, posting succeeds, auditing fails. Without orchestration, you have a posted entry with no audit trail — terrible for compliance. With orchestrated atomicity, all four either succeed together or none do. The system is never in a half-done state. This atomicity is what makes the audit trail TRUSTWORTHY: if an entry exists, its audit record exists too."
+  },
+  {
+    "id": 780,
+    "topic": "AA Mastery",
+    "q": "AA's effective-dated versioning is described as letting business analysts 'schedule future-dated changes'. The control-flow advantage over manual scheduling is…",
+    "options": [
+      "Random",
+      "The change is staged TODAY (reviewable, approvable, testable) but activates on its effective date. The bank gates the change before activation, not at activation time — eliminating last-minute panic",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Manual: 'change the rate on April 1' = an action happening on April 1, when something might go wrong, no one's there to fix it. Effective-dated: 'change is reviewed and committed in March; activates April 1'. By April 1, the change has been approved, validated, signed off — activation is just a system tick. Same effect; far lower operational risk."
+  },
+  {
+    "id": 781,
+    "topic": "Target Arch",
+    "q": "Why was Strapi (a headless CMS) chosen for managing CBS web-app configuration, when CBS has its own DDD?",
+    "options": [
+      "Random",
+      "DDD governs CORE data structures (Tables, Fields, validation); Strapi governs FRONT-END concerns (visualisation, dynamic UI elements, copy/messaging) — these are orthogonal concerns",
+      "Random",
+      "It's free"
+    ],
+    "correct": 1,
+    "tip": "DDD shapes the data layer — what fields exist, what validation applies, how the database is structured. Strapi shapes the presentation layer — what users SEE, how content is arranged, what marketing copy displays. Both are 'dynamic configuration' but at different layers. Trying to bend DDD to handle presentation would muddy its purpose; using a CMS for that role keeps each tool in its lane."
+  },
+  {
+    "id": 782,
+    "topic": "Target Arch",
+    "q": "Keycloak is reused (rather than building a custom IAM). The clearest reason is…",
+    "options": [
+      "Random",
+      "IAM (OAuth, OIDC, SAML, SCIM, MFA, federation) is a deep specialty with constant security updates — reusing a mature engine eliminates a huge surface area the team would otherwise need to maintain",
+      "Random",
+      "Cost"
+    ],
+    "correct": 1,
+    "tip": "Building IAM looks straightforward — until you handle token rotation, MFA, social logins, federated identities, SAML edge cases, attacks (token replay, CSRF). It's a forever-evolving security battleground. Reusing Keycloak means: get a battle-tested engine, benefit from upstream patches, focus team effort on banking logic. The architecturally healthy choice is 'don't roll your own auth'."
+  },
+  {
+    "id": 783,
+    "topic": "Target Arch",
+    "q": "PostgreSQL is the transactional DB. The architecture leaves OLAP database 'under discussion'. The decision should depend on…",
+    "options": [
+      "Random",
+      "Reporting load profile — if reporting is light AND can tolerate eventual consistency, PostgreSQL replicas suffice; if heavy analytical queries need column-store performance, an OLAP store is justified",
+      "Random",
+      "Cost"
+    ],
+    "correct": 1,
+    "tip": "Over-engineering risk: adding an OLAP store doubles operational complexity (replication, schema sync, query routing). Under-engineering risk: heavy analytics on PostgreSQL slows the OLTP path. The 'right' answer depends on MEASURED load, not assumption. Postpone the decision until real workload data exists — the architecture's open question is intentionally so."
+  },
+  {
+    "id": 784,
+    "topic": "Target Arch",
+    "q": "Why was Kafka chosen as the primary event platform, with RabbitMQ 'depending on future requirements'?",
+    "options": [
+      "Random",
+      "Kafka excels at high-throughput persistent event logs (audit, webhook fan-out); RabbitMQ is better for request-reply patterns. Most CBS needs match Kafka; reserve RabbitMQ for use cases that justify the operational addition",
+      "Random",
+      "Vendor"
+    ],
+    "correct": 1,
+    "tip": "Kafka and RabbitMQ are NOT interchangeable — Kafka is a distributed log (events replay, persistent); RabbitMQ is a smart router (queues, routing, RPC). CBS's primary needs (event sourcing, audit replays, webhook fan-out) match Kafka. Adding RabbitMQ adds operational burden — only justified if a specific use case clearly needs queue semantics. Default to one; add the other only on demand."
+  },
+  {
+    "id": 785,
+    "topic": "Target Arch",
+    "q": "ElasticSearch is chosen 'to maintain a simple team skill set' (existing Payment Hub use). The MOST important non-obvious lesson is…",
+    "options": [
+      "Random",
+      "Operational excellence requires deep skill — using a tool the team already operates well is better than picking the theoretically best tool the team would learn from scratch",
+      "Random",
+      "Cost"
+    ],
+    "correct": 1,
+    "tip": "Comparing Splunk, Datadog, ElasticSearch — the 'best' depends on heaps of dimensions. But if the team already runs ElasticSearch successfully in Payment Hub, they ALREADY have: monitoring, backup, alerting, on-call experience. Picking the same tech for CBS = leveraging that operational maturity. Architecture choices include team-context, not just tool-feature comparisons."
+  },
+  {
+    "id": 786,
+    "topic": "Target Arch",
+    "q": "The architecture uses C4 notation. Why C4 over UML for explaining the system to stakeholders?",
+    "options": [
+      "Random",
+      "C4 has a defined ZOOM HIERARCHY (Context → Container → Component → Code) that lets the same diagram set communicate at different abstraction levels for different audiences",
+      "Random",
+      "Trendy"
+    ],
+    "correct": 1,
+    "tip": "UML overwhelms with notation. C4 limits to four levels of abstraction, each appropriate for a different conversation: Context for execs, Container for architects, Component for developers, Code for individual contributors. Same architecture, different views per audience. Predictable; teachable; clean. Avoids the common architecture-diagram disease of 'too much detail for some, too little for others'."
+  },
+  {
+    "id": 787,
+    "topic": "Target Arch",
+    "q": "The Application Registry 'allows banks to implement custom applications within the CBS framework'. What's the strategic value vs. forcing vendor-only applications?",
+    "options": [
+      "Random",
+      "Banks always have unique workflows (regional, regulatory, business-specific) that a generic CBS can't anticipate — letting them inject custom applications lets the bank own its differentiation while CBS provides the platform",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "If only vendor apps were allowed, every bank would have to wait for vendor releases for any unique need — slow, expensive, sometimes impossible. Custom apps via the Registry = bank engineering can build their differentiated capability on top of the platform. CBS becomes a PLATFORM, not a closed product. Banks adopt because they retain control over their unique edge."
+  },
+  {
+    "id": 788,
+    "topic": "Target Arch",
+    "q": "The 'Application Orchestrator within the registry' handles API composition, bulk processing, dynamic query engine. Why combine these three?",
+    "options": [
+      "Random",
+      "All three are CROSS-CUTTING concerns over the registered applications — handling them centrally avoids each app reinventing them; provides consistent behaviour across the platform",
+      "Random",
+      "Coincidence"
+    ],
+    "correct": 1,
+    "tip": "Each application could implement its own bulk processing, its own query engine, its own API composition. The result: 20 implementations, all subtly different. Centralising in the Orchestrator: one battle-tested implementation, consistent behaviour, easier optimisation. Applications focus on their unique value; the platform handles the universal concerns."
+  },
+  {
+    "id": 789,
+    "topic": "Target Arch",
+    "q": "The External Event Publisher exposes events via webhooks to external consumers. From an integration architecture perspective, what does this enable that a polling-based API doesn't?",
+    "options": [
+      "Random",
+      "Push-based reactivity — partners react to events in near real-time without polling. Reduces partner integration latency and reduces CBS's API load (no constant polling traffic)",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Polling-based: external systems hit the CBS every N seconds, asking 'anything new?' — wastes both sides' resources, introduces latency. Webhook-based: CBS pushes events as they happen. Partner systems react immediately; CBS doesn't field hundreds of polls per second. Architecture supports both patterns, but webhooks scale better for high-event-frequency banking integrations."
+  },
+  {
+    "id": 790,
+    "topic": "Target Arch",
+    "q": "Financial Crime Management (FCM) acts as a 'gateway' for external providers — screening, sanction checks, AML, KYC. Why gateway pattern rather than direct provider calls per service?",
+    "options": [
+      "Random",
+      "Centralising in a gateway: (a) easier to swap providers, (b) consistent retry/timeout policy, (c) single point for compliance auditing, (d) hides provider variability from the rest of the system",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Without a gateway: every service calling FCM has its own retry logic, its own provider config. Provider migration = touching many services. Audits = hunting across services. Gateway pattern: callers see ONE API; behind the gateway, providers can be swapped, retried, A/B tested. Encapsulates provider details cleanly; FCM team owns the gateway, callers don't care."
+  },
+  {
+    "id": 791,
+    "topic": "Target Arch",
+    "q": "24/7 operations are 'supported by switching clocks'. What's the conceptual mechanism?",
+    "options": [
+      "Random",
+      "Business date is decoupled from server clock — when COB runs, it advances the business date; transactions during COB are accepted but value-dated to the NEXT business day, so the bank stays operational while books close",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Naive approach: shut the bank during COB. Clock-switching approach: COB processes 'yesterday' (the day being closed) while the system simultaneously accepts 'today' transactions value-dated forward. Clock switching = the system effectively serves both days at once during the transition window. Customers see no downtime; books close cleanly. Engineering trick that hugely improves customer experience."
+  },
+  {
+    "id": 792,
+    "topic": "Target Arch",
+    "q": "Object storage uses SeaweedFS (S3-compatible). What architectural property does S3-compatibility give the system?",
+    "options": [
+      "Random",
+      "S3 is an industry-standard interface — the bank can later swap SeaweedFS for AWS S3, MinIO, or another provider WITHOUT changing application code that uses the storage interface",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Picking a proprietary blob storage means: switching providers = rewriting every storage call. S3-compatible = a standard interface; SeaweedFS today, MinIO tomorrow, AWS S3 the day after = same code. This is interface-based portability. Especially valuable for banks where data sovereignty or vendor-mix may force changes over time."
+  },
+  {
+    "id": 793,
+    "topic": "Target Arch",
+    "q": "The architecture distinguishes 'CBS-managed infrastructure' from 'bank-managed infrastructure' (DNS, firewalls, VPNs, etc.). The boundary line communicates…",
+    "options": [
+      "Random",
+      "Where CBS team's responsibility ends and the bank's begins — important for SLA, incident response, and security audit conversations. Ambiguity here causes blame games and incident delays",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Pre-defined boundary: incidents have clear ownership ('that's the bank's DNS layer' vs 'that's CBS routing'). Ambiguous boundary: incidents devolve into who's responsible. SLAs depend on this clarity. Documenting the boundary IS architecture work — it shapes operations as much as the code."
+  },
+  {
+    "id": 794,
+    "topic": "Target Arch",
+    "q": "Why does the architecture integrate via Keycloak with the bank's 'internal identity provider, typically Active Directory'?",
+    "options": [
+      "Random",
+      "Bank employees already have AD accounts — federating via Keycloak means CBS doesn't maintain a duplicate user store, and employee provisioning/deprovisioning continues to flow through bank HR processes",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Duplicate user stores mean: when an employee leaves, the bank disables AD but forgets CBS = security gap. Federation means: AD is source of truth; deactivation in AD instantly propagates to CBS. Employee lifecycle stays in bank HR/IT control; CBS is downstream. Keycloak handles the protocol translation. Standard, secure, low-friction."
+  },
+  {
+    "id": 795,
+    "topic": "Target Arch",
+    "q": "Financial reporting is described as 'primarily through asynchronous events to ensure scalability and avoid system blocking'. Why async rather than sync queries?",
+    "options": [
+      "Random",
+      "Heavy reports could lock or slow the OLTP path; async means reports consume events at their own pace into their own store — keeping the transactional core fast",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Sync reports against OLTP DB = report query slows the transactional system. Heavy reports could lock tables, exhaust connections, starve customer-facing transactions. Async pattern: events flow from OLTP to a reporting store; reports query the reporting store — never touching OLTP. Decoupling protects the customer-facing path's responsiveness."
+  },
+  {
+    "id": 796,
+    "topic": "Target Arch",
+    "q": "The COB engine 'handles rollbacks and mechanisms' for 24/7 ops. The non-trivial part of COB rollback in 24/7 context is…",
+    "options": [
+      "Random",
+      "Once COB has advanced the business date and accepted 'next day' transactions, rolling back COB risks invalidating those future-dated transactions — needs careful staging to preserve them",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Naive rollback: undo everything, restart COB. But during 24/7 ops, some 'next day' transactions have already been accepted. Rolling COB back without preserving them = data loss. The engine must rollback its own work while protecting forward-committed transactions. This is a non-trivial concurrency problem the architecture explicitly accounts for."
+  },
+  {
+    "id": 797,
+    "topic": "Target Arch",
+    "q": "Why was bare-metal VM development environment chosen, rather than cheaper cloud VMs?",
+    "options": [
+      "Random",
+      "Development infrastructure must MIRROR production closely — production is bare metal, so dev should be too. Cloud VMs would mask production-specific issues (latency profiles, hardware behaviour, networking)",
+      "Random",
+      "Cost"
+    ],
+    "correct": 1,
+    "tip": "Cloud-dev/bare-metal-prod divergence = bugs found in production that worked perfectly in dev. The point of dev environment is to catch issues BEFORE production. Mirroring production minimises 'works in dev, fails in prod' surprises. Bare-metal dev costs more but de-risks production. Engineering economics often favour 'expensive dev that catches bugs early'."
+  },
+  {
+    "id": 798,
+    "topic": "Target Arch",
+    "q": "Configurability is listed as the fifth ASR alongside Security/Availability/Scalability/Observability. What does treating it as architecture-significant prevent?",
+    "options": [
+      "Random",
+      "Hard-coded customer-specific or region-specific values that, when changed, force a release. Architectural configurability means changes are config-only — no code release for routine adaptation",
+      "Random",
+      "Marketing"
+    ],
+    "correct": 1,
+    "tip": "Without configurability as ASR: a country-specific holiday rule gets coded; a region-specific report format gets coded; etc. Every adaptation = release. Banks slow down. With configurability as ASR: changes are configuration loads, instantly testable, instantly reversible. The architecture buys ITSELF the right to evolve without releases."
+  },
+  {
+    "id": 799,
+    "topic": "Target Arch",
+    "q": "Andrei Sialila reminded that 'every requirement adds complexity'. From an architecture review standpoint, this should drive what behaviour?",
+    "options": [
+      "Random",
+      "RUTHLESS prioritisation — for each requirement, explicitly ask: what does NOT delivering this cost? Often the answer is 'less than building it', and the requirement should be cut",
+      "Random",
+      "Build everything"
+    ],
+    "correct": 1,
+    "tip": "Stakeholders are biased to add features; nobody's bonus depends on cutting them. Architecture reviews are where 'no' is structurally easier — the review weighs cost. Without that discipline, the system bloats with features no one uses but everyone maintains. Saying no early is cheaper than removing late; ruthless prioritisation is itself an architecture practice."
+  },
+  {
+    "id": 800,
+    "topic": "Target Arch",
+    "q": "An external consumer wants to read account balances. Should this go through (a) a direct DB read, (b) an API gateway, (c) a webhook subscription, or (d) the External Event Publisher?",
+    "options": [
+      "Direct DB read",
+      "API gateway — synchronous reads of CURRENT state are pull-based and should use the gateway's auth/rate-limiting/observability",
+      "Webhook for every balance change",
+      "DB triggers"
+    ],
+    "correct": 1,
+    "tip": "Reading current state = synchronous pull = API gateway. Notifications about CHANGE = async push = External Event Publisher. Different consumer patterns demand different mechanisms. The architecture explicitly separates them so external consumers pick the right shape: 'show me current balance' (gateway), 'tell me when it changes' (events). Forcing the wrong pattern (webhook for current reads, gateway for change notifications) gives bad UX and load characteristics."
   }
 ]
